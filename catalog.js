@@ -346,6 +346,3 @@ const procedures = [
     keywords: ["trivora", "oc", "pill"]
   }
 ];
-
-export default procedures;
-// End of catolog.js
