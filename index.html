@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>FHES — Home</title>
+  <link rel="stylesheet" href="style.css"><!-- optional, safe to keep -->
+  <style>
+    :root{
+      --blue:#acdbf9;
+      --pink:#f8c9f9;
+      --ink:#000;
+      --text:#333;
+    }
+
+    /* Layout */
+    html,body{height:100%}
+    body{
+      margin:0;
+      background:var(--blue);
+      color:var(--text);
+      font-family: Arial, sans-serif;
+
+      /* two columns: big title + buttons column */
+      display:grid;
+      grid-template-columns: auto 450px;
+      align-items:center;               /* vertical centering of both columns */
+      min-height:100vh;
+      gap:4vw;
+      padding:6vh 6vw;
+    }
+
+    /* Left: stacked title */
+    .title-left{
+      line-height:1.05;
+      letter-spacing: 0.5px;
+      color:var(--pink);
+      font-weight: 800;
+      /* responsive size similar to your screenshot */
+      font-size: clamp(48px, 9vw, 120px);
+
+      /* thick black outline using multi-shadow */
+      text-shadow:
+        3px 0   var(--ink),
+       -3px 0   var(--ink),
+        0   3px var(--ink),
+        0  -3px var(--ink),
+        2px 2px var(--ink),
+       -2px 2px var(--ink),
+        2px -2px var(--ink),
+       -2px -2px var(--ink);
+    }
+
+    /* Right: vertical button stack */
+    .nav-right{
+      display:flex;
+      flex-direction:column;
+      gap:22px;
+      justify-self:center;                 /* hug the right side */
+      width: 100%;
+      max-width: 440px;
+      padding: 0 4vw;  
+    }
+
+    .nav-button{
+      display:block;
+      width:100%;
+      padding:18px 32px;
+      background:var(--pink);
+      color:var(--text);
+      text-decoration:none;
+      font-weight:800;
+      font-size:1.25rem;
+      text-align:center;
+      border:2.5px solid var(--ink);
+      border-radius:999px;              /* pill */
+      box-shadow: 0 2px 0 var(--ink);
+      transition: transform .05s ease, background .15s ease;
+    }
+    .nav-button:hover{ background:#e8b3e8; }
+    .nav-button:active{ transform: translateY(1px); }
+
+    /* Smaller screens: stack vertically */
+    @media (max-width:900px){
+      body{
+        grid-template-columns: 1fr;
+        align-items:start;
+        padding: 32px 20px 48px;
+      }
+      .title-left{ font-size: clamp(42px, 12vw, 80px); }
+      .nav-right{ justify-self:stretch; max-width: 100%; }
+    }
+  </style>
+</head>
+<body>
+  <div class="title-left">
+    Family<br>
+    Health<br>
+    Education<br>
+    Services
+  </div>
+
+  <nav class="nav-right" aria-label="Main">
+    <a class="nav-button" href="feescale.html">Fee Scale</a>
+    <a class="nav-button" href="pricelist.html">Price List</a>
+    <a class="nav-button" href="cpt-locator.html">CPT Locator</a>
+  </nav>
+</body>
+</html>
