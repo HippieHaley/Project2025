@@ -6,7 +6,7 @@ const procedures = [
   // VISIT CODES
   // ======================
   {
-    service: "99202\nNew Pt Limited",
+    name: "99202\nNew Pt Limited",
     cpt: "99202",
     hcpcs: "",
     icd10: "",
@@ -14,7 +14,7 @@ const procedures = [
     keywords: ["limited-new", "new pt", "99202"]
   },
   {
-    service: "99203\nNew Pt Intermediate",
+    name: "99203\nNew Pt Intermediate",
     cpt: "99203",
     hcpcs: "",
     icd10: "",
@@ -22,7 +22,7 @@ const procedures = [
     keywords: ["intermediate-new", "new pt", "99203"]
   },
   {
-    service: "99204\nNew Pt Comprehensive",
+    name: "99204\nNew Pt Comprehensive",
     cpt: "99204",
     hcpcs: "",
     icd10: "",
@@ -30,7 +30,7 @@ const procedures = [
     keywords: ["comprehensive-new", "new pt", "99204"]
   },
   {
-    service: "99211\nEst Pt Minimal (RN)",
+    name: "99211\nEst Pt Minimal (RN)",
     cpt: "99211",
     hcpcs: "",
     icd10: "",
@@ -38,7 +38,7 @@ const procedures = [
     keywords: ["minimal-established", "est pt", "99211"]
   },
   {
-    service: "99212\nEst Pt Limited",
+    name: "99212\nEst Pt Limited",
     cpt: "99212",
     hcpcs: "",
     icd10: "",
@@ -46,7 +46,7 @@ const procedures = [
     keywords: ["limited-established", "est pt", "99212"]
   },
   {
-    service: "99213\nEst Pt Intermediate",
+    name: "99213\nEst Pt Intermediate",
     cpt: "99213",
     hcpcs: "",
     icd10: "",
@@ -54,7 +54,7 @@ const procedures = [
     keywords: ["intermediate-established", "est pt", "99213"]
   },
   {
-    service: "99214\nEst Pt Comprehensive",
+    name: "99214\nEst Pt Comprehensive",
     cpt: "99214",
     hcpcs: "",
     icd10: "",
@@ -62,7 +62,7 @@ const procedures = [
     keywords: ["comprehensive-established", "est pt", "99214"]
   },
   {
-    service: "99384\nPreventive New 12–17",
+    name: "99384\nPreventive New 12–17",
     cpt: "99384",
     hcpcs: "",
     icd10: "",
@@ -70,7 +70,7 @@ const procedures = [
     keywords: ["preventive new", "99384", "12–17"]
   },
   {
-    service: "99385\nPreventive New 18–39",
+    name: "99385\nPreventive New 18–39",
     cpt: "99385",
     hcpcs: "",
     icd10: "",
@@ -78,7 +78,7 @@ const procedures = [
     keywords: ["preventive new", "99385", "18–39"]
   },
   {
-    service: "99386\nPreventive New 40–64",
+    name: "99386\nPreventive New 40–64",
     cpt: "99386",
     hcpcs: "",
     icd10: "",
@@ -86,7 +86,7 @@ const procedures = [
     keywords: ["preventive new", "99386", "40–64"]
   },
   {
-    service: "99394\nPreventive Est 12–17",
+    name: "99394\nPreventive Est 12–17",
     cpt: "99394",
     hcpcs: "",
     icd10: "",
@@ -94,7 +94,7 @@ const procedures = [
     keywords: ["preventive established", "99394", "12–17"]
   },
   {
-    service: "99395\nPreventive Est 18–39",
+    name: "99395\nPreventive Est 18–39",
     cpt: "99395",
     hcpcs: "",
     icd10: "",
@@ -102,7 +102,7 @@ const procedures = [
     keywords: ["preventive established", "99395", "18–39"]
   },
   {
-    service: "99396\nPreventive Est 40–64",
+    name: "99396\nPreventive Est 40–64",
     cpt: "99396",
     hcpcs: "",
     icd10: "",
@@ -114,7 +114,7 @@ const procedures = [
   // PROCEDURES
   // ======================
   {
-    service: "Implant Insertion",
+    name: "Implant Insertion",
     cpt: "11981",
     hcpcs: "J7307",
     icd10: "Z30.017",
@@ -122,7 +122,7 @@ const procedures = [
     keywords: ["implant insert", "nexplanon", "insertion"]
   },
   {
-    service: "Implant Removal",
+    name: "Implant Removal",
     cpt: "11982",
     hcpcs: "",
     icd10: "Z30.46",
@@ -130,7 +130,7 @@ const procedures = [
     keywords: ["implant removal", "nexplanon", "removal"]
   },
   {
-    service: "Implant Removal + Reinsertion",
+    name: "Implant Removal + Reinsertion",
     cpt: "11983",
     hcpcs: "",
     icd10: "Z30.017",
@@ -138,7 +138,7 @@ const procedures = [
     keywords: ["implant reinsertion", "nexplanon", "remove + insert"]
   },
   {
-    service: "IUD Insertion",
+    name: "IUD Insertion",
     cpt: "58300",
     hcpcs: "J7297, J7296, J7300",
     icd10: "Z30.430",
@@ -146,7 +146,7 @@ const procedures = [
     keywords: ["iud insert", "liletta", "paragard", "mirena"]
   },
   {
-    service: "IUD Removal",
+    name: "IUD Removal",
     cpt: "58301",
     hcpcs: "",
     icd10: "Z30.432",
@@ -158,7 +158,7 @@ const procedures = [
   // COMMON MEDS
   // ======================
   {
-    service: "Doxycycline",
+    name: "Doxycycline",
     cpt: "",
     hcpcs: "",
     icd10: "A56.01",
@@ -166,7 +166,7 @@ const procedures = [
     keywords: ["doxycycline", "sti treatment", "antibiotic"]
   },
   {
-    service: "Rocephin (Ceftriaxone inj)",
+    name: "Rocephin (Ceftriaxone inj)",
     cpt: "",
     hcpcs: "J0696",
     icd10: "A54.01",
@@ -174,7 +174,7 @@ const procedures = [
     keywords: ["rocephin", "ceftriaxone", "sti treatment"]
   },
   {
-    service: "Bicillin L-A",
+    name: "Bicillin L-A",
     cpt: "",
     hcpcs: "J0561",
     icd10: "A51.0",
@@ -186,7 +186,7 @@ const procedures = [
   // LABS
   // ======================
   {
-    service: "Chlamydia (CHL)",
+    name: "Chlamydia (CHL)",
     cpt: "87491",
     hcpcs: "",
     icd10: "Z11.8",
@@ -194,7 +194,7 @@ const procedures = [
     keywords: ["chlamydia", "chl"]
   },
   {
-    service: "Gonorrhea (GC)",
+    name: "Gonorrhea (GC)",
     cpt: "87591",
     hcpcs: "",
     icd10: "Z11.3",
@@ -202,7 +202,7 @@ const procedures = [
     keywords: ["gonorrhea", "gc"]
   },
   {
-    service: "HPV",
+    name: "HPV",
     cpt: "87624",
     hcpcs: "",
     icd10: "Z11.51",
@@ -210,7 +210,7 @@ const procedures = [
     keywords: ["hpv"]
   },
   {
-    service: "Liquid Based PAP",
+    name: "Liquid Based PAP",
     cpt: "88175",
     hcpcs: "",
     icd10: "Z12.4",
@@ -218,7 +218,7 @@ const procedures = [
     keywords: ["pap", "liquid pap"]
   },
   {
-    service: "Conventional PAP",
+    name: "Conventional PAP",
     cpt: "88164",
     hcpcs: "",
     icd10: "Z12.4",
@@ -230,7 +230,7 @@ const procedures = [
   // SUPPLIES + CONTRACEPTIVES
   // ======================
   {
-    service: "Depo (Medroxyprogesterone)",
+    name: "Depo (Medroxyprogesterone)",
     cpt: "",
     hcpcs: "J1050",
     icd10: "Z30.42",
@@ -238,7 +238,7 @@ const procedures = [
     keywords: ["depo", "medroxyprogesterone", "j1050"]
   },
   {
-    service: "Nexplanon",
+    name: "Nexplanon",
     cpt: "",
     hcpcs: "J7307",
     icd10: "Z30.017",
@@ -246,7 +246,7 @@ const procedures = [
     keywords: ["nexplanon", "implant", "j7307"]
   },
   {
-    service: "NuvaRing",
+    name: "NuvaRing",
     cpt: "",
     hcpcs: "J7303",
     icd10: "Z30.011",
@@ -254,7 +254,7 @@ const procedures = [
     keywords: ["nuvaring", "ring", "birth control"]
   },
   {
-    service: "Xulane Patch",
+    name: "Xulane Patch",
     cpt: "",
     hcpcs: "J7304",
     icd10: "Z30.011",
@@ -266,7 +266,7 @@ const procedures = [
   // ORAL CONTRACEPTIVES (OC) – dropdown
   // ======================
   {
-    service: "Alese",
+    name: "Alese",
     cpt: "",
     hcpcs: "S4993",
     icd10: "Z30.011",
@@ -274,7 +274,7 @@ const procedures = [
     keywords: ["alese", "oc", "pill", "s4993"]
   },
   {
-    service: "Apri",
+    name: "Apri",
     cpt: "",
     hcpcs: "S4993",
     icd10: "Z30.011",
@@ -282,7 +282,7 @@ const procedures = [
     keywords: ["apri", "oc", "pill", "s4993"]
   },
   {
-    service: "Aviane",
+    name: "Aviane",
     cpt: "",
     hcpcs: "S4993",
     icd10: "Z30.011",
@@ -290,7 +290,7 @@ const procedures = [
     keywords: ["aviane", "oc", "pill", "s4993"]
   },
   {
-    service: "Camila",
+    name: "Camila",
     cpt: "",
     hcpcs: "S4993",
     icd10: "Z30.011",
@@ -298,7 +298,7 @@ const procedures = [
     keywords: ["camila", "oc", "pop", "progestin"]
   },
   {
-    service: "Cryselle",
+    name: "Cryselle",
     cpt: "",
     hcpcs: "S4993",
     icd10: "Z30.011",
@@ -306,7 +306,7 @@ const procedures = [
     keywords: ["cryselle", "oc", "pill"]
   },
   {
-    service: "Levora",
+    name: "Levora",
     cpt: "",
     hcpcs: "S4993",
     icd10: "Z30.011",
@@ -314,7 +314,7 @@ const procedures = [
     keywords: ["levora", "oc", "pill"]
   },
   {
-    service: "Lutera",
+    name: "Lutera",
     cpt: "",
     hcpcs: "S4993",
     icd10: "Z30.011",
@@ -322,7 +322,7 @@ const procedures = [
     keywords: ["lutera", "oc", "pill"]
   },
   {
-    service: "Sprintec",
+    name: "Sprintec",
     cpt: "",
     hcpcs: "S4993",
     icd10: "Z30.011",
@@ -330,7 +330,7 @@ const procedures = [
     keywords: ["sprintec", "oc", "pill"]
   },
   {
-    service: "Tri-Lo Marzia",
+    name: "Tri-Lo Marzia",
     cpt: "",
     hcpcs: "S4993",
     icd10: "Z30.011",
@@ -338,7 +338,7 @@ const procedures = [
     keywords: ["tri-lo marzia", "oc", "pill"]
   },
   {
-    service: "Trivora",
+    name: "Trivora",
     cpt: "",
     hcpcs: "S4993",
     icd10: "Z30.011",
