@@ -22,7 +22,7 @@
 
       /* two columns: big title + buttons column */
       display:grid;
-      grid-template-columns: auto 450px;
+      grid-template-columns: 2fr auto;
       align-items:center;               /* vertical centering of both columns */
       min-height:100vh;
       gap:4vw;
@@ -32,11 +32,13 @@
     /* Left: stacked title */
     .title-left{
       line-height:1.05;
-      letter-spacing: 0.5px;
+      letter-spacing: 0.5px;      
+      margin-left: 20px;
       color:var(--pink);
       font-weight: 800;
       /* responsive size similar to your screenshot */
       font-size: clamp(48px, 9vw, 120px);
+
 
       /* thick black outline using multi-shadow */
       text-shadow:
@@ -51,16 +53,14 @@
     }
 
     /* Right: vertical button stack */
-    .nav-right{
-      display:flex;
-      flex-direction:column;
-      gap:22px;
-      justify-self:center;                 /* hug the right side */
-      width: 100%;
-      max-width: 440px;
-      padding: 0 4vw;  
-    }
-
+.nav-right{
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+  justify-self: 350px;     /* anchors the column to the right edge of its grid cell */
+  max-width: 440px;      /* let content define width; drop width:100% */
+  margin-right: 20vw;     /* ← pushes the whole column away from the screen edge */
+}
     .nav-button{
       display:block;
       width:100%;
