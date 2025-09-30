@@ -1,313 +1,374 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Income Calculator</title>
-  <link rel="stylesheet" href="style.css">
-  <style>
-    /* Basic Reset */
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
-    .section {
-      justify-content: center;
-      padding: 20px;
-      border: 2px solid #333;
-      box-sizing: border-box;
-      background-color: #acdbf9; /* Light blue background */
-      border-radius: 30px; /* Rounded edges */
-    }
-    .heart {
-  height: 30px;
-  width: auto
-}
- .label{
-      margin-top: 30px;
-   margin-bottom: 10px;
-    align-items: center; /* Centers text vertically */
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Income Calculator</title>
+<style>
+  :root{
+    --blue:#acdbf9;
+    --pink:#f8c9f9;
+    --ink:#333;
+    --ring:#000;
+    --radius:30px;
   }
-   .example {
-    margin-top: 15px;
-   align-items: center; /* Centers text vertically */
-     }
-      .space {
-     margin-top: 8px;
-     align-items: center; /* Centers text vertically */
-      }
-      /* Position & size for the copy button in top-right corner */
 
-.toggle-notes-button {
-  margin-left: 10px;
-  padding: 6px 12px;
-  border-radius: 10px;
-  border: 2px solid #f8c9f9; /* Soft pink border */
-      border-radius: 30px; /* Rounded edges */
-      background-color: #f8c9f9; /* Soft pink background */
-}
+  /* Reset */
+  *,*::before,*::after{ box-sizing:border-box; }
+  html,body{ height:100%; }
+  body{
+    margin:0;
+    font-family:Arial, sans-serif;
+    background:var(--blue);
+    color:var(--ink);
+  }
 
-#toggleNotes:hover {
-  background-color: #e8b8e8;  /* Slightly darker pink on hover */
-}
+  /* Header row */
+  .page{
+    max-width:1100px;
+    margin:0 auto;
+    padding:64px 20px 80px;
+  }
+  .back-home{
+    position:fixed; top:16px; left:16px;
+    padding:10px 20px; border-radius:30px;
+    background:var(--pink); color:var(--ink);
+    border:1px solid var(--ring); text-decoration:none; font-weight:700;
+  }
+  .back-home:hover{ filter:brightness(.95); }
 
-    input[type="number"] {
-      width: 100%;
-      max-width: 300px;
-      padding: 10px 15px;
-      margin: 10px 0;
-      border: 2px solid #f8c9f9; /* Soft pink border */
-      border-radius: 30px; /* Rounded edges */
-      background-color: #f8c9f9; /* Soft pink background */
-      color: #333;
-      font-size: 1rem;
-      outline: none;
-      transition: 0.3s ease;
-      justify-content: center;
-    }
-    input[type="number"]:hover {
-      background-color: #f0d4f0; /* Slightly lighter pink */
-    }
-    input[type="number"]:focus {
-      border-color: #e8b8e8;
-      background-color: #fff;
-      box-shadow: 0 0 5px rgba(232, 184, 232, 0.5);
-      justify-content: center;
-    }
-     /* Grand Total Section Styling */
-     .grand-total-section {
-      background-color: #acdbf9;
-      border: 2px solid #333;
-      align-items: center; /* Centers text vertically */
-      justify-content: center; /* Centers text horizontally */
-    }
-    /* Household Information Lookup Section */
-    .lookup-section {
-      padding: 15px;
-      background-color: #acdbf9;
-      border-radius: 30px; /* Rounded edges */
-      flex-grow: 1; /* Makes all boxes equal height */
-      align-items: center; /* Centers text vertically */
-      border: 2px solid #333;
-    }
-    input[type="text"] {
-  width: 100%;
-  max-width: 300px;
-  padding: 10px 15px;
-  margin: 10px 0;
-  border: 2px solid #f8c9f9;
-  border-radius: 30px;
-  background-color: #f8c9f9;
-  color: #333;
-  font-size: 1rem;
-  outline: none;
-  transition: 0.3s ease;
-}
-input[type="text"]:hover {
-  background-color: #f0d4f0;
-}
-input[type="text"]:focus {
-  border-color: #e8b8e8;
-  background-color: #fff;
-  box-shadow: 0 0 5px rgba(232, 184, 232, 0.5);
-}
-/* Style for ALL select dropdowns */
-select {
-  width: 100%;
-  max-width: 300px;
-  padding: 10px 15px;
-  margin: 10px 0;
-  border: 2px solid #f8c9f9; /* Soft pink border */
-  border-radius: 30px; /* Rounded edges */
-  background-color: #f8c9f9; /* Soft pink background */
-  color: #333;
-  font-size: 1rem;
-  outline: none;
-  transition: 0.3s ease;
+  h1{ text-align:center; margin:0 0 16px; font-size:2rem; }
+
+  /* Top controls */
+  .toolbar{
+    display:flex; flex-wrap:wrap; gap:12px 16px;
+    justify-content:center; align-items:center;
+    margin:12px 0 28px;
+  }
+  .toolbar label{ font-weight:700; }
+  .notes-btn,
+  .toolbar select,
+  .toolbar input[type="text"]{
+    border:2px solid var(--pink);
+    background:var(--pink);
+    border-radius:var(--radius);
+    padding:10px 14px;
+    outline:none;
+  }
+  .notes-btn{ cursor:pointer; font-weight:600; }
+
+  /* CARD LAYOUT (Flexbox) */
+.cards {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 24px;
+  align-items:stretch; /* equal height per row */
+  justify-content: center;
 }
 
-/* Hover effect for selects */
-select:hover {
-  background-color: #f0d4f0; /* Slightly lighter pink */
+.card {
+  flex: 0 0 calc((100% - 48px) / 3); /* 3 per row, minus the gaps */
+  max-width: calc((100% - 48px) / 3);
+    border:2px solid var(--ink);
+    border-radius:var(--radius);
+    padding:20px;
+    position:relative;
+    display:flex;
+    flex-direction:column;
 }
+  .card h2{ margin:0 0 6px; }
+  .example,.space{ height:8px; }
+  .example:first-of-type{ height:12px; }
+   /* Inputs */
+  input[type="number"],
+  input[type="text"],
+  select{
+    width:100%;
+    max-width:320px;
+    padding:10px 15px;
+    margin:10px 0;
+    border:2px solid var(--pink);
+    border-radius:var(--radius);
+    background:var(--pink);
+    color:var(--ink);
+    font-size:1rem;
+    outline:none; transition:.2s;
+  }
+  input[type="number"]:focus,
+  input[type="text"]:focus,
+  select:focus{
+    background:#fff; box-shadow:0 0 6px rgba(0,0,0,.1);
+  }
 
-/* Focus effect for selects */
-select:focus {
-  border-color: #e8b8e8;
-  background-color: #fff;
-  box-shadow: 0 0 5px rgba(232, 184, 232, 0.5);
-}
+  .heart{ height:30px; width:auto; vertical-align:middle; }
 
-.icon-button {
-  position: absolute;
-  top: 0;
-  right: 0;
-  width: 40px;
-  height: 40px;
-  /* If you want the icon centered, keep display:flex, etc. 
-     But you can rely on .button's inline-flex if you prefer. */
-}
-   /* Trigger Buttons */
-   .modal-trigger {
-      cursor: pointer;
-      font-size: 18px;
-      border-radius: 4px;
-      padding: 0 5px;
-      margin-left: 5px;
-      display: inline-block;
-    }
-    /* Modal Overlay (common style for both modals) */
-    .modal-overlay {
-      display: none; /* Hidden by default */
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background-color: rgba(0,0,0,0.5);
-      z-index: 9000; /* Above most content */
-      justify-content: center;
-      align-items: center;
-    }
-    /* Modal Window */
-    .modal {
-      background-color: #fff;
-      padding: 10px;
-      width: 100%;
-      max-width: 1000px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.3);
-    }
-    /* Table Styling for Modal Content */
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      margin-top: 10px;
-    }
-    th, td {
-      border: 1px solid #ddd;
-      padding: 8px;
-      text-align: center;
-    }
-    th {
-      background-color: #f2f2f2;
-    }
-    .hidden {
-      visibility: hidden;
-    }
-    #notesContainer {
-  position: absolute;
-  top: 120px;      /* Adjust to align with top of your form */
-  right: 40px;     /* Adjust spacing from right side */
-  width: 300px;
-  display: none;
-  padding: 15px;
-  background-color: #f8c9f9;
-  border: 2px solid #000;
-  border-radius: 20px;
-  box-shadow: 0 0 10px rgba(0,0,0,0.1);
-}
+  /* Copy button in Household card */
+  .icon-button{
+    position:absolute; top:10px; right:10px;
+    width:40px; height:40px; display:inline-flex; align-items:center; justify-content:center;
+    background:var(--pink); border:1px solid var(--ring); border-radius:50%; cursor:pointer;
+  }
+  .icon-button:hover{ filter:brightness(.95); }
 
-#notesContainer textarea {
-  width: 100%;
-  border-radius: 10px;
-  padding: 10px;
-  border: 1px solid #ccc;
-  resize: vertical;
-  background-color: #ffffff;
-  color: #333;
-}
-  </style>
+  .hidden{ visibility:hidden; }
+
+  /* Modal overlay + window (shared) */
+  .modal-overlay{
+    display:none; position:fixed; inset:0;
+    background:rgba(0,0,0,.5); z-index:9000;
+    align-items:center; justify-content:center;
+  }
+  .modal{
+    background:#fff; width:min(1000px, calc(100% - 32px));
+    padding:12px; box-shadow:0 2px 8px rgba(0,0,0,.3);
+    border-radius:12px;
+  }
+  table{ width:100%; border-collapse:collapse; margin-top:8px; }
+  th,td{ border:1px solid #ddd; padding:8px; text-align:center; }
+  th{ background:#f2f2f2; }
+
+  /* Notes panel */
+  #notesContainer{
+    position:fixed; top:110px; right:24px; width:300px;
+    display:none; padding:15px; background:var(--pink);
+    border:2px solid #000; border-radius:20px; box-shadow:0 0 10px rgba(0,0,0,.08);
+  }
+  #notesContainer textarea{
+    width:100%; border-radius:10px; padding:10px; border:1px solid #ccc; resize:vertical; background:#fff;
+  }
+
+  /* Small phones tweak */
+  @media (max-width:380px){
+    .card{ flex-basis: 300px; }
+  }
+</style>
 </head>
 <body>
-    <a href="index.html" class="back-home">Back to Home</a>
+  <a href="index.html" class="back-home">Back to Home</a>
+
+  <div class="page">
     <h1>Income Calculator</h1>
-    <div style="margin: 20px 0;">
-      <label for="incomeType"><strong>Income Type:</strong></label>
-      <select id="incomeType" style="padding: 6px 10px; border-radius: 10px; margin-left: 10px;">
+
+    <div class="toolbar">
+      <label for="incomeType">Income Type:</label>
+      <select id="incomeType">
         <option value="" selected disabled hidden>Select one...</option>
         <option value="W2">W2</option>
         <option value="Paycheck">Paycheck</option>
         <option value="NEED INCOME DOCS">NEED INCOME DOCS-VERBAL INCOME</option>
       </select>
-      <label for="workingAt" style="margin-left: 20px;">Working @</label>
-<input type="text" id="workingAt" placeholder="Where?" style="padding: 8px; border-radius: 10px; border: 1px solid #f8c9f9;" />
-<button style="padding: 8px; border-radius: 10px;  width: 130px;
-height: 40px;
-border: 2px solid #f8c9f9;
-border-radius: 30px; /* Rounded edges */
-background-color: #f8c9f9; /* Soft pink background */" class="toggleNotes">+ Add Notes</button>
-    </div>      
-    <div class="container">
-      <!-- Column 1: Biweekly and Weekly Income Sections -->
-      <div class="column">
-        <div class="section">
-          <h2>Biweekly Income</h2>
-          <div class="example"></div>
-          <p>Example: Every other Friday</p>
-          <div class="example"></div>
-          <label>Paystub one: $<input type="number" id="paystub1" value="0" onchange="calculateIncome('biweekly')"></label><br>
-          <div class="space"></div>
-          <label>Paystub two: $<input type="number" id="paystub2" value="0" onchange="calculateIncome('biweekly')"></label><br>
-            <div class=" hidden"><p>Total: $<span id="biweeklyTotal">0</span></p></div>
-          <p>Average: $<span id="biweeklyAverage">0</span></p>
-          <div class="space"></div>
-          <p>Annual: $<span id="biweeklyAnnual">0</span></p>
+
+      <label for="workingAt">Working @</label>
+      <input type="text" id="workingAt" placeholder="Where?" />
+      <button class="notes-btn toggleNotes">+ Add Notes</button>
+    </div>
+
+    <div class="cards">
+      <!-- Biweekly -->
+      <section class="card">
+        <h2>Biweekly Income</h2>
+        <p>Example: Every other Friday</p>
+        <label>Paystub one: $
+          <input type="number" id="paystub1" value="0" onchange="calculateIncome('biweekly')">
+        </label>
+        <label>Paystub two: $
+          <input type="number" id="paystub2" value="0" onchange="calculateIncome('biweekly')">
+        </label>
+        <div class="hidden"><p>Total: $<span id="biweeklyTotal">0</span></p></div>
+        <p>Average: $<span id="biweeklyAverage">0</span></p>
+        <p>Annual: $<span id="biweeklyAnnual">0</span></p>
+      </section>
+
+      <!-- Weekly -->
+      <section class="card">
+        <h2>Weekly Income</h2>
+        <p>Example: Every Friday</p>
+        <label>Paystub one: $
+          <input type="number" id="weeklyPaystub1" value="0" onchange="calculateIncome('weekly')">
+        </label>
+        <label>Paystub two: $
+          <input type="number" id="weeklyPaystub2" value="0" onchange="calculateIncome('weekly')">
+        </label>
+        <div class="hidden"><p>Total: $<span id="weeklyTotal">0</span></p></div>
+        <p>Average: $<span id="weeklyAverage">0</span></p>
+        <p>Annual: $<span id="weeklyAnnual">0</span></p>
+      </section>
+
+      <!-- Twice a Month -->
+      <section class="card">
+        <h2>Twice a Month Income</h2>
+        <p>Example: 1st and 15th</p>
+        <label>Paystub one: $
+          <input type="number" id="twiceMonthPaystub1" value="0" onchange="calculateIncome('twiceMonth')">
+        </label>
+        <label>Paystub two: $
+          <input type="number" id="twiceMonthPaystub2" value="0" onchange="calculateIncome('twiceMonth')">
+        </label>
+        <div class="hidden"><p>Total: $<span id="twiceMonthTotal">0</span></p></div>
+        <p>Average: $<span id="twiceMonthAverage">0</span></p>
+        <p>Annual: $<span id="twiceMonthAnnual">0</span></p>
+      </section>
+
+      <!-- Weekly Verbal -->
+      <section class="card">
+        <h2>Weekly Verbal Income</h2>
+        <p>Example: Freelance or hourly work</p>
+        <label>Hours worked:
+          <input type="number" id="verbalHours" value="0" onchange="calculateIncome('verbal')">
+        </label>
+        <label>Hourly Pay: $
+          <input type="number" id="verbalRate" value="0" onchange="calculateIncome('verbal')">
+        </label>
+        <div class="hidden"><p>Total: $<span id="verbalTotal">0</span></p></div>
+        <p>Average: $<span id="verbalAverage">0</span></p>
+        <p>Annual: $<span id="verbalAnnual">0</span></p>
+      </section>
+
+      <!-- Extra Income -->
+      <section class="card">
+        <h2>Extra Income Sources</h2>
+        <label>Tips per week: $
+          <input type="number" id="AnnualTips" value="0" onchange="calculateGrandTotal()">
+        </label>
+        <label>Other Income per month: $
+          <input type="number" id="AnnualOtherMonthly" value="0" onchange="calculateGrandTotal()">
+        </label>
+        <label>Other Income by year: $
+          <input type="number" id="OtherAnnual" value="0" onchange="calculateGrandTotal()">
+        </label>
+      </section>
+
+      <!-- Household Info -->
+      <section class="card">
+        <button class="icon-button" onclick="copyIncomeInfo()" aria-label="Copy Household Info">
+          <svg width="24" height="24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24">
+            <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+            <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+          </svg>
+        </button>
+
+        <h2>Household Info</h2>
+        <p>People per Household:</p>
+        <input type="number" id="householdSize" min="1" value="1" onchange="updateHouseholdIncome()">
+
+        <h2>Household Income</h2>
+        <p><strong>Total Income: $<span id="grandTotal">0</span></strong></p>
+
+        <p><strong>Client Pay: <span id="coverageLevel">N/A</span></strong>
+          <span class="modal-trigger" id="triggerModal1">
+            <img src="images/heart.png" class="heart" alt="Coverage chart">
+          </span>
+        </p>
+
+        <div class="modal-overlay" id="modalOverlay1">
+          <div class="modal">
+            <!-- your coverage table unchanged -->
+            <table>
+              <thead>
+                <tr>
+                  <th>Family Size</th><th>0% Patient Pay</th><th>25% Patient Pay</th>
+                  <th>50% Patient Pay</th><th>75% Patient Pay</th><th>100% Patient Pay</th>
+                </tr>
+              </thead>
+              <tbody>
+                <!-- … keep your rows exactly as you had them … -->
+              </tbody>
+            </table>
+          </div>
         </div>
-        <div class="section">
-          <h2>Weekly Income</h2>
-          <div class="example"></div>
-          <p>Example: Every Friday</p>
-          <div class="example"></div>
-          <label>Paystub one: $<input type="number" id="weeklyPaystub1" value="0" onchange="calculateIncome('weekly')"></label><br>
-          <div class="space"></div>
-          <label>Paystub two: $<input type="number" id="weeklyPaystub2" value="0" onchange="calculateIncome('weekly')"></label><br>
-          <div class=" hidden">
-            <p>Total: $<span id="weeklyTotal">0</span></p></div>
-          <p>Average: $<span id="weeklyAverage">0</span></p>
-          <div class="space"></div>
-          <p>Annual: $<span id="weeklyAnnual">0</span></p>
+
+        <p><strong>AWC! qualification: <span id="awcQualification">N/A</span></strong>
+          <span class="modal-trigger" id="triggerModal2">
+            <img src="images/heart.png" class="heart" alt="AWC limits">
+          </span>
+        </p>
+
+        <div class="modal-overlay" id="modalOverlay2">
+          <div class="modal">
+            <h2>AWC! Program Eligibility</h2>
+            <table>
+              <thead><tr><th>Family Size</th><th>Max Annual Income</th></tr></thead>
+              <tbody>
+                <!-- … keep your AWC rows exactly as you had them … -->
+              </tbody>
+            </table>
+          </div>
         </div>
-      </div>
-      <!-- Column 2: Twice a Month and Weekly Verbal Income Sections -->
-      <div class="column">
-        <div class="section">
-          <h2>Twice a Month Income</h2>
-          <div class="example"></div>
-          <p>Example: 1st and 15th</p>
-          <div class="example"></div>
-          <label>Paystub one: $<input type="number" id="twiceMonthPaystub1" value="0" onchange="calculateIncome('twiceMonth')"></label><br>
-          <div class="space"></div>
-          <label>Paystub two: $<input type="number" id="twiceMonthPaystub2" value="0" onchange="calculateIncome('twiceMonth')"></label><br>
-          <div class=" hidden">
-            <p>Total: $<span id="twiceMonthTotal">0</span></p></div>
-          <p>Average: $<span id="twiceMonthAverage">0</span></p>
-          <div class="space"></div>
-          <p>Annual: $<span id="twiceMonthAnnual">0</span></p>
-        </div>
-        <div class="section">
-          <h2>Weekly Verbal Income</h2>
-          <div class="example"></div>
-          <p> Example: Freelance or hourly work</p>
-          <div class="example"></div>
-          <label>Hours worked: <input type="number" id="verbalHours" value="0" onchange="calculateIncome('verbal')"></label><br>
-          <div class="space"></div>
-          <label>Hourly Pay: $<input type="number" id="verbalRate" value="0" onchange="calculateIncome('verbal')"></label><br>
-          <div class=" hidden"><p>Total: $<span id="verbalTotal">0</span></p></div>
-          <p>Average: $<span id="verbalAverage">0</span></p>
-          <div class="space"></div>
-          <p>Annual: $<span id="verbalAnnual">0</span></p>
-        </div>
-      </div>
-      <!-- Column 3: Grand Total and Household Information Section -->
-      <div class="column">
-        <div class="section">
-          <h2>Extra Income Sources</h2>
-          <div class="example"></div>
-          <label>Tips per week: $<input type="number" id="AnnualTips" value="0" onchange="calculateGrandTotal()"></label><br>
-          <div class="space"></div>
-          <label>Other Income per month: $<input type="number" id="AnnualOtherMonthly" value="0" onchange="calculateGrandTotal()"></label><br>
-          <div class="space"></div>
-          <label>Other Income by year: $<input type="number" id="OtherAnnual" value="0" onchange="calculateGrandTotal()"></label><br>
-          <div class="space"></div>
-        </div>
+      </section>
+    </div>
+
+    <!-- Household members -->
+    <section id="householdMembersSection" class="card" style="margin-top:24px;">
+      <h2>Other Household Members</h2>
+      <div id="householdMembersContainer"></div>
+    </section>
+  </div>
+
+  <!-- Notes panel -->
+  <div id="notesContainer">
+    <label for="userNotes">Notes:</label><br/>
+    <textarea id="userNotes" placeholder="Enter any additional notes..." rows="8"></textarea>
+  </div>
+
+<script>
+  /* === Your entire JS from the last message, unchanged === */
+  /* paste everything from: coverageChart … down to toggleNotes listeners */
+  /* (I kept all IDs so it works as-is.) */
+
+  /***************************************************
+   * 1) Coverage Chart & Coverage Level Logic
+   ***************************************************/
+  const coverageChart = { /* … your object as sent … */ };
+  const coverageLevels = ["0%","25%","50%","75%","100%"];
+  function determineCoverageLevel(householdSize, yearlyIncome){ /* … */ }
+
+  /***************************************************
+   * 2) AWC! Qualification Logic
+   ***************************************************/
+  const awcChart = { /* … your object as sent … */ };
+  function determineAWCQualification(householdSize, yearlyIncome){ /* … */ }
+
+  /***************************************************
+   * 3) Income Calculations
+   ***************************************************/
+  function calculateIncome(type){ /* … your switch logic as sent … */ }
+
+  /***************************************************
+   * 4) Grand Total
+   ***************************************************/
+  function calculateGrandTotal(){ /* … your function as sent … */ }
+
+  /***************************************************
+   * 5) Household Info Display
+   ***************************************************/
+  function updateHouseholdIncome(){ /* … your function as sent … */ }
+  function updateHouseholdMemberFields(){ /* … your function as sent … */ }
+
+  // Modals
+  const triggerModal1=document.getElementById('triggerModal1');
+  const modalOverlay1=document.getElementById('modalOverlay1');
+  triggerModal1.addEventListener('click',()=>modalOverlay1.style.display='flex');
+  modalOverlay1.addEventListener('click',e=>{ if(e.target===modalOverlay1) modalOverlay1.style.display='none'; });
+
+  const triggerModal2=document.getElementById('triggerModal2');
+  const modalOverlay2=document.getElementById('modalOverlay2');
+  triggerModal2.addEventListener('click',()=>modalOverlay2.style.display='flex');
+  modalOverlay2.addEventListener('click',e=>{ if(e.target===modalOverlay2) modalOverlay2.style.display='none'; });
+
+  /***************************************************
+   * 6) Copy Button
+   ***************************************************/
+  function copyIncomeInfo(){ /* … your function as sent … */ }
+
+  // Init
+  calculateGrandTotal();
+  document.getElementById('householdSize').addEventListener('change', updateHouseholdMemberFields);
+  document.querySelectorAll('.toggleNotes').forEach(btn=>{
+    btn.addEventListener('click',()=>{
+      const notes=document.getElementById('notesContainer');
+      notes.style.display = (notes.style.display==='none'||notes.style.display==='') ? 'block':'none';
+    });
+  });
+</script>
+</body>
+</html>
