@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>CPT Locator</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="stylesheet" href="style.css">
+  <style>
+    :root{
+      --blue:#acdbf9;
+      --pink:#f8c9f9;
+      --ink:#333;
+      --card:#fff;
+    }
+    *{ box-sizing:border-box; }
+    body{
+      font-family: Arial, sans-serif;
+      background-color: var(--blue);
+      color: var(--ink);
+      min-height:100vh;
+      margin:0;
+      text-align:center;
+    }
+
+    h1{
+      margin:90px 0 10px;
+      font-size:2rem;
+    }
+    .sub{
+      opacity:.9;
+      margin-bottom:8px;
+    }
+
+    .mh-searchbar{
+      margin: 1rem auto 1.5rem;
+      padding: 1rem 1.25rem;
+      background: var(--blue);
+      border: 1.5px solid var(--blue);
+      border-radius: 12px;
+      box-shadow: 0 4px 16px rgba(190,190,190,0.13);
+      display:flex; flex-wrap:wrap; align-items:center; gap:.7rem;
+      width:fit-content;
+      font-family: Arial, sans-serif;
+    }
+    .mh-searchbar label{
+      font-weight:600; color:var(--ink); margin-right:.25rem;
+    }
+    .mh-searchbar input[type="text"]{
+      font: inherit;
+      font-size: 1rem;
+      padding: .35em .9em;
+      border: 1px solid var(--pink);
+      border-radius: 7px;
+      background: var(--pink);
+      color: #222;
+      outline: none;
+      transition: border .2s, background .2s;
+    }
+    .mh-searchbar input[type="text"]:focus{
+      border-color:#8aa9ff; background:#fff;
+    }
+
+    #results{
+      padding: 0 16px 48px;
+    }
+
+    #results .meta{
+      max-width: 980px;
+      margin: 0 auto .5rem;
+      text-align:left;
+      font-size:.95rem;
+    }
+
+    #results table{
+      margin: 0 auto 2rem;
+      background: var(--card);
+      border-radius: 16px;
+      padding: 0 0 .5rem;
+      box-shadow: 0 2px 16px #bbb4;
+      min-width: 950px;
+      max-width: 950px;
+      width: 100%;
+      border-collapse: separate;
+      border-spacing: 0;
+      overflow:hidden;
+    }
+    #results thead th{
+      background: var(--pink);
+      padding: 12px 18px;
+      text-align:left;
+      font-weight:700;
+      letter-spacing:.02em;
+    }
+    #results tbody td{
+      padding: 10px 18px;
+      text-align:left;
+      font-size:1.06rem;
+      background:#fff;
+    }
+    #results tbody tr:nth-child(even) td{ background:#f7e4fa; }
+
+    .muted{ color:#555; font-size:.95rem; }
+    .nowrap{ white-space:nowrap; }
+    .kw{
+      display:block;
+      font-size:.85rem;
+      color:#666;
+      margin-top:2px;
+    }
+
+    .no-results{
+      margin: 1rem auto 0;
+      background: #fff;
+      border-radius: 12px;
+      padding: 14px 18px;
+      display: inline-block;
+      box-shadow: 0 2px 10px #bbb4;
+    }
+
+    @media (max-width: 1020px){
+      #results table{ min-width: unset; width: 96%; }
+      #results thead th:nth-child(3),
+      #results thead th:nth-child(5),
+      #results tbody td:nth-child(3),
+      #results tbody td:nth-child(5){ display:none; } /* hide HCPCS + Modifier on narrow screens */
+    }
+  </style>
+</head>
+<body>
+  <a href="./index.html" class="back-home">Back to Home</a>
+
+  <h1>CPT Locator</h1>
+  <div class="sub">Search by any combination of fields. Service search also checks keywords.</div>
+
+  <div class="mh-searchbar" role="search" aria-label="CPT Locator search">
+    <label for="search-service">Search by:</label>
+    <input type="text" id="search-service" placeholder="Service / Keywords" autocomplete="off" />
+    <input type="text" id="search-cpt" placeholder="CPT" autocomplete="off" />
+    <input type="text" id="search-hcpcs" placeholder="HCPCS" autocomplete="off" />
+    <input type="text" id="search-icd10" placeholder="ICD-10" autocomplete="off" />
+    <input type="text" id="search-modifier" placeholder="Modifier" autocomplete="off" />
+  </div>
+  <div id="results"></div>
+</body>
+  <script type="module">
+    import procedures from './catalog.js';
+
+    // --- helpers ---
+    const norm = v => (v ?? '').toString().trim();
+    const toLower = v => norm(v).toLowerCase();
+    const empty = v => !norm(v);
+
+    const els = {
+      service:  document.getElementById('search-service'),
+      cpt:      document.getElementById('search-cpt'),
+      hcpcs:    document.getElementById('search-hcpcs'),
+      icd10:    document.getElementById('search-icd10'),
+      modifier: document.getElementById('search-modifier'),
+      results:  document.getElementById('results'),
+    };
+
+    // Debounce to keep typing smooth
+    let t;
+    const debounce = (fn, ms=120) => (...args) => { clearTimeout(t); t = setTimeout(() => fn(...args), ms); };
+
+    function searchProcedures(){
+      const q = {
+        service:  toLower(els.service.value),
+        cpt:      toLower(els.cpt.value),
+        hcpcs:    toLower(els.hcpcs.value),
+        icd10:    toLower(els.icd10.value),
+        modifier: toLower(els.modifier.value),
+      };
+
+      const rows = procedures.filter(row => {
+        const service = toLower(row.service);
+        const cpt = toLower(row.cpt);
+        const hcpcs = toLower(row.hcpcs);
+        const icd10 = toLower(row.icd10);
+        const modifier = toLower(row.modifier);
+        const keywords = (row.keywords ?? []).map(toLower).join(' ');
+
+        const serviceHit =
+          empty(q.service) || service.includes(q.service) || keywords.includes(q.service);
+
+        return (
+          serviceHit &&
+          (empty(q.cpt)      || cpt.includes(q.cpt)) &&
+          (empty(q.hcpcs)    || hcpcs.includes(q.hcpcs)) &&
+          (empty(q.icd10)    || icd10.includes(q.icd10)) &&
+          (empty(q.modifier) || modifier.includes(q.modifier))
+        );
+      });
+
+      displayResults(rows);
+    }
+
+    function displayResults(rows){
+      if (!rows.length){
+        els.results.innerHTML = `<div class="no-results">No results found.</div>`;
+        return;
+      }
+
+      const meta = `<div class="meta"><strong>${rows.length}</strong> result${rows.length===1?'':'s'}</div>`;
+
+      const body = rows.map(r => {
+        const svc = norm(r.service);
+        const cpt = norm(r.cpt);
+        const hcpcs = norm(r.hcpcs);
+        const icd10 = norm(r.icd10);
+        const mod = norm(r.modifier);
+        const kw = (r.keywords && r.keywords.length)
+          ? `<span class="kw">Keywords: ${r.keywords.join(', ')}</span>`
+          : '';
+
+        return `
+          <tr>
+            <td>
+              <div>${svc.replace(/\n/g,'<br/>')}</div>
+              ${kw}
+            </td>
+            <td class="nowrap">${cpt}</td>
+            <td class="nowrap">${hcpcs}</td>
+            <td class="nowrap">${icd10}</td>
+            <td class="nowrap">${mod}</td>
+          </tr>
+        `;
+      }).join('');
+
+      els.results.innerHTML = `
+        ${meta}
+        <table aria-label="Search results">
+          <thead>
+            <tr>
+              <th>Service</th>
+              <th>CPT</th>
+              <th>HCPCS</th>
+              <th>ICD-10</th>
+              <th>Modifier</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${body}
+          </tbody>
+        </table>
+      `;
+    }
+
+    // Wire up inputs (with debounce)
+    const run = debounce(searchProcedures, 120);
+    ['service','cpt','hcpcs','icd10','modifier'].forEach(k => {
+      els[k].addEventListener('input', run);
+    });
+
+    // Initial render: show all in original order
+    displayResults(procedures);
+  </script>
+</html>
