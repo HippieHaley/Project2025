@@ -141,121 +141,71 @@
     <input type="text" id="search-modifier" placeholder="Modifier" autocomplete="off" />
   </div>
   <div id="results"></div>
-</body>
   <script type="module">
-const procedures = await import('./catalog.js');
- const searchInputs = document.querySelectorAll('.mh-searchbar input[type="text"]');
-    searchInputs.forEach(input => {
-      input.addEventListener('input', () => {
-        const name = document.getElementById('search-name').value.toLowerCase();
-        const cpt = document.getElementById('search-cpt').value.toLowerCase();
-        const hcpcs = document.getElementById('search-hcpcs').value.toLowerCase();
-        const icd10 = document.getElementById('search-icd10').value.toLowerCase();    
-        const modifier = document.getElementById('search-modifier').value.toLowerCase();      
-        const results = procedures.filter(row =>
-          (!name   || row.name.toLowerCase().includes(name)) &&
-          (!cpt    || row.cpt.toLowerCase().includes(cpt)) &&
-          (!hcpcs  || row.hcpcs.toLowerCase().includes(hcpcs)) &&
-          (!icd10  || row.icd10.toLowerCase().includes(icd10))
-        );
-        displayResults(results);
-      });
+  // 1) Make sure catalog.js ends with:  export default procedures;
+  import procedures from './catalog.js';
+
+  const get = (id) => document.getElementById(id);
+
+  function displayResults(results) {
+    const resultsDiv = get('results');
+    if (!results || results.length === 0) {
+      resultsDiv.innerHTML = "<p>No results found.</p>";
+      return;
+    }
+    let html = `
+      <table style="margin:2rem auto;background:#fff;border-radius:8px;padding:1rem;box-shadow:0 2px 10px #bbb;">
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>CPT</th>
+            <th>HCPCS</th>
+            <th>ICD-10</th>
+          </tr>
+        </thead>
+        <tbody>
+    `;
+    results.forEach(row => {
+      html += `
+        <tr>
+          <td>${row.name}</td>
+          <td>${row.cpt || ''}</td>
+          <td>${row.hcpcs || ''}</td>
+          <td>${row.icd10 || ''}</td>
+        </tr>
+      `;
+    });
+    html += `</tbody></table>`;
+    resultsDiv.innerHTML = html;
+  }
+
+  function searchProcedures() {
+    const name    = (get('search-service').value || '').toLowerCase();
+    const cpt     = (get('search-cpt').value || '').toLowerCase();
+    const hcpcs   = (get('search-hcpcs').value || '').toLowerCase();
+    const icd10   = (get('search-icd10').value || '').toLowerCase();
+    // You don’t have modifiers/notes in data; read it but ignore in filter for now:
+    const modifier = (get('search-modifier').value || '').toLowerCase();
+
+    const results = procedures.filter(row => {
+      const kw = (row.keywords || []).join(' ').toLowerCase();
+      return (
+        (!name  || row.name.toLowerCase().includes(name) || kw.includes(name)) &&
+        (!cpt   || (row.cpt   || '').toLowerCase().includes(cpt)) &&
+        (!hcpcs || (row.hcpcs || '').toLowerCase().includes(hcpcs)) &&
+        (!icd10 || (row.icd10 || '').toLowerCase().includes(icd10))
+        // modifier intentionally not used: no row.notes/row.modifier in your data
+      );
     });
 
-    function displayResults(results) {
-      const resultsDiv = document.getElementById('results');
-      if (results.length === 0) {
-        resultsDiv.innerHTML = "<p>No results found.</p>";
-        return;
-      }
-      let html = "<table style='margin:2rem auto;background:#fff;border-radius:8px;padding:1rem;box-shadow:0 2px 10px #bbb;'><thead><tr><th>Name</th><th>CPT</th><th>HCPCS</th><th>ICD-10</th></tr></thead><tbody>";
-      results.forEach(row => {
-        html += `<tr>
-          <td>${row.name}</td>
-          <td>${row.cpt}</td>
-          <td>${row.hcpcs}</td>
-          <td>${row.icd10}</td>
-            <td>${row.modifier || ''}</td>
-        </tr>`;
-      });
-      html += "</tbody></table>";
-      resultsDiv.innerHTML = html;
-    }
-
-    function searchProcedures() {
-      const name = document.getElementById('search-name').value.toLowerCase();
-      const cpt = document.getElementById('search-cpt').value.toLowerCase();
-      const hcpcs = document.getElementById('search-hcpcs').value.toLowerCase();
-      const icd10 = document.getElementById('search-icd10').value.toLowerCase();
-        const modifier = document.getElementById('search-modifier').value.toLowerCase();
-
-      const results = procedures.filter(row =>
-        (!name   || row.name.toLowerCase().includes(name)) &&
-        (!cpt    || row.cpt.toLowerCase().includes(cpt)) &&
-        (!hcpcs  || row.hcpcs.toLowerCase().includes(hcpcs)) &&
-        (!icd10  || row.icd10.toLowerCase().includes(icd10))
-        && (!modifier || (row.notes && row.notes.toLowerCase().includes(modifier)))
-      );
-      displayResults(results);
-    }
-
-    document.getElementById('search-name').addEventListener('input', searchProcedures);
-    document.getElementById('search-cpt').addEventListener('input', searchProcedures);
-    document.getElementById('search-hcpcs').addEventListener('input', searchProcedures);
-    document.getElementById('search-icd10').addEventListener('input', searchProcedures);
-    document.getElementById('search-modifier').addEventListener('input', searchProcedures);
-    // Show all results on load
-    displayResults(procedures);
-    const results = procedures.filter(row => {
-  // helper to search keywords array
-  function match(field) {
-    return field && field.toLowerCase().includes(name);
-  }
-  const allKeywords = (row.keywords || []).join(" ").toLowerCase();
-  return (
-    (!name   || row.name.toLowerCase().includes(name) || allKeywords.includes(name)) &&
-    (!cpt    || row.cpt.toLowerCase().includes(cpt)) &&
-    (!hcpcs  || row.hcpcs.toLowerCase().includes(hcpcs)) &&
-    (!icd10  || row.icd10.toLowerCase().includes(icd10))
-    && (!modifier || (row.notes && row.notes.toLowerCase().includes(modifier)))
-  );
-});
-    function displayResults(results) {
-  const resultsDiv = document.getElementById('results');
-  if (results.length === 0) {
-    resultsDiv.innerHTML = "<p>No results found.</p>";
-    return;
-  }
-  let html = `
-    <table>
-      <thead>
-        <tr>
-          <th>Name</th>
-          <th>CPT</th>
-          <th>HCPCS</th>
-          <th>ICD-10</th>
-            <th>Notes</th>
-        </tr>
-      </thead>
-      <tbody>
-  `;
-  results.forEach(row => {
-    html += `
-      <tr>
-        <td>${row.name}</td>
-        <td>${row.cpt}</td>
-        <td>${row.hcpcs}</td>
-        <td>${row.icd10}</td>
-        <td>${row.notes || ''}</td>
-      </tr>
-    `;
-  });
-  html += `
-      </tbody>
-    </table>
-  `;
-  resultsDiv.innerHTML = html;
-}
     displayResults(results);
-  </script>
+  }
+
+  // Single, simple wiring:
+  ['search-service','search-cpt','search-hcpcs','search-icd10','search-modifier']
+    .forEach(id => get(id).addEventListener('input', searchProcedures));
+
+  // Show all on load
+  displayResults(procedures);
+</script>
 </html>

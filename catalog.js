@@ -346,3 +346,4 @@ const procedures = [
     keywords: ["trivora", "oc", "pill"]
   }
 ];
+export default procedures;
