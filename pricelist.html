@@ -151,12 +151,8 @@
     #section-procedures h3::before { content: "🔧"; }
     #section-labs h3::before { content: "🧪"; }
     #section-meds {
-      grid-column: 3;
-      grid-row: 3;
-    }
-    #section-contraceptives {
-      grid-column: 2;
-      grid-row: 3;
+      grid-column: 1 / span 2;
+      grid-row: 3 ;
     }
     #section-meds h3::before { content: "💊"; }
     .item {
@@ -165,7 +161,12 @@
       border-radius: 6px;
       transition: background 0.2s;
     }
-    
+    #section-meds .list {
+      grid-column: 1 / span 2;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
     .item:hover {
       background: #f8f9fa;
     }
