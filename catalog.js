@@ -6,7 +6,7 @@ const procedures = [
   // VISIT CODES
   // ======================
   {
-    name: "99202\nNew Pt Limited",
+    name: "New Pt Limited",
     cpt: "99202",
     hcpcs: "",
     icd10: "",
@@ -16,7 +16,7 @@ const procedures = [
     keywords: ["limited-new", "new pt", "99202"]
   },
   {
-    name: "99203\nNew Pt Intermediate",
+    name: "New Pt Intermediate",
     cpt: "99203",
     hcpcs: "",
     icd10: "",
@@ -26,7 +26,7 @@ const procedures = [
     keywords: ["intermediate-new", "new pt", "99203"]
   },
   {
-    name: "99204\nNew Pt Comprehensive",
+    name: "New Pt Comprehensive",
     cpt: "99204",
     hcpcs: "",
     icd10: "",
@@ -36,7 +36,7 @@ const procedures = [
     keywords: ["comprehensive-new", "new pt", "99204"]
   },
   {
-    name: "99211\nEst Pt Minimal (RN)",
+    name: "Est Pt Minimal (RN)",
     cpt: "99211",
     hcpcs: "",
     icd10: "",
@@ -46,7 +46,7 @@ const procedures = [
     keywords: ["minimal-established", "est pt", "99211"]
   },
   {
-    name: "99212\nEst Pt Limited",
+    name: "Est Pt Limited",
     cpt: "99212",
     hcpcs: "",
     icd10: "",
@@ -56,7 +56,7 @@ const procedures = [
     keywords: ["limited-established", "est pt", "99212"]
   },
   {
-    name: "99213\nEst Pt Intermediate",
+    name: "Est Pt Intermediate",
     cpt: "99213",
     hcpcs: "",
     icd10: "",
@@ -66,7 +66,7 @@ const procedures = [
     keywords: ["intermediate-established", "est pt", "99213"]
   },
   {
-    name: "99214\nEst Pt Comprehensive",
+    name: "Est Pt Comprehensive",
     cpt: "99214",
     hcpcs: "",
     icd10: "",
@@ -76,7 +76,7 @@ const procedures = [
     keywords: ["comprehensive-established", "est pt", "99214"]
   },
   {
-    name: "99384\nPreventive New 12–17",
+    name: "Preventive New 12–17",
     cpt: "99384",
     hcpcs: "",
     icd10: "",
@@ -86,7 +86,7 @@ const procedures = [
     keywords: ["preventive new", "99384", "12–17"]
   },
   {
-    name: "99385\nPreventive New 18–39",
+    name: "Preventive New 18–39",
     cpt: "99385",
     hcpcs: "",
     icd10: "",
@@ -96,7 +96,7 @@ const procedures = [
     keywords: ["preventive new", "99385", "18–39"]
   },
   {
-    name: "99386\nPreventive New 40–64",
+    name: "Preventive New 40–64",
     cpt: "99386",
     hcpcs: "",
     icd10: "",
@@ -106,7 +106,7 @@ const procedures = [
     keywords: ["preventive new", "99386", "40–64"]
   },
   {
-    name: "99394\nPreventive Est 12–17",
+    name: "Preventive Est 12–17",
     cpt: "99394",
     hcpcs: "",
     icd10: "",
@@ -116,7 +116,7 @@ const procedures = [
     keywords: ["preventive established", "99394", "12–17"]
   },
   {
-    name: "99395\nPreventive Est 18–39",
+    name: "Preventive Est 18–39",
     cpt: "99395",
     hcpcs: "",
     icd10: "",
@@ -126,7 +126,7 @@ const procedures = [
     keywords: ["preventive established", "99395", "18–39"]
   },
   {
-    name: "99396\nPreventive Est 40–64",
+    name: "Preventive Est 40–64",
     cpt: "99396",
     hcpcs: "",
     icd10: "",
@@ -274,8 +274,8 @@ const procedures = [
     hcpcs: "J1050",
     icd10: "Z30.42",
     fullprice: 27,
-    category: "meds",
-    keywords: ["depo", "medroxyprogesterone", "j1050"]
+    category: "contraceptives",
+    keywords: ["depo", "medroxyprogesterone", "j1050", "birth control"]
   },
   {
     name: "Nexplanon",
@@ -283,8 +283,8 @@ const procedures = [
     hcpcs: "J7307",
     icd10: "Z30.017",
     fullprice: 573,
-    category: "meds",
-    keywords: ["nexplanon", "implant", "j7307"]
+    category: "contraceptives",
+    keywords: ["nexplanon", "implant", "j7307", "birth control"]
   },
   {
     name: "NuvaRing",
@@ -292,7 +292,7 @@ const procedures = [
     hcpcs: "J7303",
     icd10: "Z30.011",
     fullprice: 8,
-    category: "meds",
+    category: "contraceptives",
     keywords: ["nuvaring", "ring", "birth control"]
   },
   {
@@ -301,7 +301,7 @@ const procedures = [
     hcpcs: "J7304",
     icd10: "Z30.011",
     fullprice: 75,
-    category: "meds",
+    category: "contraceptives",
     keywords: ["xulane", "patch", "birth control"]
   },
 
@@ -314,7 +314,7 @@ const procedures = [
     hcpcs: "S4993",
     icd10: "Z30.011",
     fullprice: 5,
-    category: "contraceptives",
+    category: " oral contraceptives",
     keywords: ["alese", "oc", "pill", "s4993"]
   },
   {
@@ -323,7 +323,7 @@ const procedures = [
     hcpcs: "S4993",
     icd10: "Z30.011",
     fullprice: 5,
-    category: "contraceptives",
+    category: " oral contraceptives",
     keywords: ["apri", "oc", "pill", "s4993"]
   },
   {
@@ -332,7 +332,7 @@ const procedures = [
     hcpcs: "S4993",
     icd10: "Z30.011",
     fullprice: 5,
-    category: "contraceptives",
+    category: " oral contraceptives",
     keywords: ["aviane", "oc", "pill", "s4993"]
   },
   {
@@ -341,7 +341,7 @@ const procedures = [
     hcpcs: "S4993",
     icd10: "Z30.011",
     fullprice: 28,
-    category: "contraceptives",
+    category: " oral contraceptives",
     keywords: ["camila", "oc", "pop", "progestin"]
   },
   {
@@ -350,7 +350,7 @@ const procedures = [
     hcpcs: "S4993",
     icd10: "Z30.011",
     fullprice: 5,
-    category: "contraceptives",
+    category: " oral contraceptives",
     keywords: ["cryselle", "oc", "pill"]
   },
   {
@@ -359,7 +359,7 @@ const procedures = [
     hcpcs: "S4993",
     icd10: "Z30.011",
     fullprice: 14,
-    category: "contraceptives",
+    category: " oral contraceptives",
     keywords: ["levora", "oc", "pill"]
   },
   {
@@ -368,7 +368,7 @@ const procedures = [
     hcpcs: "S4993",
     icd10: "Z30.011",
     fullprice: 16,
-    category: "contraceptives",
+    category: " oral contraceptives",
     keywords: ["lutera", "oc", "pill"]
   },
   {
@@ -377,7 +377,7 @@ const procedures = [
     hcpcs: "S4993",
     icd10: "Z30.011",
     fullprice: 5,
-    category: "contraceptives",
+    category: " oral contraceptives",
     keywords: ["sprintec", "oc", "pill"]
   },
   {
@@ -386,7 +386,7 @@ const procedures = [
     hcpcs: "S4993",
     icd10: "Z30.011",
     fullprice: 14,
-    category: "contraceptives",
+    category: " oral contraceptives",
     keywords: ["tri-lo marzia", "oc", "pill"]
   },
   {
@@ -395,7 +395,7 @@ const procedures = [
     hcpcs: "S4993",
     icd10: "Z30.011",
     fullprice: 14,
-    category: "contraceptives",
+    category: " oral contraceptives",
     keywords: ["trivora", "oc", "pill"]
   }
 ];
