@@ -74,8 +74,6 @@
     display:flex;
     flex-direction:column;
   }
-ex-direction:column;
-  }
   .card h2{ margin:0 0 6px; }
   .example,.space{ height:8px; }
   .example:first-of-type{ height:12px; }
@@ -165,16 +163,30 @@ th {
       max-width: 100%;
     }
   }
+ .householdmemebercontainer {
+  display: flex;
+  flex-wrap: wrap;       /* allow children to wrap inside */
+  gap: 15px;
+      justify-content: center;
+  width: 100%;           /* stretch full width of its parent */
+  grid-column: 1 / -1;   /* if you're using CSS grid above */
+}
 #householdMembersSection {
   transition: all 0.3s ease;
+  flex-wrap: wrap;       /* allow children to wrap inside */
+      justify-content: center;
+  gap: 15px;
+  width: 100%;           /* stretch full width of its parent */
+  grid-column: 1 / -1;   /* if you're using CSS grid above */
 }
-
 .household-member {
-  margin-bottom: 15px;
+       align-items:stretch;
+    justify-content: center;
+    margin-bottom: 15px;
   padding: 15px;
-  border: 2px solid var(--pink);
-  border-radius: 10px;
-  background: rgba(255, 182, 193, 0.1);
+  border:2px solid var(--ink);
+    border-radius:var(--radius);
+
 }
 </style>
 </head>
@@ -299,7 +311,7 @@ th {
       </section>
 
       <!-- Household Members Section - CORRECTED -->
-      <section id="householdMembersSection" class="card" style="display: none;">
+      <section id="householdMembersSection" style="display: none;">
         <h2>Other Household Members</h2>
         <div id="householdMembersContainer"></div>
       </section>
