@@ -1,8 +1,76 @@
 /* ===== Imports ===== */
-import 'charts.js'             // <-- adjust path if needed
-const { coverageChart, awcChart } = charts; // from charts.js
+<script src="charts.js"></script>     // <-- adjust path if needed
 const coverageLevels = ["100%", "75%", "50%", "25%", "0%"];
+function calculateIncome(type) {
+  let paystub1, paystub2, verbalHours, verbalRate, total, average, annual;
+  switch (type) {
+    case 'biweekly':
+      paystub1 = parseFloat($('paystub1').value) || 0;
+      paystub2 = parseFloat($('paystub2').value) || 0;
+      total = paystub1 + paystub2; average = total / 2; annual = average * 26; break;
+    case 'weekly':
+      paystub1 = parseFloat($('weeklyPaystub1').value) || 0;
+      paystub2 = parseFloat($('weeklyPaystub2').value) || 0;
+      total = paystub1 + paystub2; average = total / 2; annual = average * 52; break;
+    case 'twiceMonth':
+      paystub1 = parseFloat($('twiceMonthPaystub1').value) || 0;
+      paystub2 = parseFloat($('twiceMonthPaystub2').value) || 0;
+      total = paystub1 + paystub2; average = total / 2; annual = average * 24; break;
+    case 'verbal':
+      verbalHours = parseFloat($('verbalHours').value) || 0;
+      verbalRate  = parseFloat($('verbalRate').value)  || 0;
+      total = verbalHours * verbalRate; average = total; annual = total * 52; break;
+    default: return;
+  }
+  $(`${type}Total`).textContent   = total.toFixed(2);
+  $(`${type}Average`).textContent = average.toFixed(2);
+  $(`${type}Annual`).textContent  = annual.toFixed(2);
+  calculateGrandTotal();
+}
+window.calculateIncome = calculateIncome;
 
+/* ===== Grand total (unchanged) ===== */
+function calculateGrandTotal() {
+  const biweeklyAnnual   = parseFloat($('biweeklyAnnual').textContent)   || 0;
+  const weeklyAnnual     = parseFloat($('weeklyAnnual').textContent)     || 0;
+  const twiceMonthAnnual = parseFloat($('twiceMonthAnnual').textContent) || 0;
+  const verbalAnnual     = parseFloat($('verbalAnnual').textContent)     || 0;
+
+  const weeklyTips   = parseFloat($('AnnualTips').value)          || 0; // weekly
+  const otherMonthly = parseFloat($('AnnualOtherMonthly').value)  || 0; // monthly
+  const otherAnnual  = parseFloat($('OtherAnnual').value)         || 0; // annual
+
+  let GrandTotal = biweeklyAnnual + weeklyAnnual + twiceMonthAnnual + verbalAnnual
+                 + (weeklyTips * 52) + (otherMonthly * 12) + otherAnnual;
+
+  // household members
+  document.querySelectorAll('#householdMembersContainer > div').forEach(div=>{
+    const incomeInput = div.querySelector('input[name^="memberIncome"]');
+    const freqSelect  = div.querySelector('select[name^="memberFrequency"]');
+    if (incomeInput && freqSelect && incomeInput.value){
+      const amt = parseFloat(incomeInput.value) || 0;
+      let annual = amt;
+      if (freqSelect.value === 'weekly')   annual = amt*52;
+      if (freqSelect.value === 'biweekly') annual = amt*26;
+      if (freqSelect.value === 'monthly')  annual = amt*12;
+      GrandTotal += annual;
+    }
+  });
+
+  $('grandTotal').textContent = GrandTotal.toFixed(2);
+  updateHouseholdIncome();
+}
+window.calculateGrandTotal = calculateGrandTotal;
+
+/* ===== Household summary ===== */
+function updateHouseholdIncome(){
+  const size   = parseInt($('householdSize').value) || 0;
+  const income = parseFloat($('grandTotal').textContent) || 0;
+
+  $('coverageLevel').textContent   = determineCoverageLevel(size, income);
+  $('awcQualification').textContent = determineAWCQualification(size, income);
+}
+window.updateHouseholdIncome = updateHouseholdIncome;
 function determineCoverageLevel(householdSize, yearlyIncome){
   const row = coverageChart[householdSize];
   if (!row) return "N/A";
@@ -408,3 +476,119 @@ document.querySelectorAll('.toggleNotes').forEach(button => {
         notes.style.display = (notes.style.display === 'none' || notes.style.display === '') ? 'block' : 'none';
     });
 });
+// Add this helper function - this is what's missing!
+function $(id) {
+    return document.getElementById(id);
+}
+
+// Modal functionality for the coverage charts
+document.addEventListener('DOMContentLoaded', function() {
+    // Modal 1 - Coverage Chart
+    const trigger1 = $('#triggerModal1');
+    const overlay1 = $('#modalOverlay1');
+    
+    if (trigger1 && overlay1) {
+        trigger1.addEventListener('click', () => {
+            overlay1.style.display = 'flex';
+        });
+        
+        overlay1.addEventListener('click', (e) => {
+            if (e.target === overlay1) {
+                overlay1.style.display = 'none';
+            }
+        });
+    }
+
+    // Modal 2 - AWC Chart
+    const trigger2 = $('#triggerModal2');
+    const overlay2 = $('#modalOverlay2');
+    
+    if (trigger2 && overlay2) {
+        trigger2.addEventListener('click', () => {
+            overlay2.style.display = 'flex';
+        });
+        
+        overlay2.addEventListener('click', (e) => {
+            if (e.target === overlay2) {
+                overlay2.style.display = 'none';
+            }
+        });
+    }
+
+    // Notes toggle functionality
+    const notesBtn = document.querySelector('.toggleNotes');
+    const notesContainer = $('#notesContainer');
+    
+    if (notesBtn && notesContainer) {
+        notesBtn.addEventListener('click', () => {
+            notesContainer.style.display = notesContainer.style.display === 'none' ? 'block' : 'none';
+        });
+        // Hide notes by default
+        notesContainer.style.display = 'none';
+    }
+
+    // Household members functionality
+    const householdSize = $('#householdSize');
+    if (householdSize) {
+        householdSize.addEventListener('change', updateHouseholdMembers);
+    }
+});
+
+// Household members management
+function updateHouseholdMembers() {
+    const container = $('#householdMembersContainer');
+    const size = parseInt($('#householdSize').value) || 1;
+    
+    if (!container) return;
+    
+    // Clear existing members (keep first one)
+    container.innerHTML = '';
+    
+    // Add member inputs (starting from 2 since primary is 1)
+    for (let i = 2; i <= size; i++) {
+        const div = document.createElement('div');
+        div.className = 'household-member';
+        div.innerHTML = `
+            <h3>Household Member ${i}</h3>
+            <label>Income: $
+                <input type="number" name="memberIncome${i}" value="0" onchange="calculateGrandTotal()">
+            </label>
+            <label>Frequency:
+                <select name="memberFrequency${i}" onchange="calculateGrandTotal()">
+                    <option value="annual">Annual</option>
+                    <option value="monthly">Monthly</option>
+                    <option value="biweekly">Biweekly</option>
+                    <option value="weekly">Weekly</option>
+                </select>
+            </label>
+        `;
+        container.appendChild(div);
+    }
+}
+
+// Copy income info function
+function copyIncomeInfo() {
+    const total = $('#grandTotal').textContent;
+    const coverage = $('#coverageLevel').textContent;
+    const awc = $('#awcQualification').textContent;
+    const notes = $('#userNotes').value;
+    
+    const text = `HOUSEHOLD INCOME SUMMARY\n` +
+                 `Total Annual Income: $${total}\n` +
+                 `Coverage Level: ${coverage}\n` +
+                 `AWC Qualification: ${awc}\n` +
+                 `Notes: ${notes || 'None'}`;
+    
+    navigator.clipboard.writeText(text).then(() => {
+        alert('Household info copied to clipboard!');
+    }).catch(err => {
+        // Fallback for older browsers
+        const textArea = document.createElement('textarea');
+        textArea.value = text;
+        document.body.appendChild(textArea);
+        textArea.select();
+        document.execCommand('copy');
+        document.body.removeChild(textArea);
+        alert('Household info copied to clipboard!');
+    });
+}
