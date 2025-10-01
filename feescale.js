@@ -110,6 +110,14 @@ function setupHouseholdSectionToggle() {
     }
   });
 }
+const size = document.getElementById('householdSize');
+if (size) {
+  size.addEventListener('input', () => {
+    updateHouseholdMemberFields();
+    updateHouseholdIncome();
+  });
+}
+
 function updateHouseholdIncome() {
   const householdSize = parseInt(document.getElementById('householdSize')?.value) || 0;
   const yearlyIncome  = parseFloat(document.getElementById('grandTotal')?.textContent) || 0;
