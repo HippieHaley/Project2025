@@ -161,14 +161,6 @@ function renderCatalog() {
         row.appendChild(qb);
       });
     }
-
-    // Add button
-    const addBtn = document.createElement('button');
-    addBtn.className = 'btn';
-    addBtn.textContent = 'Add';
-    addBtn.addEventListener('click', () => addLine(name, 1));
-    row.appendChild(addBtn);
-
     // Codes
     const codesSpan = document.createElement('span');
     codesSpan.className = 'codes' + (showCodes ? ' show' : '');
