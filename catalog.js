@@ -184,7 +184,51 @@ const procedures = [
     category: "procedures",
     keywords: ["iud removal", "liletta", "paragard", "mirena"]
   },
-
+{
+  name: "Female Genital Wart Treatment",
+  cpt: "56501",
+  hcpcs: "",
+  icd10: "A63.0",
+  fullprice: 323,
+  category: "procedures",
+  keywords: ["female genital wart", "wart treatment", "56501"]
+},
+{
+  name: "Male Genital Wart Treatment",
+  cpt: "54050",
+  hcpcs: "",
+  icd10: "A63.0",
+  fullprice: 300,
+  category: "procedures",
+  keywords: ["male genital wart", "wart treatment", "54050"]
+},
+{
+  name: "Injection Fee",
+  cpt: "96372",
+  hcpcs: "",
+  icd10: "",
+  fullprice: 38,
+  category: "procedures",
+  keywords: ["injection", "96372"]
+},
+{
+  name: "Vasectomy",
+  cpt: "55250",
+  hcpcs: "",
+  icd10: "Z30.2",
+  fullprice: 847,
+  category: "procedures",
+  keywords: ["vasectomy", "male sterilization", "55250"]
+},
+{
+  name: "Venipuncture",
+  cpt: "36415",
+  hcpcs: "",
+  icd10: "",
+  fullprice: 7,
+  category: "procedures",
+  keywords: ["venipuncture", "blood draw", "36415"]
+},
   // ======================
   // COMMON MEDS
   // ======================
@@ -264,6 +308,96 @@ const procedures = [
     category: "labs",
     keywords: ["pap", "conventional pap"]
   },
+  {
+  name: "Herpes Viral Culture",
+  cpt: "87254",
+  hcpcs: "",
+  icd10: "A60.9",
+  fullprice: 39,
+  category: "labs",
+  keywords: ["herpes", "viral culture", "87254"]
+},
+{
+  name: "Syphilis-TPPA",
+  cpt: "86593",
+  hcpcs: "",
+  icd10: "A51.9",
+  fullprice: 35,
+  category: "labs",
+  keywords: ["syphilis", "TPPA", "86593"]
+},
+{
+  name: "RPR Qualitative",
+  cpt: "86592",
+  hcpcs: "",
+  icd10: "A51.9",
+  fullprice: 20,
+  category: "labs",
+  keywords: ["syphilis", "RPR", "86592"]
+},
+{
+  name: "HIV Rapid",
+  cpt: "86703",
+  hcpcs: "",
+  icd10: "B20",
+  fullprice: 40,
+  category: "labs",
+  keywords: ["HIV", "rapid", "86703"]
+},
+{
+  name: "HIV Serum",
+  cpt: "87389",
+  hcpcs: "",
+  icd10: "B20",
+  fullprice: 22,
+  category: "labs",
+  keywords: ["HIV", "serum", "87389"]
+},
+{
+  name: "Pathology Interpretation",
+  cpt: "88141",
+  hcpcs: "",
+  icd10: "",
+  fullprice: 72,
+  category: "labs",
+  keywords: ["pathology", "interpretation", "88141"]
+},
+{
+  name: "Urine Pregnancy Test",
+  cpt: "81025",
+  hcpcs: "",
+  icd10: "Z32.02",
+  fullprice: 20,
+  category: "labs",
+  keywords: ["pregnancy test", "urine", "81025"]
+},
+{
+  name: "UA Dipstick",
+  cpt: "81002",
+  hcpcs: "",
+  icd10: "R82.5",
+  fullprice: 8,
+  category: "labs",
+  keywords: ["urinalysis", "dipstick", "81002"]
+},
+{
+  name: "UA Dip Automated",
+  cpt: "81003",
+  hcpcs: "",
+  icd10: "R82.5",
+  fullprice: 10,
+  category: "labs",
+  keywords: ["urinalysis", "automated", "81003"]
+},
+{
+  name: "Wet Mount/Gram Stain",
+  cpt: "87210",
+  hcpcs: "",
+  icd10: "N76.0",
+  fullprice: 15,
+  category: "labs",
+  keywords: ["wet mount", "gram stain", "87210"]
+},
 
   // ======================
   // SUPPLIES + CONTRACEPTIVES
@@ -304,6 +438,61 @@ const procedures = [
     category: "meds",
     keywords: ["xulane", "patch", "birth control"]
   },
+  {
+  name: "Liletta IUD",
+  cpt: "",
+  hcpcs: "J7297",
+  icd10: "Z30.430",
+  fullprice: 113,
+  category: "meds",
+  keywords: ["Liletta", "IUD", "J7297"]
+},
+{
+  name: "Paragard IUD",
+  cpt: "",
+  hcpcs: "J7300",
+  icd10: "Z30.430",
+  fullprice: 276,
+  category: "meds",
+  keywords: ["Paragard", "IUD", "J7300"]
+},
+{
+  name: "Mirena IUD",
+  cpt: "",
+  hcpcs: "J7302",
+  icd10: "Z30.430",
+  fullprice: 942,
+  category: "meds",
+  keywords: ["Mirena", "IUD", "J7302"]
+},
+{
+  name: "Basal Thermometer",
+  cpt: "",
+  hcpcs: "A4931",
+  icd10: "",
+  fullprice: 16,
+  category: "meds",
+  keywords: ["basal thermometer", "A4931"]
+},
+{
+  name: "VCF Foam",
+  cpt: "",
+  hcpcs: "A4269",
+  icd10: "",
+  fullprice: 16,
+  category: "meds",
+  keywords: ["VCF foam", "contraceptive", "A4269"]
+},
+{
+  name: "Gynol II",
+  cpt: "",
+  hcpcs: "A4269",
+  icd10: "",
+  fullprice: 7,
+  category: "meds",
+  keywords: ["Gynol II", "contraceptive", "A4269"]
+},
+
 
   // ======================
   // ORAL CONTRACEPTIVES (OC) – dropdown
@@ -397,7 +586,178 @@ const procedures = [
     fullprice: 14,
     category: " oral contraceptives",
     keywords: ["trivora", "oc", "pill"]
-  }
+  },
+  {
+  name: "Aubra",
+  cpt: "",
+  hcpcs: "S4993",
+  icd10: "Z30.011",
+  fullprice: 6,
+  category: "oral contraceptives",
+  keywords: ["Aubra", "oc", "pill", "S4993"]
+},
+{
+  name: "Chateal",
+  cpt: "",
+  hcpcs: "S4993",
+  icd10: "Z30.011",
+  fullprice: 4,
+  category: "oral contraceptives",
+  keywords: ["Chateal", "oc", "pill", "S4993"]
+},
+{
+  name: "Cyred",
+  cpt: "",
+  hcpcs: "S4993",
+  icd10: "Z30.011",
+  fullprice: 4,
+  category: "oral contraceptives",
+  keywords: ["Cyred", "oc", "pill", "S4993"]
+},
+{
+  name: "Enpresse",
+  cpt: "",
+  hcpcs: "S4993",
+  icd10: "Z30.011",
+  fullprice: 6,
+  category: "oral contraceptives",
+  keywords: ["Enpresse", "oc", "pill", "S4993"]
+},
+{
+  name: "Jolivette",
+  cpt: "",
+  hcpcs: "S4993",
+  icd10: "Z30.011",
+  fullprice: 4,
+  category: "oral contraceptives",
+  keywords: ["Jolivette", "oc", "pill", "S4993"]
+},
+{
+  name: "Lyza",
+  cpt: "",
+  hcpcs: "S4993",
+  icd10: "Z30.011",
+  fullprice: 4,
+  category: "oral contraceptives",
+  keywords: ["Lyza", "oc", "pill", "S4993"]
+},
+{
+  name: "Mononessa",
+  cpt: "",
+  hcpcs: "S4993",
+  icd10: "Z30.011",
+  fullprice: 4,
+  category: "oral contraceptives",
+  keywords: ["Mononessa", "oc", "pill", "S4993"]
+},
+{
+  name: "Nor QD",
+  cpt: "",
+  hcpcs: "S4993",
+  icd10: "Z30.011",
+  fullprice: 9,
+  category: "oral contraceptives",
+  keywords: ["Nor QD", "oc", "pill", "S4993"]
+},
+{
+  name: "Nordette",
+  cpt: "",
+  hcpcs: "S4993",
+  icd10: "Z30.011",
+  fullprice: 4,
+  category: "oral contraceptives",
+  keywords: ["Nordette", "oc", "pill", "S4993"]
+},
+{
+  name: "Norethindrone",
+  cpt: "",
+  hcpcs: "S4993",
+  icd10: "Z30.011",
+  fullprice: 1,
+  category: "oral contraceptives",
+  keywords: ["Norethindrone", "oc", "pill", "S4993"]
+},
+{
+  name: "Nortrel 777",
+  cpt: "",
+  hcpcs: "S4993",
+  icd10: "Z30.011",
+  fullprice: 5,
+  category: "oral contraceptives",
+  keywords: ["Nortrel 777", "oc", "pill", "S4993"]
+},
+{
+  name: "Orsythia",
+  cpt: "",
+  hcpcs: "S4993",
+  icd10: "Z30.011",
+  fullprice: 4,
+  category: "oral contraceptives",
+  keywords: ["Orsythia", "oc", "pill", "S4993"]
+},
+{
+  name: "Portia",
+  cpt: "",
+  hcpcs: "S4993",
+  icd10: "Z30.011",
+  fullprice: 1,
+  category: "oral contraceptives",
+  keywords: ["Portia", "oc", "pill", "S4993"]
+},
+{
+  name: "Reclipsen",
+  cpt: "",
+  hcpcs: "S4993",
+  icd10: "Z30.011",
+  fullprice: 11,
+  category: "oral contraceptives",
+  keywords: ["Reclipsen", "oc", "pill", "S4993"]
+},
+{
+  name: "Sronyx",
+  cpt: "",
+  hcpcs: "S4993",
+  icd10: "Z30.011",
+  fullprice: 5,
+  category: "oral contraceptives",
+  keywords: ["Sronyx", "oc", "pill", "S4993"]
+},
+{
+  name: "Tri-Lo Sprintec",
+  cpt: "",
+  hcpcs: "S4993",
+  icd10: "Z30.011",
+  fullprice: 2,
+  category: "oral contraceptives",
+  keywords: ["Tri-Lo Sprintec", "oc", "pill", "S4993"]
+},
+{
+  name: "TriNessa Lo",
+  cpt: "",
+  hcpcs: "S4993",
+  icd10: "Z30.011",
+  fullprice: 4,
+  category: "oral contraceptives",
+  keywords: ["TriNessa Lo", "oc", "pill", "S4993"]
+},
+{
+  name: "Triphasil",
+  cpt: "",
+  hcpcs: "S4993",
+  icd10: "Z30.011",
+  fullprice: 4,
+  category: "oral contraceptives",
+  keywords: ["Triphasil", "oc", "pill", "S4993"]
+},
+{
+  name: "Vilbra",
+  cpt: "",
+  hcpcs: "S4993",
+  icd10: "Z30.011",
+  fullprice: 5,
+  category: "oral contraceptives",
+  keywords: ["Vilbra", "oc", "pill", "S4993"]
+}
 ];
 
 export default procedures;
