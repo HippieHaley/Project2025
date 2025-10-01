@@ -144,6 +144,7 @@
       margin: 0 0 12px;
       font-size: 1.1rem;
       text-align: center;
+      grid-column: 1 / span 2;
       border-bottom: 1px solid var(--border);
       padding-bottom: 8px;
       color: var(--primary);
@@ -164,7 +165,7 @@
       grid-template-columns: 1fr 1fr;
       gap: 20px;
     }
-    #section-visits h3::before { content: "🩺"; }
+    #section-visits h3::before { content: "🩺";}
     #section-visits .list {
       grid-column: 1 / span 2;
       display: grid;
@@ -379,8 +380,6 @@
 <body>
   <div class="container">
     <h1>Medical Service Pricelist</h1>
-
-    <!-- Controls for filtering, searching, etc. -->
     <div class="controls">
       <input type="text" id="searchInput" placeholder="Search..." />
       <select id="percentSelector">
