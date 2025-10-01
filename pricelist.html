@@ -1,154 +1,341 @@
 <!DOCTYPE html>
 <html lang="en">
+  <script src="catalog.js"></script>
 <head>
   <meta charset="UTF-8" />
   <title>Interactive Pricelist</title>
-  <link rel="stylesheet" href="./style.css">
   <style>
-    :root{
-      --blue:#acdbf9; --ink:#222; --rule:#000; --bar:#d9d9d9;
+    :root {
+      --blue: #acdbf9; 
+      --ink: #222; 
+      --rule: #000; 
+      --bar: #d9d9d9;
     }
-    html,body{ margin:0; }
-    body{ background:var(--blue); color:var(--ink); font-family:Arial, Helvetica, sans-serif; }
-
-    .page-wrapper{ max-width:1100px; margin:0 auto; padding:0 16px 40px; }
-
-    .back-home{
-      position:fixed; top:20px; left:20px;
-      display:inline-block; padding:10px 20px; border:1px solid #000; border-radius:30px;
-      background:#f8c9f9; color:#000; text-decoration:none; font-weight:700;
+    
+    html, body { 
+      margin: 0; 
+      font-family: Arial, Helvetica, sans-serif; 
+    }
+    
+    body { 
+      background: var(--blue); 
+      color: var(--ink); 
     }
 
-    header{ text-align:center; padding-top:72px; }
-    .controls{
-      margin:10px auto 14px; display:flex; flex-wrap:wrap; gap:10px; align-items:center; justify-content:center;
+    .page-wrapper { 
+      max-width: 1100px; 
+      margin: 0 auto; 
+      padding: 0 16px 40px; 
     }
-    select#percentSelector, .toggle-codes{
-      padding:8px 12px; border:1px solid #000; border-radius:22px; background:#f8c9f9; font-weight:600;
-    }
-    .toggle-codes{ cursor:pointer; user-select:none; }
 
-    /* overall page columns: left grid + receipt */
-    .content{ display:grid; grid-template-columns: 1fr 360px; gap:18px; }
+    .back-home {
+      position: fixed; 
+      top: 20px; 
+      left: 20px;
+      display: inline-block; 
+      padding: 10px 20px; 
+      border: 1px solid #000; 
+      border-radius: 30px;
+      background: #f8c9f9; 
+      color: #000; 
+      text-decoration: none; 
+      font-weight: 700;
+    }
+
+    header { 
+      text-align: center; 
+      padding-top: 72px; 
+    }
+    
+    .controls {
+      margin: 10px auto 14px; 
+      display: flex; 
+      flex-wrap: wrap; 
+      gap: 10px; 
+      align-items: center; 
+      justify-content: center;
+    }
+    
+    select#percentSelector, .toggle-codes {
+      padding: 8px 12px; 
+      border: 1px solid #000; 
+      border-radius: 22px; 
+      background: #f8c9f9; 
+      font-weight: 600;
+    }
+    
+    .toggle-codes { 
+      cursor: pointer; 
+      user-select: none; 
+    }
+
+    /* Overall page columns: left grid + receipt */
+    .content { 
+      display: grid; 
+      grid-template-columns: 1fr 360px; 
+      gap: 18px; 
+    }
 
     /* =======================
-       LEFT: 2 ROWS × 4 COLS
+       CORRECTED GRID LAYOUT
        ======================= */
-    .sections{
-      display:grid;
-      grid-template-columns: repeat(4, 1fr);
-      grid-template-rows: auto auto;   /* 2 rows */
-      gap:10px 10px;
-      border-top:2px solid var(--rule);
-      border-bottom:2px solid var(--rule);
-      padding:8px 0 6px;
-      align-items:start;
+    .sections {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr); /* Only 3 columns needed */
+      grid-template-rows: auto auto;         /* 2 rows */
+      gap: 10px 10px;
+      border-top: 2px solid var(--rule);
+      border-bottom: 2px solid var(--rule);
+      padding: 8px 0 6px;
+      align-items: start;
     }
 
-    /* Row 1: Visit Codes occupies all width but is internally split into 4 mini-columns */
-    #section-visits{
-      grid-column:1 / span 4; grid-row:1;
-      padding:0 6px;
+    /* ROW 1: Visit Codes spans first 2 columns */
+    #section-visits {
+      grid-column: 1 / span 2;  /* Spans columns 1-2 */
+      grid-row: 1;
+      padding: 0 6px;
     }
 
-    /* Row 2: three working columns + an empty spacer (keeps 4-col skeleton) */
-    #section-procedures{ grid-column:1; grid-row:2; padding:0 6px; }
-    #section-labs{ grid-column:2; grid-row:2; padding:0 6px; }
-    #section-oc{ grid-column:2; grid-row:2; padding:0 6px; } /* appears under Labs */
-    #section-meds{ grid-column:3; grid-row:2; padding:0 6px; }
-    .col-spacer{ grid-column:4; grid-row:2; } /* unused, preserves 4th column */
-
-    /* Grey section bars like screenshot */
-    .section{ background:transparent; border:none; }
-    .bar{
-      background:var(--bar);
-      padding:6px 8px; font-weight:800; font-size:.9rem; text-transform:uppercase;
-      border:1px solid var(--rule);
-      margin:0 0 4px 0;
+    /* ROW 2: Three working sections */
+    #section-procedures { 
+      grid-column: 1; 
+      grid-row: 2; 
+      padding: 0 6px; 
+      border-right: 1px solid #000;
+    }
+    
+    #section-labs { 
+      grid-column: 2; 
+      grid-row: 2; 
+      padding: 0 6px; 
+      border-right: 1px solid #000;
+    }
+    
+    #section-meds { 
+      grid-column: 3; 
+      grid-row: 2; 
+      padding: 0 6px; 
     }
 
-    /* VISIT CODES block broken into 4 sub-columns with borders like four little cards */
-    #section-visits .list{
-      column-count: 4;
+    /* Grey section bars */
+    .section { 
+      background: transparent; 
+      border: none; 
+    }
+    
+    .bar {
+      background: var(--bar);
+      padding: 6px 8px; 
+      font-weight: 800; 
+      font-size: .9rem; 
+      text-transform: uppercase;
+      border: 1px solid var(--rule);
+      margin: 0 0 4px 0;
+    }
+
+    /* VISIT CODES block broken into 2 sub-columns */
+    #section-visits .list {
+      column-count: 2;
       column-gap: 10px;
     }
-    #section-visits .subbox{
+    
+    #section-visits .subbox {
       break-inside: avoid;
-      border:1px solid var(--rule);
-      padding:6px 8px;
-      margin:0 0 8px 0;
+      border: 1px solid var(--rule);
+      padding: 6px 8px;
+      margin: 0 0 8px 0;
     }
-    #section-visits .subbox .subhead{
-      font-weight:800; font-size:.82rem; text-transform:uppercase;
-      margin:0 0 6px 0;
-      display:flex; justify-content:space-between; align-items:center;
+    
+    #section-visits .subbox .subhead {
+      font-weight: 800; 
+      font-size: .82rem; 
+      text-transform: uppercase;
+      margin: 0 0 6px 0;
+      display: flex; 
+      justify-content: space-between; 
+      align-items: center;
     }
 
     /* rows look like ticket lines: left label, right codes/btn, dotted rule */
-    .list{ margin:0; padding:0; }
-    .item{
-      display:grid; grid-template-columns: 1fr auto; align-items:center;
-      gap:10px; padding:4px 0; border-bottom:1px dotted var(--rule);
+    .list { 
+      margin: 0; 
+      padding: 0; 
     }
-    .item:last-child{ border-bottom:none; }
+    
+    .item {
+      display: grid; 
+      grid-template-columns: 1fr auto; 
+      align-items: center;
+      gap: 10px; 
+      padding: 4px 0; 
+      border-bottom: 1px dotted var(--rule);
+    }
+    
+    .item:last-child { 
+      border-bottom: none; 
+    }
 
     /* leading open circle (purely visual) */
-    .item::before{
-      content:""; width:11px; height:11px; border:1.6px solid var(--rule); border-radius:50%;
-      margin-right:8px; justify-self:start;
+    .item::before {
+      content: ""; 
+      width: 11px; 
+      height: 11px; 
+      border: 1.6px solid var(--rule); 
+      border-radius: 50%;
+      margin-right: 8px; 
+      justify-self: start;
     }
-    .item > *:first-child{ display:flex; align-items:center; gap:8px; }
+    
+    .item > *:first-child { 
+      display: flex; 
+      align-items: center; 
+      gap: 8px; 
+    }
 
     /* right-aligned code text (CPT/HCPCS/etc) */
-    .codes, .code-right{
-      font-size:.8rem; opacity:.9; font-variant-numeric:tabular-nums; text-align:right;
+    .codes, .code-right {
+      font-size: .8rem; 
+      opacity: .9; 
+      font-variant-numeric: tabular-nums; 
+      text-align: right;
     }
-    .codes{ display:none; }  /* your JS toggles .show */
-    .codes.show{ display:inline; }
+    
+    .codes { 
+      display: none; 
+    }  /* your JS toggles .show */
+    
+    .codes.show { 
+      display: inline; 
+    }
 
-    /* “Add” buttons: small outlined squares like the paper buttons */
-    .btn, .item button{
-      background:#fff; border:1px solid var(--rule); border-radius:6px;
-      padding:2px 8px; font-size:.78rem; font-weight:800; cursor:pointer;
+    /* "Add" buttons: small outlined squares like the paper buttons */
+    .btn, .item button {
+      background: #fff; 
+      border: 1px solid var(--rule); 
+      border-radius: 2px;
+      padding: 1px 4px; 
+      font-size: .78rem; 
+      font-weight: 800; 
+      cursor: pointer;
+      min-width: 20px;
+      height: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
-    .btn:hover, .item button:hover{ background:#eee; }
+    
+    .btn:hover, .item button:hover { 
+      background: #f0f0f0; 
+    }
 
     /* OC control under Labs */
-    .oc-row{ display:flex; flex-direction:column; gap:6px; align-items:flex-start; margin:6px 0 2px; }
-    .oc-row select{ min-width:240px; padding:6px 10px; border:1px solid #000; border-radius:20px; background:#f8c9f9; }
+    .oc-row { 
+      display: flex; 
+      flex-direction: column; 
+      gap: 6px; 
+      align-items: flex-start; 
+      margin: 6px 0 2px; 
+    }
+    
+    .oc-row select { 
+      min-width: 240px; 
+      padding: 6px 10px; 
+      border: 1px solid #000; 
+      border-radius: 20px; 
+      background: #f8c9f9; 
+    }
 
     /* RIGHT: receipt box */
-    .receipt{
-      position:sticky; top:16px;
-      background:#fff; border:1px solid var(--rule); padding:12px;
+    .receipt {
+      position: sticky; 
+      top: 16px;
+      background: #fff; 
+      border: 1px solid var(--rule); 
+      padding: 12px;
     }
-    .receipt h2{ margin:0 0 8px 0; text-transform:uppercase; font-size:1rem; }
-    .receipt-item{
-      display:grid; grid-template-columns: 1fr 84px 32px; gap:8px; align-items:center; margin:4px 0;
+    
+    .receipt h2 { 
+      margin: 0 0 8px 0; 
+      text-transform: uppercase; 
+      font-size: 1rem; 
     }
-    .qty-select{ width:84px; padding:6px 10px; border:1px solid var(--rule); border-radius:10px; background:#eaf4fb; }
-    .remove{ height:32px; background:#eaf4fb; border:1px solid var(--rule); border-radius:8px; cursor:pointer; }
-    .total{
-      display:flex; justify-content:space-between; align-items:center; margin-top:8px; padding-top:8px;
-      border-top:2px solid var(--rule); font-weight:800; font-variant-numeric:tabular-nums;
+    
+    .receipt-item {
+      display: grid; 
+      grid-template-columns: 1fr 84px 32px; 
+      gap: 8px; 
+      align-items: center; 
+      margin: 4px 0;
+    }
+    
+    .qty-select { 
+      width: 84px; 
+      padding: 6px 10px; 
+      border: 1px solid var(--rule); 
+      border-radius: 10px; 
+      background: #eaf4fb; 
+    }
+    
+    .remove { 
+      height: 32px; 
+      background: #eaf4fb; 
+      border: 1px solid var(--rule); 
+      border-radius: 8px; 
+      cursor: pointer; 
+    }
+    
+    .total {
+      display: flex; 
+      justify-content: space-between; 
+      align-items: center; 
+      margin-top: 8px; 
+      padding-top: 8px;
+      border-top: 2px solid var(--rule); 
+      font-weight: 800; 
+      font-variant-numeric: tabular-nums;
     }
 
     /* print like the ticket */
-    @media print{
-      @page{ margin:0.5in; }
-      body{ background:#fff !important; }
-      .back-home, header{ display:none !important; }
-      .receipt{ position:static; }
+    @media print {
+      @page { 
+        margin: 0.5in; 
+      }
+      
+      body { 
+        background: #fff !important; 
+      }
+      
+      .back-home, header { 
+        display: none !important; 
+      }
+      
+      .receipt { 
+        position: static; 
+      }
     }
 
     /* mobile fallback */
-    @media (max-width: 900px){
-      .content{ grid-template-columns:1fr; }
-      .sections{ grid-template-columns: 1fr 1fr; grid-template-rows:auto auto; }
-      #section-visits{ grid-column:1 / span 2; }
-      #section-procedures{ grid-column:1; } #section-labs, #section-oc{ grid-column:2; }
-      #section-meds{ grid-column:1 / span 2; }
-      .col-spacer{ display:none; }
+    @media (max-width: 900px) {
+      .content { 
+        grid-template-columns: 1fr; 
+      }
+      
+      .sections { 
+        grid-template-columns: 1fr; 
+        grid-template-rows: auto auto auto;
+      }
+      
+      #section-visits, 
+      #section-procedures, 
+      #section-labs, 
+      #section-meds { 
+        grid-column: 1; 
+      }
+      
+      #section-visits .list {
+        column-count: 1;
+      }
     }
   </style>
 </head>
@@ -171,69 +358,84 @@
     </header>
 
     <div class="content">
-      <!-- LEFT GRID: 2 rows × 4 columns -->
+      <!-- LEFT GRID: 2 rows × 3 columns -->
       <div class="sections">
 
-        <!-- ROW 1 (spans 4 cols internally split into 4 mini columns) -->
+        <!-- ROW 1 (spans 2 cols internally split into 2 mini columns) -->
         <div class="section" id="section-visits">
           <div class="bar">Visit Codes</div>
           <div class="list">
-            <!-- your JS will inject .item lines here; the CSS below expects four subboxes, so we provide containers -->
-            <!-- If your JS already outputs groups, keep them. These 4 subboxes are optional wrappers for styling. -->
             <div class="subbox">
               <div class="subhead">New Pt/Office</div>
-              <!-- items go here from JS -->
+              <div class="item">
+                <span>New Patient - Level 1</span>
+                <div>
+                  <span class="codes">99201</span>
+                  <button>Add</button>
+                </div>
+              </div>
+              <div class="item">
+                <span>New Patient - Level 2</span>
+                <div>
+                  <span class="codes">99202</span>
+                  <button>Add</button>
+                </div>
+              </div>
+              <div class="item">
+                <span>New Patient - Level 3</span>
+                <div>
+                  <span class="codes">99203</span>
+                  <button>Add</button>
+                </div>
+              </div>
             </div>
             <div class="subbox">
               <div class="subhead">Est. Pt/Office</div>
-            </div>
-            <div class="subbox">
-              <div class="subhead">New Pt (Age)</div>
-            </div>
-            <div class="subbox">
-              <div class="subhead">Est. Pt (Age)</div>
+              <div class="item">
+                <span>Est. Patient - Level 1</span>
+                <div>
+                  <span class="codes">99211</span>
+                  <button>Add</button>
+                </div>
+              </div>
+              <div class="item">
+                <span>Est. Patient - Level 2</span>
+                <div>
+                  <span class="codes">99212</span>
+                  <button>Add</button>
+                </div>
+              </div>
+              <div class="item">
+                <span>Est. Patient - Level 3</span>
+                <div>
+                  <span class="codes">99213</span>
+                  <button>Add</button>
+                </div>
+              </div>
             </div>
           </div>
         </div>
 
-        <!-- ROW 2 (four columns; last is spacer to keep 4-col skeleton) -->
+        <!-- ROW 2 (three columns) -->
         <div class="section" id="section-procedures">
           <div class="bar">Procedures</div>
-          <div class="list"></div>
-        </div>
-
-        <div class="section" id="section-labs">
-          <div class="bar">Labs</div>
-          <div class="list"></div>
-
-          <div class="bar" style="margin-top:8px;">Oral Contraceptives</div>
-          <div class="oc-row">
-            <select id="ocSelect"></select>
-            <button class="btn" id="addOC">Add</button>
-          </div>
-        </div>
-
-        <div class="section" id="section-meds">
-          <div class="bar">Medications &amp; Supplies</div>
-          <div class="list"></div>
-        </div>
-
-        <div class="col-spacer"></div> <!-- keeps exact 4th column in row 2 -->
-      </div>
-
-      <!-- RIGHT: Receipt -->
-      <aside class="receipt">
-        <h2>Receipt</h2>
-        <div id="receiptItems"></div>
-        <div class="total">
-          <span>Total</span>
-          <span id="grandTotal">$0.00</span>
-        </div>
-        <button class="btn" id="copyReceipt">Copy Receipt</button>
-      </aside>
-    </div>
-  </div>
+          <div class="list">
+            <div class="item">
+              <span>Pap Smear</span>
+              <div>
+                <span class="codes">88142</span>
+                <button>Add</button>
+              </div>
+            </div>
+            <div class="item">
+              <span>IUD Insertion</span>
+              <div>
+                <span class="codes">58300</span>
+                <button>Add</button>
+              </div>
+            </div>
 
   <script type="module" src="./pricelist.js"></script>
+
 </body>
 </html>
