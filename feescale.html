@@ -3,8 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<script src="charts.js"></script>
-<script src="feescale.js"></script>
+<script type="module" src="feescale.js"></script>
 <link rel="stylesheet" href="style.css"><!-- optional, safe to keep -->
 <title>Income Calculator</title>
 <style>
@@ -246,7 +245,6 @@
           <input type="number" id="OtherAnnual" value="0" onchange="calculateGrandTotal()">
         </label>
       </section>
-
       <!-- Household Info -->
       <section class="card">
         <button class="icon-button" onclick="copyIncomeInfo()" aria-label="Copy Household Info">
@@ -263,42 +261,8 @@
         <h2>Household Income</h2>
         <p><strong>Total Income: $<span id="grandTotal">0</span></strong></p>
 
-        <p><strong>Client Pay: <span id="coverageLevel">N/A</span></strong>
-          <span class="modal-trigger" id="triggerModal1">
-            <img src="images/heart.png" class="heart" alt="Coverage chart">
-          </span>
-        </p>
-
-        <div class="modal-overlay" id="modalOverlay1">
-          <div class="modal">
-            <table>
-              <thead>
-                <tr>
-                  <th>Family Size</th><th>0% Patient Pay</th><th>25% Patient Pay</th>
-                  <th>50% Patient Pay</th><th>75% Patient Pay</th><th>100% Patient Pay</th>
-                </tr>
-              </thead>
-              <tbody id="coverageChart"></tbody>
-            </table>
-          </div>
-        </div>
-
-        <p><strong>AWC! qualification: <span id="awcQualification">N/A</span></strong>
-          <span class="modal-trigger" id="triggerModal2">
-            <img src="images/heart.png" class="heart" alt="AWC limits">
-          </span>
-        </p>
-        <div class="modal-overlay" id="modalOverlay2">
-          <div class="modal">
-            <h2>AWC! Program Eligibility</h2>
-            <table>
-              <thead><tr><th>Family Size</th><th>Max Annual Income</th></tr></thead>
-            <tbody id="awcTableBody"></tbody>
-            </table>
-          </div>
-        </div>
+        <p><strong>Client Pay: <span id="coverageLevel">N/A</span></strong></p>
       </section>
-    </div>
     <!-- Household members -->
     <section id="householdMembersSection" class="card" style="margin-top:24px;">
       <h2>Other Household Members</h2>
