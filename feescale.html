@@ -163,7 +163,7 @@ th {
       max-width: 100%;
     }
   }
-  #householdMembersSection {
+  .householdMembersSection {
   display: none; /* start hidden */
   grid-column: 1 / -1; /* spans all columns in a CSS grid */
 }
@@ -272,13 +272,12 @@ th {
             <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
           </svg>
         </button>
-
         <h2>Household Info</h2>
         <p>People per Household:</p>
-        <input type="number" id="householdSize" min="1" value="1" onchange="updateHouseholdMemberFields()">
-
-        <h2>Household Income</h2>
-        <p><strong>Total Income: $<span id="grandTotal">0</span></strong></p>
+         <input type="number" id="householdSize" min="1" value="1" onchange="updateHouseholdMemberFields()">
+ <h2>Household Income</h2><p><strong>Total Income: $<span id="grandTotal">0</span></strong></p>
+       
+       
 
         <!-- ADDED MODAL TRIGGERS -->
         <p><strong>Client Pay: <span id="coverageLevel">N/A</span></strong>
@@ -296,9 +295,9 @@ th {
     </div>
 
     <!-- Household members -->
-    <section id="householdMembersSection" class="card" style="margin-top:24px;">
+    <section class="householdMembersSection" class="card" style="margin-top:24px;">
       <h2>Other Household Members</h2>
-      <div id="householdMembersContainer"></div>
+      <div class="householdMembersContainer"></div>
     </section>
   </div>
 
