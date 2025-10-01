@@ -349,10 +349,31 @@ function copyIncomeInfo() {
       document.body.appendChild(tmp);
       tmp.select();
       try {
-        document.execCommand('copy');
-        document.body.removeChild(tmp);
-        alert("Copied to clipboard!");
+        // Use Clipboard API if available
+        if (navigator.clipboard && window.isSecureContext) {
+          navigator.clipboard.writeText(tmp.value)
+            .then(() => {
+              document.body.removeChild(tmp);
+              alert("Copied to clipboard!");
+            })
+            .catch(() => {
+              document.body.removeChild(tmp);
+              alert("Clipboard copy failed. Please copy manually from the console.");
+              console.log("Copy this text:\n", infoToCopy);
+            });
+        } else {
+          // Fallback for older browsers
+          const successful = document.execCommand && document.execCommand('copy');
+          document.body.removeChild(tmp);
+          if (successful) {
+            alert("Copied to clipboard!");
+          } else {
+            alert("Clipboard copy failed. Please copy manually from the console.");
+            console.log("Copy this text:\n", infoToCopy);
+          }
+        }
       } catch (e) {
+        document.body.removeChild(tmp);
         alert("Clipboard copy failed. Please copy manually from the console.");
         console.log("Copy this text:\n", infoToCopy);
       }

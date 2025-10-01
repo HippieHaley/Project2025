@@ -163,7 +163,7 @@ th {
       max-width: 100%;
     }
   }
- .householdMemberContainer {
+ .householdmemebercontainer {
   display: flex;
   flex-wrap: wrap;       /* allow children to wrap inside */
   gap: 15px;
@@ -216,10 +216,10 @@ th {
         <h2>Biweekly Income</h2>
         <p>Example: Every other Friday</p>
         <label>Paystub one: $
-          <input type="number" id="paystub1" value="0">
+          <input type="number" id="paystub1" value="0" onchange="calculateIncome('biweekly')">
         </label>
         <label>Paystub two: $
-          <input type="number" id="paystub2" value="0">
+          <input type="number" id="paystub2" value="0" onchange="calculateIncome('biweekly')">
         </label>
         <div class="hidden"><p>Total: $<span id="biweeklyTotal">0</span></p></div>
         <p>Average: $<span id="biweeklyAverage">0</span></p>
@@ -231,10 +231,10 @@ th {
         <h2>Weekly Income</h2>
         <p>Example: Every Friday</p>
         <label>Paystub one: $
-          <input type="number" id="weeklyPaystub1" value="0">
+          <input type="number" id="weeklyPaystub1" value="0" onchange="calculateIncome('weekly')">
         </label>
         <label>Paystub two: $
-          <input type="number" id="weeklyPaystub2" value="0">
+          <input type="number" id="weeklyPaystub2" value="0" onchange="calculateIncome('weekly')">
         </label>
         <div class="hidden"><p>Total: $<span id="weeklyTotal">0</span></p></div>
         <p>Average: $<span id="weeklyAverage">0</span></p>
@@ -246,10 +246,10 @@ th {
         <h2>Twice a Month Income</h2>
         <p>Example: 1st and 15th</p>
         <label>Paystub one: $
-          <input type="number" id="twiceMonthPaystub1" value="0">
+          <input type="number" id="twiceMonthPaystub1" value="0" onchange="calculateIncome('twiceMonth')">
         </label>
         <label>Paystub two: $
-          <input type="number" id="twiceMonthPaystub2" value="0">
+          <input type="number" id="twiceMonthPaystub2" value="0" onchange="calculateIncome('twiceMonth')">
         </label>
         <div class="hidden"><p>Total: $<span id="twiceMonthTotal">0</span></p></div>
         <p>Average: $<span id="twiceMonthAverage">0</span></p>
@@ -261,10 +261,10 @@ th {
         <h2>Weekly Verbal Income</h2>
         <p>Example: Freelance or hourly work</p>
         <label>Hours worked:
-          <input type="number" id="verbalHours" value="0">
+          <input type="number" id="verbalHours" value="0" onchange="calculateIncome('verbal')">
         </label>
         <label>Hourly Pay: $
-          <input type="number" id="verbalRate" value="0">
+          <input type="number" id="verbalRate" value="0" onchange="calculateIncome('verbal')">
         </label>
         <div class="hidden"><p>Total: $<span id="verbalTotal">0</span></p></div>
         <p>Average: $<span id="verbalAverage">0</span></p>
@@ -275,19 +275,19 @@ th {
       <section class="card">
         <h2>Extra Income Sources</h2>
         <label>Tips per week: $
-          <input type="number" id="AnnualTips" value="0">
+          <input type="number" id="AnnualTips" value="0" onchange="calculateGrandTotal()">
         </label>
         <label>Other Income per month: $
-          <input type="number" id="AnnualOtherMonthly" value="0">
+          <input type="number" id="AnnualOtherMonthly" value="0" onchange="calculateGrandTotal()">
         </label>
         <label>Other Income by year: $
-          <input type="number" id="OtherAnnual" value="0">
+          <input type="number" id="OtherAnnual" value="0" onchange="calculateGrandTotal()">
         </label>
       </section>
 
       <!-- Household Info -->
       <section class="card">
-        <button class="icon-button" id="copyIncomeInfoBtn" aria-label="Copy Household Info">
+        <button class="icon-button" onclick="copyIncomeInfo()" aria-label="Copy Household Info">
           <svg width="24" height="24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24">
             <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
             <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
