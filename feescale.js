@@ -177,8 +177,8 @@ function updateHouseholdMemberFields() {
 
     const incomeInput = incomeSection.querySelector(`input[name="memberIncome${i}"]`);
     const freqSelect = incomeSection.querySelector(`select[name="memberFrequency${i}"]`);
-    incomeInput?.addEventListener('input', calculateGrandTotal);
-    freqSelect?.addEventListener('change', calculateGrandTotal);
+    if (incomeInput) incomeInput.addEventListener('input', calculateGrandTotal);
+    if (freqSelect) freqSelect.addEventListener('change', calculateGrandTotal);
 
     plusBtn.addEventListener('click', () => {
       incomeSection.style.display = incomeSection.style.display === 'none' ? 'block' : 'none';
@@ -199,7 +199,6 @@ if (triggerModal1 && modalOverlay1) {
   });
   modalOverlay1.addEventListener('click', e => { if (e.target === modalOverlay1) modalOverlay1.style.display = 'none'; });
 }
-
 const triggerModal2 = document.getElementById('triggerModal2');
 const modalOverlay2 = document.getElementById('modalOverlay2');
 if (triggerModal2 && modalOverlay2) {
@@ -324,7 +323,12 @@ function copyIncomeInfo() {
 function init() {
   calculateGrandTotal();
   const size = document.getElementById('householdSize');
-  size?.addEventListener('change', updateHouseholdMemberFields);
+  if (size) {
+    size.addEventListener('input', () => {
+      updateHouseholdMemberFields();
+      updateHouseholdIncome();
+    });
+  }
 
   // Notes toggle
   document.querySelectorAll('.toggleNotes').forEach(btn => {
@@ -414,3 +418,5 @@ if (document.readyState === 'loading') {
 } else {
   init();
 }
+updateHouseholdIncome();
+updateHouseholdMemberFields();
