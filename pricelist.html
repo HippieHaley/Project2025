@@ -5,121 +5,150 @@
   <title>Interactive Pricelist</title>
   <link rel="stylesheet" href="./style.css">
   <style>
-    /* === Ticket-only formatting (no logic changes) === */
-    :root{ --blue:#acdbf9; --pink:#f8c9f9; --ink:#333; }
-    body{ background:var(--blue); margin:0; color:var(--ink); }
+    :root{
+      --blue:#acdbf9; --ink:#222; --rule:#000; --bar:#d9d9d9;
+    }
+    html,body{ margin:0; }
+    body{ background:var(--blue); color:var(--ink); font-family:Arial, Helvetica, sans-serif; }
+
     .page-wrapper{ max-width:1100px; margin:0 auto; padding:0 16px 40px; }
 
-    /* Back link pinned like your ticket header */
     .back-home{
       position:fixed; top:20px; left:20px;
-      display:inline-block; padding:10px 20px;
-      background:var(--pink); color:#000; text-decoration:none;
-      font-weight:700; border:1px solid #000; border-radius:30px;
+      display:inline-block; padding:10px 20px; border:1px solid #000; border-radius:30px;
+      background:#f8c9f9; color:#000; text-decoration:none; font-weight:700;
     }
-    .back-home:hover{ filter:brightness(.97); }
 
     header{ text-align:center; padding-top:72px; }
     .controls{
-      margin:12px auto 18px; display:flex; gap:12px; align-items:center; justify-content:center; flex-wrap:wrap;
+      margin:10px auto 14px; display:flex; flex-wrap:wrap; gap:10px; align-items:center; justify-content:center;
     }
-    select#percentSelector,.toggle-codes{
-      padding:8px 14px; border:1px solid #000; border-radius:24px; background:var(--pink); font-weight:600;
+    select#percentSelector, .toggle-codes{
+      padding:8px 12px; border:1px solid #000; border-radius:22px; background:#f8c9f9; font-weight:600;
     }
     .toggle-codes{ cursor:pointer; user-select:none; }
 
-    /* Layout: left sections + right receipt */
-    .content{ display:grid; grid-template-columns: 1fr 360px; gap:18px; align-items:start; }
+    /* overall page columns: left grid + receipt */
+    .content{ display:grid; grid-template-columns: 1fr 360px; gap:18px; }
 
-    /* === TWO-ROW TICKET GRID ON THE LEFT === */
+    /* =======================
+       LEFT: 2 ROWS × 4 COLS
+       ======================= */
     .sections{
       display:grid;
-      grid-template-columns: repeat(4, 1fr); /* virtual grid, we place sections onto it */
-      gap:0 12px;
-      border-top:2px solid #000;
-      border-bottom:2px solid #000;
-      padding:6px 0 4px;
+      grid-template-columns: repeat(4, 1fr);
+      grid-template-rows: auto auto;   /* 2 rows */
+      gap:10px 10px;
+      border-top:2px solid var(--rule);
+      border-bottom:2px solid var(--rule);
+      padding:8px 0 6px;
+      align-items:start;
     }
 
-    /* Row 1: Visits spans entire width */
-    #section-visits{ grid-column:1 / span 4; padding:0 6px; margin-bottom:8px; }
-
-    /* Row 2: Three ticket columns */
-    #section-procedures{ grid-column:1 / span 1; padding:0 6px; border-right:1px solid #000; }
-    #section-labs{ grid-column:2 / span 1; padding:0 6px; border-right:1px solid #000; }
-    #section-oc{ grid-column:2 / span 1; padding:0 6px; } /* OC sits right under Labs */
-    #section-meds{ grid-column:3 / span 2; padding:0 6px; } /* spans remaining width */
-
-    /* Ticket headings & lines */
-    .section{ background:transparent; border:none; border-radius:0; }
-    .section h2{
-      margin:0 0 4px 0; font-size:.9rem; font-weight:700; text-transform:uppercase;
-      border-bottom:1px solid #000; padding-bottom:3px; letter-spacing:.02em;
+    /* Row 1: Visit Codes occupies all width but is internally split into 4 mini-columns */
+    #section-visits{
+      grid-column:1 / span 4; grid-row:1;
+      padding:0 6px;
     }
-    .list{ margin-top:2px; }
 
-    /* Item rows: label left, control right, dotted rule */
-    .item{
+    /* Row 2: three working columns + an empty spacer (keeps 4-col skeleton) */
+    #section-procedures{ grid-column:1; grid-row:2; padding:0 6px; }
+    #section-labs{ grid-column:2; grid-row:2; padding:0 6px; }
+    #section-oc{ grid-column:2; grid-row:2; padding:0 6px; } /* appears under Labs */
+    #section-meds{ grid-column:3; grid-row:2; padding:0 6px; }
+    .col-spacer{ grid-column:4; grid-row:2; } /* unused, preserves 4th column */
+
+    /* Grey section bars like screenshot */
+    .section{ background:transparent; border:none; }
+    .bar{
+      background:var(--bar);
+      padding:6px 8px; font-weight:800; font-size:.9rem; text-transform:uppercase;
+      border:1px solid var(--rule);
+      margin:0 0 4px 0;
+    }
+
+    /* VISIT CODES block broken into 4 sub-columns with borders like four little cards */
+    #section-visits .list{
+      column-count: 4;
+      column-gap: 10px;
+    }
+    #section-visits .subbox{
+      break-inside: avoid;
+      border:1px solid var(--rule);
+      padding:6px 8px;
+      margin:0 0 8px 0;
+    }
+    #section-visits .subbox .subhead{
+      font-weight:800; font-size:.82rem; text-transform:uppercase;
+      margin:0 0 6px 0;
       display:flex; justify-content:space-between; align-items:center;
-      padding:3px 0; border-bottom:1px dotted #000;
+    }
+
+    /* rows look like ticket lines: left label, right codes/btn, dotted rule */
+    .list{ margin:0; padding:0; }
+    .item{
+      display:grid; grid-template-columns: 1fr auto; align-items:center;
+      gap:10px; padding:4px 0; border-bottom:1px dotted var(--rule);
     }
     .item:last-child{ border-bottom:none; }
-    .item .price{ justify-self:end; font-variant-numeric:tabular-nums; font-weight:600; }
 
-    /* “Add” buttons: outlined ticket look */
+    /* leading open circle (purely visual) */
+    .item::before{
+      content:""; width:11px; height:11px; border:1.6px solid var(--rule); border-radius:50%;
+      margin-right:8px; justify-self:start;
+    }
+    .item > *:first-child{ display:flex; align-items:center; gap:8px; }
+
+    /* right-aligned code text (CPT/HCPCS/etc) */
+    .codes, .code-right{
+      font-size:.8rem; opacity:.9; font-variant-numeric:tabular-nums; text-align:right;
+    }
+    .codes{ display:none; }  /* your JS toggles .show */
+    .codes.show{ display:inline; }
+
+    /* “Add” buttons: small outlined squares like the paper buttons */
     .btn, .item button{
-      background:#fff; border:1px solid #000; border-radius:6px;
-      padding:2px 8px; font-size:.8rem; font-weight:700; cursor:pointer;
+      background:#fff; border:1px solid var(--rule); border-radius:6px;
+      padding:2px 8px; font-size:.78rem; font-weight:800; cursor:pointer;
     }
     .btn:hover, .item button:hover{ background:#eee; }
 
-    /* Codes show inline like small ticket notes */
-    .codes{ font-size:.8rem; font-style:italic; opacity:.85; display:none; }
-    .codes.show{ display:inline; }
+    /* OC control under Labs */
+    .oc-row{ display:flex; flex-direction:column; gap:6px; align-items:flex-start; margin:6px 0 2px; }
+    .oc-row select{ min-width:240px; padding:6px 10px; border:1px solid #000; border-radius:20px; background:#f8c9f9; }
 
-    /* OC control compact and left-aligned under Labs */
-    .oc-row{ display:flex; flex-direction:column; gap:6px; align-items:flex-start; margin:4px 0 2px; }
-    .oc-row select{
-      min-width:260px; padding:6px 10px; border-radius:20px; border:1px solid #000; background:var(--pink);
-    }
-
-    /* Receipt: thin border box, tabular totals */
+    /* RIGHT: receipt box */
     .receipt{
       position:sticky; top:16px;
-      background:#fff; border:1px solid #000; border-radius:0; padding:12px;
+      background:#fff; border:1px solid var(--rule); padding:12px;
     }
     .receipt h2{ margin:0 0 8px 0; text-transform:uppercase; font-size:1rem; }
     .receipt-item{
       display:grid; grid-template-columns: 1fr 84px 32px; gap:8px; align-items:center; margin:4px 0;
     }
-    .qty-select{
-      width:84px; padding:6px 10px; border-radius:10px; border:1px solid #000; background:var(--blue);
-    }
-    .remove{ height:32px; background:var(--blue); border:1px solid #000; border-radius:8px; cursor:pointer; }
-
+    .qty-select{ width:84px; padding:6px 10px; border:1px solid var(--rule); border-radius:10px; background:#eaf4fb; }
+    .remove{ height:32px; background:#eaf4fb; border:1px solid var(--rule); border-radius:8px; cursor:pointer; }
     .total{
       display:flex; justify-content:space-between; align-items:center; margin-top:8px; padding-top:8px;
-      border-top:2px solid #000; font-weight:800; font-variant-numeric:tabular-nums;
+      border-top:2px solid var(--rule); font-weight:800; font-variant-numeric:tabular-nums;
     }
-    #grandTotal{ font-size:1.1rem; }
 
-    /* Print like the ticket */
+    /* print like the ticket */
     @media print{
       @page{ margin:0.5in; }
       body{ background:#fff !important; }
       .back-home, header{ display:none !important; }
-      .content{ grid-template-columns: 1fr 360px; gap:14px; }
       .receipt{ position:static; }
     }
 
-    /* Mobile fallback */
+    /* mobile fallback */
     @media (max-width: 900px){
       .content{ grid-template-columns:1fr; }
-      .sections{ grid-template-columns: 1fr 1fr; }
+      .sections{ grid-template-columns: 1fr 1fr; grid-template-rows:auto auto; }
       #section-visits{ grid-column:1 / span 2; }
-      #section-procedures{ grid-column:1; border-right:none; }
-      #section-labs, #section-oc{ grid-column:2; border-right:none; }
+      #section-procedures{ grid-column:1; } #section-labs, #section-oc{ grid-column:2; }
       #section-meds{ grid-column:1 / span 2; }
+      .col-spacer{ display:none; }
     }
   </style>
 </head>
@@ -137,44 +166,62 @@
           <option value="50">50%</option>
           <option value="25">25%</option>
         </select>
-
         <label class="toggle-codes"><input type="checkbox" id="toggleCodes"> Show Codes</label>
       </div>
     </header>
 
     <div class="content">
-      <!-- LEFT: ticket grid (two rows) -->
+      <!-- LEFT GRID: 2 rows × 4 columns -->
       <div class="sections">
+
+        <!-- ROW 1 (spans 4 cols internally split into 4 mini columns) -->
         <div class="section" id="section-visits">
-          <h2>Visit Codes</h2>
-          <div class="list"></div>
+          <div class="bar">Visit Codes</div>
+          <div class="list">
+            <!-- your JS will inject .item lines here; the CSS below expects four subboxes, so we provide containers -->
+            <!-- If your JS already outputs groups, keep them. These 4 subboxes are optional wrappers for styling. -->
+            <div class="subbox">
+              <div class="subhead">New Pt/Office</div>
+              <!-- items go here from JS -->
+            </div>
+            <div class="subbox">
+              <div class="subhead">Est. Pt/Office</div>
+            </div>
+            <div class="subbox">
+              <div class="subhead">New Pt (Age)</div>
+            </div>
+            <div class="subbox">
+              <div class="subhead">Est. Pt (Age)</div>
+            </div>
+          </div>
         </div>
 
+        <!-- ROW 2 (four columns; last is spacer to keep 4-col skeleton) -->
         <div class="section" id="section-procedures">
-          <h2>Procedures</h2>
+          <div class="bar">Procedures</div>
           <div class="list"></div>
         </div>
 
         <div class="section" id="section-labs">
-          <h2>Labs</h2>
+          <div class="bar">Labs</div>
           <div class="list"></div>
-        </div>
 
-        <div class="section" id="section-oc">
-          <h2>Oral Contraceptives</h2>
+          <div class="bar" style="margin-top:8px;">Oral Contraceptives</div>
           <div class="oc-row">
             <select id="ocSelect"></select>
-            <button class="btn" id="addOC">Add to Receipt</button>
+            <button class="btn" id="addOC">Add</button>
           </div>
         </div>
 
         <div class="section" id="section-meds">
-          <h2>Medications &amp; Supplies</h2>
+          <div class="bar">Medications &amp; Supplies</div>
           <div class="list"></div>
         </div>
+
+        <div class="col-spacer"></div> <!-- keeps exact 4th column in row 2 -->
       </div>
 
-      <!-- RIGHT: receipt -->
+      <!-- RIGHT: Receipt -->
       <aside class="receipt">
         <h2>Receipt</h2>
         <div id="receiptItems"></div>
@@ -182,7 +229,7 @@
           <span>Total</span>
           <span id="grandTotal">$0.00</span>
         </div>
-        <button class="btn copy-button" id="copyReceipt">Copy Receipt</button>
+        <button class="btn" id="copyReceipt">Copy Receipt</button>
       </aside>
     </div>
   </div>
