@@ -108,7 +108,6 @@ function updateHouseholdIncome() {
   if (covEl) covEl.textContent = coverageLevel;
   if (awcEl) awcEl.textContent = awcQual;
 }
-
 function updateHouseholdMemberFields() {
   const container = document.getElementById('householdMembersContainer');
   const size = parseInt(document.getElementById('householdSize')?.value || 1);
@@ -119,10 +118,10 @@ function updateHouseholdMemberFields() {
 
   for (let i = 2; i <= size; i++) {
     const wrapper = document.createElement('div');
-    Object.assign(wrapper.style, { display:'flex', flexDirection:'column', gap:'10px', marginBottom:'10px' });
-
+    wrapper.className = 'household-member';
+    
     const topRow = document.createElement('div');
-    Object.assign(topRow.style, { display:'flex', gap:'10px' });
+    topRow.style.cssText = 'display:flex; gap:10px; margin-bottom:10px;';
 
     const select = document.createElement('select');
     select.name = `relationship${i}`;
@@ -133,19 +132,18 @@ function updateHouseholdMemberFields() {
       <option>Parent</option><option>Grandparent</option><option>Friend</option>
       <option>Roommate</option><option>Other</option>
     `;
-    Object.assign(select.style, { flex:'1', padding:'8px', borderRadius:'10px' });
+    select.style.cssText = 'flex:1; padding:8px; border-radius:10px; border:2px solid var(--pink); background:var(--pink);';
 
     const input = document.createElement('input');
-    Object.assign(input, { type:'text', name:`name${i}`, placeholder:`Name of person ${i}` });
-    Object.assign(input.style, { flex:'2', padding:'8px', borderRadius:'10px' });
+    input.type = 'text';
+    input.name = `name${i}`;
+    input.placeholder = `Name of person ${i}`;
+    input.style.cssText = 'flex:2; padding:8px; border-radius:10px; border:2px solid var(--pink); background:var(--pink);';
 
     const plusBtn = document.createElement('button');
     plusBtn.type = 'button';
-    plusBtn.textContent = '+';
-    Object.assign(plusBtn.style, {
-      flex:'0 0 40px', borderRadius:'10px', backgroundColor:'#f8c9f9',
-      border:'2px solid #f8c9f9', width:'130px', height:'40px'
-    });
+    plusBtn.textContent = 'Add Income';
+    plusBtn.style.cssText = 'flex:0 0 auto; padding:8px 16px; border-radius:10px; background:var(--pink); border:2px solid var(--pink); cursor:pointer;';
 
     topRow.append(select, input, plusBtn);
 
@@ -153,9 +151,12 @@ function updateHouseholdMemberFields() {
     incomeSection.style.display = 'none';
     incomeSection.style.marginTop = '10px';
     incomeSection.innerHTML = `
-      <label>Income Amount: <input type="number" step="0.01" name="memberIncome${i}" /></label>
-      <label>Frequency:
-        <select name="memberFrequency${i}">
+      <label style="display:block; margin:10px 0;">
+        Income Amount: $<input type="number" step="0.01" name="memberIncome${i}" style="margin-left:10px; padding:8px; border-radius:10px; border:2px solid var(--pink); background:var(--pink);" />
+      </label>
+      <label style="display:block; margin:10px 0;">
+        Frequency:
+        <select name="memberFrequency${i}" style="margin-left:10px; padding:8px; border-radius:10px; border:2px solid var(--pink); background:var(--pink);">
           <option value="weekly">Weekly</option>
           <option value="biweekly">Biweekly</option>
           <option value="monthly">Monthly</option>
@@ -165,13 +166,9 @@ function updateHouseholdMemberFields() {
     `;
 
     const incomeInput = incomeSection.querySelector(`input[name="memberIncome${i}"]`);
-    const freqSelect  = incomeSection.querySelector(`select[name="memberFrequency${i}"]`);
+    const freqSelect = incomeSection.querySelector(`select[name="memberFrequency${i}"]`);
     incomeInput?.addEventListener('input', calculateGrandTotal);
     freqSelect?.addEventListener('change', calculateGrandTotal);
-
-    incomeSection.querySelectorAll('input, select').forEach(el => {
-      el.style.marginLeft = '10px'; el.style.marginRight = '20px';
-    });
 
     plusBtn.addEventListener('click', () => {
       incomeSection.style.display = incomeSection.style.display === 'none' ? 'block' : 'none';
@@ -182,7 +179,6 @@ function updateHouseholdMemberFields() {
     container.appendChild(wrapper);
   }
 }
-
 // --- Modals (guarded) ---
 const triggerModal1 = document.getElementById('triggerModal1');
 const modalOverlay1 = document.getElementById('modalOverlay1');

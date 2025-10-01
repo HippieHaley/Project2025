@@ -1,4 +1,4 @@
-const coverageChart = {
+export const coverageChart = {
       1: [15650, 23474, 31300, 39124, 39125],
       2: [21150, 31724, 42299, 52874, 52875],
       3: [26650, 39974, 53299, 66624, 66625],
@@ -15,7 +15,7 @@ const coverageChart = {
       14: [87150, 130724, 174299, 217874, 217875],
       15: [92650, 138974, 185299, 231624, 231625]
     };
-const awcChart = {
+export const awcChart = {
       1: 39125, 
       2: 52875, 
       3: 66625, 
@@ -32,4 +32,3 @@ const awcChart = {
       14: 217875, 
       15: 231625
     };
-export default { coverageChart, awcChart };
