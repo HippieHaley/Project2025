@@ -163,9 +163,16 @@ th {
       max-width: 100%;
     }
   }
-  .householdMembersSection {
-  display: none; /* start hidden */
-  grid-column: 1 / -1; /* spans all columns in a CSS grid */
+#householdMembersSection {
+  transition: all 0.3s ease;
+}
+
+.household-member {
+  margin-bottom: 15px;
+  padding: 15px;
+  border: 2px solid var(--pink);
+  border-radius: 10px;
+  background: rgba(255, 182, 193, 0.1);
 }
 </style>
 </head>

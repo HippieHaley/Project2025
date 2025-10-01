@@ -355,6 +355,9 @@ function init() {
       const notes = document.getElementById('notesContainer');
       if (!notes) return;
       notes.style.display = (notes.style.display === 'none' || notes.style.display === '') ? 'block' : 'none';
+      console.log('Household section:', document.getElementById('householdMembersSection'));
+console.log('Household container:', document.getElementById('householdMembersContainer'));
+console.log('Household size input:', document.getElementById('householdSize'));
     });
   });
 }
