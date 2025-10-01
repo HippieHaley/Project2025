@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
   <script src="catalog.js"></script>
+<link rel="stylesheet" href="style.css">
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Service Pricelist</title>
@@ -79,7 +80,7 @@
     /* MAIN CONTENT LAYOUT */
     .page {
       display: grid;
-      grid-template-columns: 2fr 1fr;
+      grid-template-columns: 3fr 1fr;
       gap: 30px;
     }
     
@@ -110,7 +111,7 @@
       margin: 0 0 12px;
       font-size: 1.1rem;
       text-align: center;
-      grid-column: 1 / span 2;
+      grid-column: 1 / span 3;
       border-bottom: 1px solid var(--border);
       padding-bottom: 8px;
       color: var(--primary);
@@ -140,18 +141,18 @@
     }
     /* Procedures and Labs in left column, Meds and Contraceptives in right column */
     #section-procedures {
-      grid-column: 1;
+      grid-column: 2;
       grid-row: 2;
     }
     #section-labs {
       grid-column: 1;
-      grid-row: 3;
+      grid-row: 2;
     }
     #section-procedures h3::before { content: "🔧"; }
     #section-labs h3::before { content: "🧪"; }
     #section-meds {
-      grid-column: 2;
-      grid-row: 2;
+      grid-column: 3;
+      grid-row: 3;
     }
     #section-contraceptives {
       grid-column: 2;
@@ -344,6 +345,7 @@
   </style>
 </head>
 <body>
+   <a href="index.html" class="back-home">Back to Home</a>
   <div class="container">
     <h1>Medical Service Pricelist</h1>
     <div class="controls">
@@ -406,6 +408,5 @@
   </div>
   <!-- Load JS at end of body for best performance -->
   <script type="module" src="pricelist.js"></script>
-  <script src="style.css"></script>
 </body>
 </html>
