@@ -189,7 +189,7 @@ function renderCatalog() {
 
   // Oral Contraceptives dropdown
   if (ocSelect) {
-    const ocItems = procedures.filter(p => p.category === 'contraceptives');
+    const ocItems = procedures.filter(p => p.category === ' oral contraceptives');
     ocSelect.innerHTML = '<option value="">Select Oral Contraceptive...</option>';
     ocItems.forEach(oc => {
       const opt = document.createElement('option');
