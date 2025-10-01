@@ -422,11 +422,20 @@ if (document.readyState === 'loading') {
 } else {
   init();
 }
-updateHouseholdIncome();
-updateHouseholdMemberFields();
 // Expose for inline handlers already in HTML
 window.calculateIncome = calculateIncome;
 window.calculateGrandTotal = calculateGrandTotal;
 window.updateHouseholdIncome = updateHouseholdIncome;
 window.copyIncomeInfo = copyIncomeInfo;
 window.updateHouseholdMemberFields = updateHouseholdMemberFields;
+
+// Ensure these functions run only after DOM is ready
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', () => {
+    updateHouseholdIncome();
+    updateHouseholdMemberFields();
+  });
+} else {
+  updateHouseholdIncome();
+  updateHouseholdMemberFields();
+}
