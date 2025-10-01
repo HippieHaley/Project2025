@@ -95,7 +95,17 @@ function calculateGrandTotal() {
 
   updateHouseholdIncome();
 }
+ const householdInput = document.getElementById('householdSize'); // your input field for size
+  const householdSection = document.getElementById('householdMembersSection');
 
+  householdInput.addEventListener('input', () => {
+    const size = parseInt(householdInput.value, 10);
+    if (size > 1) {
+      householdSection.style.display = 'block';
+    } else {
+      householdSection.style.display = 'none';
+    }
+  });
 function updateHouseholdIncome() {
   const householdSize = parseInt(document.getElementById('householdSize')?.value) || 0;
   const yearlyIncome  = parseFloat(document.getElementById('grandTotal')?.textContent) || 0;
