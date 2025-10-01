@@ -18,6 +18,7 @@ const $ = (s, r = document) => r.querySelector(s);
 const $$ = (s, r = document) => Array.from(r.querySelectorAll(s));
 const fmt = n => `$${(n ?? 0).toFixed(2)}`;
 
+// Section containers
 const sections = {
   visits: $('#section-visits .list'),
   procedures: $('#section-procedures .list'),
@@ -26,6 +27,7 @@ const sections = {
   contraceptives: $('#section-contraceptives .list')
 };
 
+// Controls
 const visitTypesGrid = $('#visitTypesGrid');
 const searchInput = $('#searchInput');
 const receiptItems = $('#receiptItems');
@@ -93,6 +95,7 @@ function buildVisitTypes() {
 
   makeBtn('All Visits', 'all', 'all visits');
   types.forEach(t => {
+    // Capitalize first letter and replace hyphens
     const label = t.replace(/-/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
     makeBtn(label, t, t);
   });
@@ -126,7 +129,7 @@ function renderCatalog() {
 
   procedures.forEach(proc => {
     const def = sectionDefs.find(d => d.match(proc));
-    const listContainer = def ? $(`#${def.id} .list`) : null;
+    const listContainer = def ? sections[def.bucket] : null;
     if (!listContainer) return;
 
     if (!matchesSearch(proc, query)) return;
@@ -184,7 +187,7 @@ function renderCatalog() {
     listContainer.appendChild(row);
   });
 
-  // Contraceptives dropdown
+  // Oral Contraceptives dropdown
   if (ocSelect) {
     const ocItems = procedures.filter(p => p.category === 'contraceptives');
     ocSelect.innerHTML = '<option value="">Select Oral Contraceptive...</option>';
@@ -353,8 +356,16 @@ if (ocCheckbox && ocSelect) {
 }
 
 /** ========================
- *  Init
+ *  Init (ensure DOM is ready)
  *  ======================== */
-buildVisitTypes();
-renderCatalog();
-renderReceipt();
+if (document.readyState === "loading") {
+  document.addEventListener("DOMContentLoaded", init);
+} else {
+  init();
+}
+
+function init() {
+  buildVisitTypes();
+  renderCatalog();
+  renderReceipt();
+}

@@ -361,7 +361,18 @@
 <body>
   <div class="container">
     <h1>Medical Service Pricelist</h1>
-
+    <!-- Controls for filtering, searching, etc. -->
+    <div class="controls">
+      <div id="visitTypesGrid"></div>
+      <input type="text" id="searchInput" placeholder="Search..." />
+      <select id="percentSelector">
+        <option value="100">100%</option>
+        <option value="80">80%</option>
+        <option value="50">50%</option>
+      </select>
+      <button id="toggleCodes">Show/Hide Codes</button>
+    </div>
+  <script type="module" src="app.js"></script>
     <div class="page">
       <!-- Left: Pricelist -->
       <div class="pricelist">
