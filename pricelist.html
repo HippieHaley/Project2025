@@ -7,6 +7,13 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Service Pricelist</title>
   <style>
+        :root{
+      --blue:#acdbf9;
+      --pink:#f8c9f9;
+      --ink:#000;
+      --text:#333;
+    }
+
     .container {
       max-width: 1400px;
       margin: 0 auto;
@@ -91,14 +98,14 @@
       gap: 20px;
       grid-template-rows: auto auto auto;
       grid-auto-flow: row;
+            align-content: center;
     }
 
     .section {
-      border: 1px solid var(--border);
+    border:2px solid var(--ink);
       padding: 16px;
       border-radius: 10px;
-      background: white;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+      box-shadow: 0 10px 6px rgba(0,0,0,0.05);
       transition: transform 0.2s ease;
     }
 
@@ -126,12 +133,14 @@
 
     /* Make Visit Codes section span both columns */
     #section-visits {
+      align-content: center;
       grid-column: 1 / span 2;
       grid-row: 1;
       display: grid;
     }
     #section-visits h3::before { content: "🩺";}
     #section-visits .list {
+      align-content: center;
       grid-column: 1 / span 2;
       display: grid;
       grid-template-columns: 1fr 1fr;
