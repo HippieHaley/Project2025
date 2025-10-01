@@ -1,134 +1,420 @@
 <!DOCTYPE html>
 <html lang="en">
+  <script src="catalog.js"></script>
 <head>
-  <meta charset="UTF-8" />
-  <title>Interactive Pricelist</title>
-  <link rel="stylesheet" href="./style.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Service Pricelist</title>
   <style>
-    :root{ --blue:#acdbf9; --ink:#222; --rule:#000; --bar:#d9d9d9; --alt:#ececec; }
-    html,body{ margin:0; }
-    body{ background:var(--blue); color:var(--ink); font-family:Arial, Helvetica, sans-serif; }
-    .page{ max-width:1100px; margin:0 auto; padding:0 16px 40px; }
-
-    .back-home{
-      position:fixed; top:20px; left:20px;
-      display:inline-block; padding:10px 20px; border:1px solid #000; border-radius:30px;
-      background:#f8c9f9; color:#000; text-decoration:none; font-weight:700;
+    :root {
+      --primary: #4361ee;
+      --primary-light: #4895ef;
+      --secondary: #3f37c9;
+      --accent: #f72585;
+      --light: #f8f9fa;
+      --dark: #212529;
+      --gray: #6c757d;
+      --border: #dee2e6;
+      --success: #4cc9f0;
     }
-
-    header{ text-align:center; padding-top:72px; }
-    .controls{ margin:10px auto 14px; display:flex; flex-wrap:wrap; gap:10px; align-items:center; justify-content:center; }
-    select#percentSelector, .toggle-codes{
-      padding:8px 12px; border:1px solid #000; border-radius:22px; background:#f8c9f9; font-weight:600;
+    
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
     }
-
-    /* Page columns: left grid + receipt */
-    .content{ display:grid; grid-template-columns: 1fr 360px; gap:18px; align-items:start; }
-
-    /* ===== LEFT GRID: 3 columns × 3 rows ===== */
-    .sections{
-      display:grid;
-      grid-template-columns: repeat(3, 1fr);
-      grid-template-rows: auto auto auto;
-      gap:12px;
-      border-top:2px solid var(--rule);
-      border-bottom:2px solid var(--rule);
-      padding:8px 0 6px;
+    
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: #f5f7fb;
+      color: var(--dark);
+      line-height: 1.6;
+      padding: 20px;
     }
-
-    /* Placement (C1R1/C1R2 are the two visit blocks; C2R1 procedures; C2R2 labs+OC; C3 spans all meds) */
-    #section-visits-office { grid-column:1; grid-row:1; }
-    #section-visits-pt     { grid-column:1; grid-row:2; }
-    #section-procedures    { grid-column:2; grid-row:1; }
-    #section-labs          { grid-column:2; grid-row:2; }
-    #section-meds          { grid-column:3; grid-row:1 / span 3; }
-
-    /* Section bars */
-    .section{ background:transparent; border:none; }
-    .bar{
-      background:var(--bar);
-      padding:6px 8px; font-weight:800; font-size:.9rem; text-transform:uppercase;
-      border:1px solid var(--rule);
-      margin:0 0 6px 0;
+    
+    h1 {
+      text-align: center;
+      margin-bottom: 25px;
+      color: var(--primary);
+      font-weight: 600;
+      font-size: 2.2rem;
     }
-
-    /* Visit mini-boxes (each with its own list) */
-    .visit-box{
-      border:1px solid var(--rule);
-      padding:6px 8px;
-      margin:0 0 8px 0;
+    
+    .container {
+      max-width: 1400px;
+      margin: 0 auto;
     }
-    .visit-head{
-      font-weight:800; font-size:.82rem; text-transform:uppercase;
-      margin:0 0 6px 0; display:flex; justify-content:space-between; align-items:center;
+    
+    /* VISIT TYPES ROW - First Row */
+    .visit-types-container {
+      background: white;
+      border-radius: 12px;
+      padding: 20px;
+      margin-bottom: 30px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+      border: 1px solid var(--border);
     }
-
-    /* Generic list row styling (ticket-like) */
-    .list{ margin:0; padding:0; }
-    .item{
-      display:grid; grid-template-columns: 1fr auto; align-items:center;
-      gap:10px; padding:3px 0; border-bottom:1px dotted var(--rule);
+    
+    .visit-types-container h2 {
+      margin-bottom: 15px;
+      color: var(--dark);
+      font-size: 1.3rem;
+      display: flex;
+      align-items: center;
     }
-    .item:last-child{ border-bottom:none; }
-
-    /* Leading open circle (purely visual) */
-    .item::before{
-      content:""; width:11px; height:11px; border:1.6px solid var(--rule); border-radius:50%;
-      margin-right:8px; justify-self:start;
+    
+    .visit-types-container h2::before {
+      content: "📋";
+      margin-right: 10px;
     }
-    .item > *:first-child{ display:flex; align-items:center; gap:8px; }
-
-    /* Right-aligned code text; your JS can fill these spans if available */
-    .code-right, .codes{
-      font-size:.8rem; opacity:.9; font-variant-numeric:tabular-nums; text-align:right;
+    
+    .visit-types-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 12px;
     }
-    .codes{ display:none; } .codes.show{ display:inline; }
-
-    /* Buttons (small ticket squares) */
-    .btn, .item button{
-      background:#fff; border:1px solid var(--rule); border-radius:6px;
-      padding:2px 8px; font-size:.78rem; font-weight:800; cursor:pointer;
+    
+    .visit-type-btn {
+      padding: 14px 16px;
+      background: white;
+      border: 2px solid var(--border);
+      border-radius: 10px;
+      cursor: pointer;
+      font-weight: 500;
+      transition: all 0.3s ease;
+      text-align: center;
+      font-size: 0.95rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
     }
-    .btn:hover, .item button:hover{ background:#eee; }
-
-    /* OC control tucked under Labs */
-    .oc-row{ display:flex; flex-direction:column; gap:6px; align-items:flex-start; margin:6px 0 2px; }
-    .oc-row select{ min-width:240px; padding:6px 10px; border:1px solid #000; border-radius:20px; background:#f8c9f9; }
-
-    /* Alternating grey for Meds */
-    #section-meds .list .item:nth-child(even){ background:var(--alt); }
-    #section-meds .list .item{ padding:4px 6px; }
-
-    /* Receipt */
-    .receipt{ position:sticky; top:16px; background:#fff; border:1px solid var(--rule); padding:12px; }
-    .receipt h2{ margin:0 0 8px 0; text-transform:uppercase; font-size:1rem; }
-    .receipt-item{ display:grid; grid-template-columns: 1fr 84px 32px; gap:8px; align-items:center; margin:4px 0; }
-    .qty-select{ width:84px; padding:6px 10px; border:1px solid var(--rule); border-radius:10px; background:#eaf4fb; }
-    .remove{ height:32px; background:#eaf4fb; border:1px solid var(--rule); border-radius:8px; cursor:pointer; }
-    .total{ display:flex; justify-content:space-between; align-items:center; margin-top:8px; padding-top:8px; border-top:2px solid var(--rule); font-weight:800; font-variant-numeric:tabular-nums; }
-
-    @media print{
-      @page{ margin:0.5in; }
-      body{ background:#fff !important; }
-      .back-home, header{ display:none !important; }
-      .receipt{ position:static; }
+    
+    .visit-type-btn:hover {
+      border-color: var(--primary-light);
+      background: #f0f7ff;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 8px rgba(67, 97, 238, 0.15);
+    }
+    
+    .visit-type-btn.active {
+      background: var(--primary);
+      color: white;
+      border-color: var(--primary);
+      box-shadow: 0 4px 12px rgba(67, 97, 238, 0.3);
+    }
+    
+    .visit-type-btn .code {
+      font-size: 0.8rem;
+      opacity: 0.8;
+      margin-top: 4px;
+    }
+    
+    /* MAIN CONTENT LAYOUT */
+    .page {
+      display: grid;
+      grid-template-columns: 2fr 1fr;
+      gap: 30px;
+    }
+    
+    /* PRICELIST STYLING */
+    .pricelist {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 20px;
+    }
+    
+    .section {
+      border: 1px solid var(--border);
+      padding: 16px;
+      border-radius: 10px;
+      background: white;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+      transition: transform 0.2s ease;
+    }
+    
+    .section:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    }
+    
+    .section h3 {
+      margin: 0 0 12px;
+      font-size: 1.1rem;
+      text-align: center;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 8px;
+      color: var(--primary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    .section h3::before {
+      margin-right: 8px;
+    }
+    
+    #section-visits h3::before { content: "🩺"; }
+    #section-procedures h3::before { content: "🔧"; }
+    #section-labs h3::before { content: "🧪"; }
+    #section-meds h3::before { content: "💊"; }
+    #section-contraceptives h3::before { content: "💝"; }
+    
+    .item {
+      margin: 8px 0;
+      padding: 8px 10px;
+      border-radius: 6px;
+      transition: background 0.2s;
+    }
+    
+    .item:hover {
+      background: #f8f9fa;
+    }
+    
+    .item label {
+      display: flex;
+      align-items: center;
+      cursor: pointer;
+      font-size: 0.95rem;
+    }
+    
+    .item input[type="checkbox"] {
+      margin-right: 10px;
+      transform: scale(1.2);
+    }
+    
+    .item-details {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 4px;
+      font-size: 0.85rem;
+      color: var(--gray);
+    }
+    
+    .item-price {
+      font-weight: 600;
+      color: var(--primary);
+    }
+    
+    /* RECEIPT STYLING */
+    #receipt {
+      border: 2px solid var(--primary);
+      padding: 20px;
+      border-radius: 12px;
+      background: white;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+      position: sticky;
+      top: 20px;
+      height: fit-content;
+    }
+    
+    #receipt h2 {
+      margin-top: 0;
+      text-align: center;
+      color: var(--primary);
+      padding-bottom: 12px;
+      border-bottom: 2px solid var(--border);
+      margin-bottom: 15px;
+    }
+    
+    .receipt-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin: 10px 0;
+      padding: 8px 0;
+      border-bottom: 1px dashed var(--border);
+    }
+    
+    .receipt-item:last-child {
+      border-bottom: none;
+    }
+    
+    .receipt-item-info {
+      flex: 1;
+    }
+    
+    .receipt-item-name {
+      font-weight: 500;
+    }
+    
+    .receipt-item-codes {
+      font-size: 0.8rem;
+      color: var(--gray);
+      margin-top: 2px;
+    }
+    
+    .qty-select {
+      margin: 0 8px;
+      width: 50px;
+      padding: 4px;
+      border: 1px solid var(--border);
+      border-radius: 4px;
+    }
+    
+    .remove {
+      background: var(--accent);
+      color: white;
+      border: none;
+      padding: 4px 8px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 0.8rem;
+      transition: background 0.2s;
+    }
+    
+    .remove:hover {
+      background: #d90452;
+    }
+    
+    #grandTotal {
+      font-weight: bold;
+      font-size: 1.3rem;
+      color: var(--primary);
+    }
+    
+    #copyReceipt {
+      background: var(--primary);
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: 500;
+      width: 100%;
+      margin-top: 15px;
+      transition: background 0.3s;
+    }
+    
+    #copyReceipt:hover {
+      background: var(--secondary);
+    }
+    
+    /* Search bar */
+    .search-container {
+      margin-bottom: 20px;
+    }
+    
+    #searchInput {
+      width: 100%;
+      padding: 12px 16px;
+      border: 2px solid var(--border);
+      border-radius: 8px;
+      font-size: 1rem;
+      transition: border 0.3s;
+    }
+    
+    #searchInput:focus {
+      border-color: var(--primary-light);
+      outline: none;
+      box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.1);
+    }
+    
+    /* Responsive adjustments */
+    @media (max-width: 1100px) {
+      .page {
+        grid-template-columns: 1fr;
+      }
+      
+      #receipt {
+        position: static;
+      }
+    }
+    
+    @media (max-width: 768px) {
+      .pricelist {
+        grid-template-columns: 1fr;
+      }
+      
+      .visit-types-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+    
+    @media (max-width: 480px) {
+      .visit-types-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+    
+    .empty-receipt {
+      text-align: center;
+      color: var(--gray);
+      padding: 20px 0;
+      font-style: italic;
+    }
+    
+    .total-row {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 15px;
+      padding-top: 15px;
+      border-top: 2px solid var(--border);
+      font-size: 1.1rem;
     }
   </style>
 </head>
 <body>
-  <a href="./index.html" class="back-home">Back to Home</a>
-
-  <div class="page">
-    <header>
-      <h1>Interactive Pricelist</h1>
-      <div class="controls">
-        <label for="percentSelector"><strong>Fee Percentage:</strong></label>
-        <select id="percentSelector">
-          <option value="100">100%</option>
-          <option value="75">75%</option>
-          <option value="50">50%</option>
-          <option value="25">25%</option>
-        </select>
-        <label class="toggle-codes"><input type="checkbox" id="toggleCodes"> Show Codes</label>
+  <div class="container">
+    <h1>Medical Service Pricelist</h1>
+    
+    <!-- VISIT TYPES - FIRST ROW -->
+    <div class="visit-types-container">
+      <h2>Select Visit Type</h2>
+      <div class="visit-types-grid" id="visitTypesGrid">
+        <!-- Visit type buttons will be generated here -->
       </div>
-    </header>
+    </div>
+    
+    <!-- SEARCH BAR -->
+    <div class="search-container">
+      <input type="text" id="searchInput" placeholder="Search procedures, labs, medications...">
+    </div>
+
+    <div class="page">
+      <!-- Left: Pricelist -->
+      <div class="pricelist">
+        <div id="section-visits" class="section">
+          <h3>Visit Codes</h3>
+          <div class="list"></div>
+        </div>
+        <div id="section-procedures" class="section">
+          <h3>Procedures</h3>
+          <div class="list"></div>
+        </div>
+        <div id="section-labs" class="section">
+          <h3>Labs</h3>
+          <div class="list"></div>
+        </div>
+        <div id="section-meds" class="section">
+          <h3>Medications & Supplies</h3>
+          <div class="list"></div>
+        </div>
+        <div id="section-contraceptives" class="section">
+          <h3>Contraceptives</h3>
+          <div class="list"></div>
+          <div class="item">
+            <label>
+              <input type="checkbox" id="addOC"> Oral Contraceptive
+              <select id="ocSelect"></select>
+            </label>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right: Receipt -->
+      <div id="receipt">
+        <h2>Receipt</h2>
+        <div id="receiptItems">
+          <div class="empty-receipt">No items added yet</div>
+        </div>
+        <div class="total-row">
+          <strong>Total:</strong>
+          <strong><span id="grandTotal">$0.00</span></strong>
+        </div>
+        <div>
+          <button id="copyReceipt">Copy Receipt</button>
+        </div>
+      </div>
+    </div>
+  </div>

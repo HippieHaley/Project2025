@@ -1,112 +1,124 @@
 // catalog.js
 // Master list of services, procedures, labs, and supplies
-
 const procedures = [
   // ======================
   // VISIT CODES
   // ======================
   {
-    name: "99202\nNew Pt Limited",
+    name: "New Pt Limited",
     cpt: "99202",
     hcpcs: "",
     icd10: "",
     fullprice: 170,
+    visitType: "new-office",
     keywords: ["limited-new", "new pt", "99202"]
   },
   {
-    name: "99203\nNew Pt Intermediate",
+    name: "New Pt Intermediate",
     cpt: "99203",
     hcpcs: "",
     icd10: "",
     fullprice: 240,
+    visitType: "new-office",
     keywords: ["intermediate-new", "new pt", "99203"]
   },
   {
-    name: "99204\nNew Pt Comprehensive",
+    name: "New Pt Comprehensive",
     cpt: "99204",
     hcpcs: "",
     icd10: "",
     fullprice: 365,
+    visitType: "new-office",
     keywords: ["comprehensive-new", "new pt", "99204"]
   },
   {
-    name: "99211\nEst Pt Minimal (RN)",
+    name: "Est Pt Minimal (RN)",
     cpt: "99211",
     hcpcs: "",
     icd10: "",
     fullprice: 51,
+    visitType: "nurse-only",
     keywords: ["minimal-established", "est pt", "99211"]
   },
   {
-    name: "99212\nEst Pt Limited",
+    name: "Est Pt Limited",
     cpt: "99212",
     hcpcs: "",
     icd10: "",
     fullprice: 101,
+    visitType: "est-office",
     keywords: ["limited-established", "est pt", "99212"]
   },
   {
-    name: "99213\nEst Pt Intermediate",
+    name: "Est Pt Intermediate",
     cpt: "99213",
     hcpcs: "",
     icd10: "",
     fullprice: 166,
+    visitType: "est-office",
     keywords: ["intermediate-established", "est pt", "99213"]
   },
   {
-    name: "99214\nEst Pt Comprehensive",
+    name: "Est Pt Comprehensive",
     cpt: "99214",
     hcpcs: "",
     icd10: "",
     fullprice: 243,
+    visitType: "est-office",
     keywords: ["comprehensive-established", "est pt", "99214"]
   },
   {
-    name: "99384\nPreventive New 12–17",
+    name: "Preventive New 12–17",
     cpt: "99384",
     hcpcs: "",
     icd10: "",
     fullprice: 306,
+    visitType: "preventive-new",
     keywords: ["preventive new", "99384", "12–17"]
   },
   {
-    name: "99385\nPreventive New 18–39",
+    name: "Preventive New 18–39",
     cpt: "99385",
     hcpcs: "",
     icd10: "",
     fullprice: 267,
+    visitType: "preventive-new",
     keywords: ["preventive new", "99385", "18–39"]
   },
   {
-    name: "99386\nPreventive New 40–64",
+    name: "Preventive New 40–64",
     cpt: "99386",
     hcpcs: "",
     icd10: "",
     fullprice: 285,
+    visitType: "preventive-new",
     keywords: ["preventive new", "99386", "40–64"]
   },
   {
-    name: "99394\nPreventive Est 12–17",
+    name: "Preventive Est 12–17",
     cpt: "99394",
     hcpcs: "",
     icd10: "",
     fullprice: 262,
+    visitType: "preventive-est",
     keywords: ["preventive established", "99394", "12–17"]
   },
   {
-    name: "99395\nPreventive Est 18–39",
+    name: "Preventive Est 18–39",
     cpt: "99395",
     hcpcs: "",
     icd10: "",
     fullprice: 267,
+    visitType: "preventive-est",
     keywords: ["preventive established", "99395", "18–39"]
   },
   {
-    name: "99396\nPreventive Est 40–64",
+    name: "Preventive Est 40–64",
     cpt: "99396",
     hcpcs: "",
     icd10: "",
     fullprice: 285,
+    visitType: "preventive-est",
     keywords: ["preventive established", "99396", "40–64"]
   },
 
@@ -346,4 +358,5 @@ const procedures = [
     keywords: ["trivora", "oc", "pill"]
   }
 ];
+
 export default procedures;
