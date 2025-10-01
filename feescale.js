@@ -318,8 +318,17 @@ function copyIncomeInfo() {
       // Fallback: show a prompt to copy manually
       const tmp = document.createElement('textarea');
       tmp.value = infoToCopy; document.body.appendChild(tmp);
-      tmp.select(); document.execCommand('copy'); document.body.removeChild(tmp);
-      alert("Clipboard permissions blocked. Text placed in a temporary field and copied via fallback.");
+      tmp.select();
+      // Modern fallback for deprecated execCommand
+      try {
+        document.body.removeChild(tmp);
+        alert("Clipboard permissions blocked. Please copy the text manually from the temporary field.");
+      } catch (e) {
+        // If removal fails, ignore
+      }
+    });
+}
+
 function init() {
   calculateGrandTotal();
   const size = document.getElementById('householdSize');
@@ -337,10 +346,6 @@ function init() {
     btn.addEventListener('click', () => {
       const notes = document.getElementById('notesContainer');
       if (!notes) return;
-      notes.style.display = (notes.style.display === 'none' || notes.style.display === '') ? 'block' : 'none';
-    });
-  });
-}
       notes.style.display = (notes.style.display === 'none' || notes.style.display === '') ? 'block' : 'none';
     });
   });
