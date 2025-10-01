@@ -95,8 +95,11 @@ function calculateGrandTotal() {
 
   updateHouseholdIncome();
 }
- const householdInput = document.getElementById('householdSize'); // your input field for size
+// Move this block inside the init function to ensure DOM elements exist
+function setupHouseholdSectionToggle() {
+  const householdInput = document.getElementById('householdSize'); // your input field for size
   const householdSection = document.getElementById('householdMembersSection');
+  if (!householdInput || !householdSection) return;
 
   householdInput.addEventListener('input', () => {
     const size = parseInt(householdInput.value, 10);
@@ -106,6 +109,7 @@ function calculateGrandTotal() {
       householdSection.style.display = 'none';
     }
   });
+}
 function updateHouseholdIncome() {
   const householdSize = parseInt(document.getElementById('householdSize')?.value) || 0;
   const yearlyIncome  = parseFloat(document.getElementById('grandTotal')?.textContent) || 0;
@@ -316,10 +320,6 @@ function copyIncomeInfo() {
       tmp.value = infoToCopy; document.body.appendChild(tmp);
       tmp.select(); document.execCommand('copy'); document.body.removeChild(tmp);
       alert("Clipboard permissions blocked. Text placed in a temporary field and copied via fallback.");
-    });
-}
-
-// --- Bootstrap ---
 function init() {
   calculateGrandTotal();
   const size = document.getElementById('householdSize');
@@ -330,11 +330,17 @@ function init() {
     });
   }
 
+  setupHouseholdSectionToggle();
+
   // Notes toggle
   document.querySelectorAll('.toggleNotes').forEach(btn => {
     btn.addEventListener('click', () => {
       const notes = document.getElementById('notesContainer');
       if (!notes) return;
+      notes.style.display = (notes.style.display === 'none' || notes.style.display === '') ? 'block' : 'none';
+    });
+  });
+}
       notes.style.display = (notes.style.display === 'none' || notes.style.display === '') ? 'block' : 'none';
     });
   });
