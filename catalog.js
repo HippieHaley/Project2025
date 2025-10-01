@@ -274,7 +274,7 @@ const procedures = [
     hcpcs: "J1050",
     icd10: "Z30.42",
     fullprice: 27,
-    category: "contraceptives",
+    category: "meds",
     keywords: ["depo", "medroxyprogesterone", "j1050", "birth control"]
   },
   {
@@ -283,7 +283,7 @@ const procedures = [
     hcpcs: "J7307",
     icd10: "Z30.017",
     fullprice: 573,
-    category: "contraceptives",
+    category: "meds",
     keywords: ["nexplanon", "implant", "j7307", "birth control"]
   },
   {
@@ -292,7 +292,7 @@ const procedures = [
     hcpcs: "J7303",
     icd10: "Z30.011",
     fullprice: 8,
-    category: "contraceptives",
+    category: "meds",
     keywords: ["nuvaring", "ring", "birth control"]
   },
   {
@@ -301,7 +301,7 @@ const procedures = [
     hcpcs: "J7304",
     icd10: "Z30.011",
     fullprice: 75,
-    category: "contraceptives",
+    category: "meds",
     keywords: ["xulane", "patch", "birth control"]
   },
 
