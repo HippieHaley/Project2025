@@ -95,24 +95,27 @@ function calculateGrandTotal() {
 
   updateHouseholdIncome();
 }
-// Move this block inside the init function to ensure DOM elements exist
+
 function setupHouseholdSectionToggle() {
-  const householdInput = document.getElementById('householdSize'); // your input field for size
+  const householdInput = document.getElementById('householdSize');
   const householdSection = document.getElementById('householdMembersSection');
   if (!householdInput || !householdSection) return;
 
+  // Set initial state on page load
+  const initialSize = parseInt(householdInput.value, 10) || 1;
+  householdSection.style.display = initialSize > 1 ? 'block' : 'none';
+  
+  // Update household members immediately
+  updateHouseholdMemberFields();
+
+  // Handle input changes
   householdInput.addEventListener('input', () => {
-    const size = parseInt(householdInput.value, 10);
+    const size = parseInt(householdInput.value, 10) || 1;
     if (size > 1) {
       householdSection.style.display = 'block';
     } else {
       householdSection.style.display = 'none';
     }
-  });
-}
-const size = document.getElementById('householdSize');
-if (size) {
-  size.addEventListener('input', () => {
     updateHouseholdMemberFields();
     updateHouseholdIncome();
   });
@@ -130,6 +133,7 @@ function updateHouseholdIncome() {
   if (covEl) covEl.textContent = coverageLevel;
   if (awcEl) awcEl.textContent = awcQual;
 }
+
 function updateHouseholdMemberFields() {
   const container = document.getElementById('householdMembersContainer');
   const size = parseInt(document.getElementById('householdSize')?.value || 1);
@@ -143,7 +147,7 @@ function updateHouseholdMemberFields() {
     wrapper.className = 'household-member';
     
     const topRow = document.createElement('div');
-    topRow.style.cssText = 'display:flex; gap:10px; margin-bottom:10px;';
+    topRow.style.cssText = 'display:flex; gap:10px; margin-bottom:10px; align-items: center;';
 
     const select = document.createElement('select');
     select.name = `relationship${i}`;
@@ -165,13 +169,17 @@ function updateHouseholdMemberFields() {
     const plusBtn = document.createElement('button');
     plusBtn.type = 'button';
     plusBtn.textContent = 'Add Income';
-    plusBtn.style.cssText = 'flex:0 0 auto; padding:8px 16px; border-radius:10px; background:var(--pink); border:2px solid var(--pink); cursor:pointer;';
+    plusBtn.style.cssText = 'flex:0 0 auto; padding:8px 16px; border-radius:10px; background:var(--pink); border:2px solid var(--pink); cursor:pointer; white-space: nowrap;';
 
     topRow.append(select, input, plusBtn);
 
     const incomeSection = document.createElement('div');
     incomeSection.style.display = 'none';
     incomeSection.style.marginTop = '10px';
+    incomeSection.style.padding = '10px';
+    incomeSection.style.border = '1px solid var(--pink)';
+    incomeSection.style.borderRadius = '8px';
+    incomeSection.style.backgroundColor = 'rgba(255, 182, 193, 0.1)';
     incomeSection.innerHTML = `
       <label style="display:block; margin:10px 0;">
         Income Amount: $<input type="number" step="0.01" name="memberIncome${i}" style="margin-left:10px; padding:8px; border-radius:10px; border:2px solid var(--pink); background:var(--pink);" />
@@ -189,6 +197,7 @@ function updateHouseholdMemberFields() {
 
     const incomeInput = incomeSection.querySelector(`input[name="memberIncome${i}"]`);
     const freqSelect = incomeSection.querySelector(`select[name="memberFrequency${i}"]`);
+    
     if (incomeInput) incomeInput.addEventListener('input', calculateGrandTotal);
     if (freqSelect) freqSelect.addEventListener('change', calculateGrandTotal);
 
@@ -201,26 +210,35 @@ function updateHouseholdMemberFields() {
     container.appendChild(wrapper);
   }
 }
-// --- Modals (guarded) ---
-const triggerModal1 = document.getElementById('triggerModal1');
-const modalOverlay1 = document.getElementById('modalOverlay1');
-if (triggerModal1 && modalOverlay1) {
-  triggerModal1.addEventListener('click', () => { 
-    modalOverlay1.style.display = 'flex'; 
-    populateCoverageChart(); // Populate when modal opens
-  });
-  modalOverlay1.addEventListener('click', e => { if (e.target === modalOverlay1) modalOverlay1.style.display = 'none'; });
+
+// --- Modals ---
+function setupModals() {
+  const triggerModal1 = document.getElementById('triggerModal1');
+  const modalOverlay1 = document.getElementById('modalOverlay1');
+  if (triggerModal1 && modalOverlay1) {
+    triggerModal1.addEventListener('click', () => { 
+      modalOverlay1.style.display = 'flex'; 
+      populateCoverageChart();
+    });
+    modalOverlay1.addEventListener('click', e => { 
+      if (e.target === modalOverlay1) modalOverlay1.style.display = 'none'; 
+    });
+  }
+
+  const triggerModal2 = document.getElementById('triggerModal2');
+  const modalOverlay2 = document.getElementById('modalOverlay2');
+  if (triggerModal2 && modalOverlay2) {
+    triggerModal2.addEventListener('click', () => { 
+      modalOverlay2.style.display = 'flex'; 
+      populateAWCChart();
+    });
+    modalOverlay2.addEventListener('click', e => { 
+      if (e.target === modalOverlay2) modalOverlay2.style.display = 'none'; 
+    });
+  }
 }
-const triggerModal2 = document.getElementById('triggerModal2');
-const modalOverlay2 = document.getElementById('modalOverlay2');
-if (triggerModal2 && modalOverlay2) {
-  triggerModal2.addEventListener('click', () => { 
-    modalOverlay2.style.display = 'flex'; 
-    populateAWCChart(); // Populate when modal opens
-  });
-  modalOverlay2.addEventListener('click', e => { if (e.target === modalOverlay2) modalOverlay2.style.display = 'none'; });
-}
-// --- Copy (with fallback) ---
+
+// --- Copy functionality ---
 function copyIncomeInfo() {
   const $ = id => document.getElementById(id);
   const householdSize  = $('householdSize')?.value || "1";
@@ -230,7 +248,10 @@ function copyIncomeInfo() {
   const workingAt = $('workingAt')?.value || "Unemployed";
 
   const incomeType = $('incomeType')?.value;
-  if (!incomeType) { alert("❌ Please select an Income Type before copying."); return; }
+  if (!incomeType) { 
+    alert("❌ Please select an Income Type before copying."); 
+    return; 
+  }
 
   let infoToCopy = `Income Type: ${incomeType}\nWorking @: ${workingAt}\nPeople in Household: ${householdSize}\n\n`;
 
@@ -323,62 +344,36 @@ function copyIncomeInfo() {
   navigator.clipboard.writeText(infoToCopy)
     .then(() => alert("Household info copied to clipboard!"))
     .catch(() => {
-      // Fallback: show a prompt to copy manually
       const tmp = document.createElement('textarea');
-      tmp.value = infoToCopy; document.body.appendChild(tmp);
+      tmp.value = infoToCopy; 
+      document.body.appendChild(tmp);
       tmp.select();
-      // Modern fallback for deprecated execCommand
       try {
+        document.execCommand('copy');
         document.body.removeChild(tmp);
-        alert("Clipboard permissions blocked. Please copy the text manually from the temporary field.");
+        alert("Copied to clipboard!");
       } catch (e) {
-        // If removal fails, ignore
+        alert("Clipboard copy failed. Please copy manually from the console.");
+        console.log("Copy this text:\n", infoToCopy);
       }
     });
 }
 
-function init() {
-  calculateGrandTotal();
-  const size = document.getElementById('householdSize');
-  if (size) {
-    size.addEventListener('input', () => {
-      updateHouseholdMemberFields();
-      updateHouseholdIncome();
-    });
-  }
-
-  setupHouseholdSectionToggle();
-
-  // Notes toggle
-  document.querySelectorAll('.toggleNotes').forEach(btn => {
-    btn.addEventListener('click', () => {
-      const notes = document.getElementById('notesContainer');
-      if (!notes) return;
-      notes.style.display = (notes.style.display === 'none' || notes.style.display === '') ? 'block' : 'none';
-      console.log('Household section:', document.getElementById('householdMembersSection'));
-console.log('Household container:', document.getElementById('householdMembersContainer'));
-console.log('Household size input:', document.getElementById('householdSize'));
-    });
-  });
-}
-// Function to populate coverage chart table
-// Function to populate coverage chart table WITH CELL HIGHLIGHTING
+// --- Chart population functions ---
 function populateCoverageChart() {
   const tbody = document.getElementById('coverageChart');
-  tbody.innerHTML = ''; // Clear existing content
+  if (!tbody) return;
   
-  // Get current household size and income
+  tbody.innerHTML = '';
+  
   const currentHouseholdSize = document.getElementById('householdSize')?.value || "1";
   const yearlyIncome = parseFloat(document.getElementById('grandTotal')?.textContent) || 0;
-  
-  // Determine which coverage level applies for the current household
   const currentCoverageLevel = determineCoverageLevel(currentHouseholdSize, yearlyIncome);
   
   for (const [size, values] of Object.entries(coverageChart)) {
     const [z, a, b, c, d] = values;
     const row = document.createElement('tr');
     
-    // Create cells with potential highlighting
     const cells = [
       `≤ $${z.toLocaleString()}`,
       `$${(z + 1).toLocaleString()} - $${a.toLocaleString()}`,
@@ -399,18 +394,17 @@ function populateCoverageChart() {
     tbody.appendChild(row);
   }
 }
-// Function to populate AWC table WITH ROW HIGHLIGHTING
+
 function populateAWCChart() {
   const tbody = document.getElementById('awcTableBody');
-  tbody.innerHTML = ''; // Clear existing content
+  if (!tbody) return;
   
-  // Get current household size
+  tbody.innerHTML = '';
   const currentHouseholdSize = document.getElementById('householdSize')?.value || "1";
   
   for (const [size, income] of Object.entries(awcChart)) {
     const row = document.createElement('tr');
     
-    // Highlight the entire row if it matches current household size
     if (size === currentHouseholdSize) {
       row.classList.add('coverage-row--highlight');
     }
@@ -423,30 +417,49 @@ function populateAWCChart() {
     tbody.appendChild(row);
   }
 }
-// Add click event listeners to populate tables when modals open
-document.getElementById('triggerModal1').addEventListener('click', populateCoverageChart);
-document.getElementById('triggerModal2').addEventListener('click', populateAWCChart);
 
-// Modules are deferred; DOM should exist. Defensive guard anyway:
-if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', init);
-} else {
-  init();
+// --- Initialization ---
+function init() {
+  console.log('Initializing feescale.js...');
+  
+  // Debug logging
+  console.log('Household section:', document.getElementById('householdMembersSection'));
+  console.log('Household container:', document.getElementById('householdMembersContainer'));
+  console.log('Household size input:', document.getElementById('householdSize'));
+
+  // Initialize core functionality
+  calculateGrandTotal();
+  setupHouseholdSectionToggle();
+  setupModals();
+
+  // Notes toggle
+  document.querySelectorAll('.toggleNotes').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const notes = document.getElementById('notesContainer');
+      if (!notes) return;
+      notes.style.display = (notes.style.display === 'none' || notes.style.display === '') ? 'block' : 'none';
+    });
+  });
+
+  // Add modal event listeners
+  const triggerModal1 = document.getElementById('triggerModal1');
+  const triggerModal2 = document.getElementById('triggerModal2');
+  if (triggerModal1) triggerModal1.addEventListener('click', populateCoverageChart);
+  if (triggerModal2) triggerModal2.addEventListener('click', populateAWCChart);
+
+  console.log('feescale.js initialized successfully');
 }
-// Expose for inline handlers already in HTML
+
+// --- Global exposure for inline handlers ---
 window.calculateIncome = calculateIncome;
 window.calculateGrandTotal = calculateGrandTotal;
 window.updateHouseholdIncome = updateHouseholdIncome;
 window.copyIncomeInfo = copyIncomeInfo;
 window.updateHouseholdMemberFields = updateHouseholdMemberFields;
 
-// Ensure these functions run only after DOM is ready
+// --- DOM Ready ---
 if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', () => {
-    updateHouseholdIncome();
-    updateHouseholdMemberFields();
-  });
+  document.addEventListener('DOMContentLoaded', init);
 } else {
-  updateHouseholdIncome();
-  updateHouseholdMemberFields();
+  init();
 }

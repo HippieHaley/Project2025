@@ -281,9 +281,9 @@ th {
         </button>
         <h2>Household Info</h2>
         <p>People per Household:</p>
-         <input type="number" id="householdSize" min="1" value="1" onchange="showHouseholdMemberFields()">
- <h2>Household Income</h2><p><strong>Total Income: $<span id="grandTotal">0</span></strong></p>
-        <!-- ADDED MODAL TRIGGERS -->
+        <input type="number" id="householdSize" min="1" value="1">
+        <h2>Household Income</h2>
+        <p><strong>Total Income: $<span id="grandTotal">0</span></strong></p>
         <p><strong>Client Pay: <span id="coverageLevel">N/A</span></strong>
           <span class="modal-trigger" id="triggerModal1">
             <img src="images/heart.png" class="heart" alt="Coverage chart">
@@ -295,40 +295,44 @@ th {
           </span>
         </p>
       </section>
-      <!-- Household members -->
-      <section class="householdMembersSection card" style="margin-top:24px;">
-<h2>Other Household Members</h2>
+
+      <!-- Household Members Section - CORRECTED -->
+      <section id="householdMembersSection" class="card" style="display: none;">
+        <h2>Other Household Members</h2>
+        <div id="householdMembersContainer"></div>
       </section>
     </div>
-  <!-- ADDED MODAL OVERLAYS -->
-  <div class="modal-overlay" id="modalOverlay1">
-    <div class="modal">
-      <table>
-        <thead>
-          <tr>
-            <th>Family Size</th><th>0% Patient Pay</th><th>25% Patient Pay</th>
-            <th>50% Patient Pay</th><th>75% Patient Pay</th><th>100% Patient Pay</th>
-          </tr>
-        </thead>
-        <tbody id="coverageChart"></tbody>
-      </table>
-    </div>
-  </div>
 
-  <div class="modal-overlay" id="modalOverlay2">
-    <div class="modal">
-      <h2>AWC! Program Eligibility</h2>
-      <table>
-        <thead><tr><th>Family Size</th><th>Max Annual Income</th></tr></thead>
-        <tbody id="awcTableBody"></tbody>
-      </table>
+    <!-- ADDED MODAL OVERLAYS -->
+    <div class="modal-overlay" id="modalOverlay1">
+      <div class="modal">
+        <table>
+          <thead>
+            <tr>
+              <th>Family Size</th><th>0% Patient Pay</th><th>25% Patient Pay</th>
+              <th>50% Patient Pay</th><th>75% Patient Pay</th><th>100% Patient Pay</th>
+            </tr>
+          </thead>
+          <tbody id="coverageChart"></tbody>
+        </table>
+      </div>
     </div>
-  </div>
 
-  <!-- Notes panel -->
-  <div id="notesContainer">
-    <label for="userNotes">Notes:</label><br/>
-    <textarea id="userNotes" placeholder="Enter any additional notes..." rows="8"></textarea>
+    <div class="modal-overlay" id="modalOverlay2">
+      <div class="modal">
+        <h2>AWC! Program Eligibility</h2>
+        <table>
+          <thead><tr><th>Family Size</th><th>Max Annual Income</th></tr></thead>
+          <tbody id="awcTableBody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Notes panel -->
+    <div id="notesContainer">
+      <label for="userNotes">Notes:</label><br/>
+      <textarea id="userNotes" placeholder="Enter any additional notes..." rows="8"></textarea>
+    </div>
   </div>
 </body>
 </html>
