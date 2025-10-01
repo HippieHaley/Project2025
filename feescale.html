@@ -253,15 +253,13 @@
             <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
           </svg>
         </button>
-
         <h2>Household Info</h2>
         <p>People per Household:</p>
-        <input type="number" id="householdSize" min="1" value="1" onchange="updateHouseholdIncome()">
-
+        <input type="number" id="householdSize" min="1" value="1" onchange="updateHouseholdMemberFields()">
         <h2>Household Income</h2>
         <p><strong>Total Income: $<span id="grandTotal">0</span></strong></p>
-
         <p><strong>Client Pay: <span id="coverageLevel">N/A</span></strong></p>
+        <p><strong>AWC! qualification: <span id="awcQualification">N/A</span></strong></p>
       </section>
     <!-- Household members -->
     <section id="householdMembersSection" class="card" style="margin-top:24px;">
