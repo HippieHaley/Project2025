@@ -361,6 +361,7 @@
 <body>
   <div class="container">
     <h1>Medical Service Pricelist</h1>
+
     <!-- Controls for filtering, searching, etc. -->
     <div class="controls">
       <div id="visitTypesGrid"></div>
@@ -372,7 +373,7 @@
       </select>
       <button id="toggleCodes">Show/Hide Codes</button>
     </div>
-  <script type="module" src="app.js"></script>
+  <script type="module" src="pricelist.js"></script>
     <div class="page">
       <!-- Left: Pricelist -->
       <div class="pricelist">
@@ -420,3 +421,7 @@
       </div>
     </div>
   </div>
+  <!-- Load JS at end of body for best performance -->
+  <script type="module" src="app.js"></script>
+</body>
+</html>
