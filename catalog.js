@@ -372,22 +372,13 @@ const procedures = [
   keywords: ["pregnancy test", "urine", "81025"]
 },
 {
-  name: "UA Dipstick",
-  cpt: "81002",
+  name: "HSV PCR",
+  cpt: "87529",
   hcpcs: "",
-  icd10: "R82.5",
-  fullprice: 8,
+  icd10: "B00.9",
+  fullprice: 0,
   category: "labs",
-  keywords: ["urinalysis", "dipstick", "81002"]
-},
-{
-  name: "UA Dip Automated",
-  cpt: "81003",
-  hcpcs: "",
-  icd10: "R82.5",
-  fullprice: 10,
-  category: "labs",
-  keywords: ["urinalysis", "automated", "81003"]
+  keywords: ["herpes", "HSV PCR", "87529"]
 },
 {
   name: "Wet Mount/Gram Stain",
@@ -466,6 +457,15 @@ const procedures = [
   keywords: ["Mirena", "IUD", "J7302"]
 },
 {
+  name: "Bayer IUD",
+  cpt: "",
+  hcpcs: "J7302",
+  icd10: "Z30.430",
+  fullprice: 0,
+  category: "meds",
+  keywords: ["bayer", "IUD", "J7302"]
+},
+{
   name: "Basal Thermometer",
   cpt: "",
   hcpcs: "A4931",
@@ -492,7 +492,78 @@ const procedures = [
   category: "meds",
   keywords: ["Gynol II", "contraceptive", "A4269"]
 },
-
+{
+  name: "Azithromycin",
+  cpt: "",
+  hcpcs: "",
+  icd10: "A74.9",
+  fullprice: 0,
+  category: "meds",
+  keywords: ["azithromycin", "antibiotic"]
+},
+{
+  name: "Suprax",
+  cpt: "",
+  hcpcs: "",
+  icd10: "A56.00",
+  fullprice: 0,
+  category: "meds",
+  keywords: ["suprax", "cefixime", "antibiotic"]
+},
+{
+  name: "Acyclovir",
+  cpt: "",
+  hcpcs: "",
+  icd10: "B00.9",
+  fullprice: 0,
+  category: "meds",
+  keywords: ["acyclovir", "antiviral"]
+},
+{
+  name: "Metronidazole",
+  cpt: "",
+  hcpcs: "",
+  icd10: "A07.2",
+  fullprice: 0,
+  category: "meds",
+  keywords: ["metronidazole", "antibiotic"]
+},
+{
+  name: "Fluconazole",
+  cpt: "",
+  hcpcs: "",
+  icd10: "B37.3",
+  fullprice: 0,
+  category: "meds",
+  keywords: ["fluconazole", "antifungal"]
+},
+{
+  name: "Ibuprofen",
+  cpt: "",
+  hcpcs: "",
+  icd10: "M79.1",
+  fullprice: 0,
+  category: "meds",
+  keywords: ["ibuprofen", "pain reliever"]
+},
+{
+  name: "Clindamycin Cream",
+  cpt: "",
+  hcpcs: "",
+  icd10: "N76.0",
+  fullprice: 0,
+  category: "meds",
+  keywords: ["clindamycin", "cream", "antibiotic"]
+},
+{
+  name: "Clotrimazole Cream",
+  cpt: "",
+  hcpcs: "",
+  icd10: "B37.3",
+  fullprice: 0,
+  category: "meds",
+  keywords: ["clotrimazole", "cream", "antifungal"]
+},
 
   // ======================
   // ORAL CONTRACEPTIVES (OC) – dropdown
