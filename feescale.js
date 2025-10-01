@@ -326,6 +326,48 @@ window.calculateGrandTotal = calculateGrandTotal;
 window.updateHouseholdIncome = updateHouseholdIncome;
 window.copyIncomeInfo = copyIncomeInfo;
 window.updateHouseholdMemberFields = updateHouseholdMemberFields;
+// Function to populate coverage chart table
+function populateCoverageChart() {
+  const tbody = document.getElementById('coverageChart');
+  tbody.innerHTML = ''; // Clear existing content
+  
+  for (const [size, values] of Object.entries(coverageChart)) {
+    const [z, a, b, c, d] = values;
+    const row = document.createElement('tr');
+    
+    row.innerHTML = `
+      <td>${size}</td>
+      <td>≤ $${z.toLocaleString()}</td>
+      <td>$${(z + 1).toLocaleString()} - $${a.toLocaleString()}</td>
+      <td>$${(a + 1).toLocaleString()} - $${b.toLocaleString()}</td>
+      <td>$${(b + 1).toLocaleString()} - $${c.toLocaleString()}</td>
+      <td>≥ $${d.toLocaleString()}</td>
+    `;
+    
+    tbody.appendChild(row);
+  }
+}
+
+// Function to populate AWC table
+function populateAWCChart() {
+  const tbody = document.getElementById('awcTableBody');
+  tbody.innerHTML = ''; // Clear existing content
+  
+  for (const [size, income] of Object.entries(awcChart)) {
+    const row = document.createElement('tr');
+    
+    row.innerHTML = `
+      <td>${size}</td>
+      <td>$${income.toLocaleString()}</td>
+    `;
+    
+    tbody.appendChild(row);
+  }
+}
+
+// Add click event listeners to populate tables when modals open
+document.getElementById('triggerModal1').addEventListener('click', populateCoverageChart);
+document.getElementById('triggerModal2').addEventListener('click', populateAWCChart);
 
 // Modules are deferred; DOM should exist. Defensive guard anyway:
 if (document.readyState === 'loading') {
