@@ -308,169 +308,165 @@
     <textarea id="userNotes" placeholder="Enter any additional notes..." rows="8"></textarea>
   </div>
 <script type="module">
-   import { coverageChart, awcChart } from './charts.js';
+  /* ===== import Scale class from charts.js ===== */
+import Scale from './charts.js';
 
-  // ---------- helpers ----------
-  const $ = (id) => document.getElementById(id);
-  const fmt = new Intl.NumberFormat('en-US');
-  const money = (n) => fmt.format(Number(n || 0));
+/* ---------- helpers ---------- */
+const $   = (id) => document.getElementById(id);
+const fmt = new Intl.NumberFormat('en-US');
+const money = (n) => fmt.format(Number(n || 0));
 
-  // ---------- coverage table (ranges like your screenshot) ----------
-  function renderCoverageChart(selectedSize){
-    const tbody = $('coverageTableBody');
-    if (!tbody) return;
-    tbody.innerHTML = '';
+/* ---------- compute patient-pay tier label ---------- */
+function determineCoverageLevel(householdSize, yearlyIncome){
+  const row = Scale.coverageChart[householdSize];
+  if (!row || !Number.isFinite(yearlyIncome)) return 'N/A';
+  const [z,a,b,c,d] = row;
 
-    Object.keys(Scale.coverageChart)
-      .sort((a,b) => Number(a) - Number(b))
-      .forEach(size => {
-        const [z,a,b,c,d] = Scale.coverageChart[size]; // [0,25,50,75,100] cutoffs
-        const tr = document.createElement('tr');
-        if (Number(size) === Number(selectedSize)) tr.classList.add('coverage-row--highlight');
+  if (yearlyIncome <= z) return '0%';
+  if (yearlyIncome <= a) return '25%';
+  if (yearlyIncome <= b) return '50%';
+  if (yearlyIncome <= c) return '75%';
+  if (yearlyIncome >= d) return '100%';
+  return 'N/A';
+}
 
-        tr.innerHTML = `
-          <td>${size}</td>
-          <td>${money(z)}</td>
-          <td>${money(z+1)} – ${money(a)}</td>
-          <td>${money(a+1)} – ${money(b)}</td>
-          <td>${money(b+1)} – ${money(c)}</td>
-          <td>${money(d)}</td>
-        `;
-        tbody.appendChild(tr);
-      });
-  }
+/* ---------- AWC yes/no ---------- */
+function determineAWCQualification(householdSize, yearlyIncome){
+  const max = Scale.awcChart[householdSize];
+  if (!max || !Number.isFinite(yearlyIncome)) return 'N/A';
+  return yearlyIncome <= max ? 'Yes' : 'No';
+}
+function renderCoverageChart(selectedSize){
+  // match your HTML: <tbody id="coverageChart">
+  const tbody = $('coverageChart');
+  if (!tbody) return;
+  tbody.innerHTML = '';
 
-  // ---------- AWC table (single threshold per size) ----------
-  function renderAWCChart(selectedSize){
-    const tbody = $('awcTableBody');
-    if (!tbody) return;
-    tbody.innerHTML = '';
+  Object.keys(Scale.coverageChart)
+    .sort((a,b) => Number(a) - Number(b))
+    .forEach(size => {
+      const [z,a,b,c,d] = Scale.coverageChart[size]; // thresholds
+      const tr = document.createElement('tr');
+      if (Number(size) === Number(selectedSize)) tr.classList.add('coverage-row--highlight');
 
-    Object.keys(Scale.awcChart)
-      .sort((a,b)=>Number(a)-Number(b))
-      .forEach(size=>{
-        const tr = document.createElement('tr');
-        if (Number(size) === Number(selectedSize)) tr.classList.add('coverage-row--highlight');
-        tr.innerHTML = `<td>${size}</td><td>${money(Scale.awcChart[size])}</td>`;
-        tbody.appendChild(tr);
-      });
-  }
-
-  // ---------- compute patient-pay tier label ----------
-  function determineCoverageLevel(householdSize, yearlyIncome){
-    const row = Scale.coverageChart[householdSize];
-    if (!row || !Number.isFinite(yearlyIncome)) return 'N/A';
-    const [z,a,b,c,d] = row;
-
-    if (yearlyIncome <= z)                 return '0%';
-    if (yearlyIncome <= a)                 return '25%';
-    if (yearlyIncome <= b)                 return '50%';
-    if (yearlyIncome <= c)                 return '75%';
-    if (yearlyIncome >= d)                 return '100%';
-    return 'N/A';
-  }
-
-  // ---------- AWC yes/no ----------
-  function determineAWCQualification(householdSize, yearlyIncome){
-    const max = Scale.awcChart[householdSize];
-    if (!max || !Number.isFinite(yearlyIncome)) return 'N/A';
-    return yearlyIncome <= max ? 'Yes' : 'No';
-  }
-
-  // ---------- income calculators (your originals, condensed) ----------
-  function calculateIncome(type) {
-    const get = id => parseFloat($(id).value) || 0;
-    let total=0, avg=0, ann=0;
-
-    if (type==='biweekly'){ total=get('paystub1')+get('paystub2'); avg=total/2; ann=avg*26; }
-    if (type==='weekly'  ){ total=get('weeklyPaystub1')+get('weeklyPaystub2'); avg=total/2; ann=avg*52; }
-    if (type==='twiceMonth'){ total=get('twiceMonthPaystub1')+get('twiceMonthPaystub2'); avg=total/2; ann=avg*24; }
-    if (type==='verbal'  ){ total=get('verbalHours')*get('verbalRate'); avg=total; ann=total*52; }
-
-    $(`${type}Total`).textContent   = ann ? (total.toFixed(2)) : '0.00';
-    $(`${type}Average`).textContent = ann ? (avg.toFixed(2))   : '0.00';
-    $(`${type}Annual`).textContent  = ann ? (ann.toFixed(2))   : '0.00';
-    calculateGrandTotal();
-  }
-  window.calculateIncome = calculateIncome;
-
-  function calculateGrandTotal(){
-    const num = id => parseFloat($(id).textContent) || 0;
-    const val = id => parseFloat($(id).value) || 0;
-
-    let grand = num('biweeklyAnnual') + num('weeklyAnnual') + num('twiceMonthAnnual') + num('verbalAnnual')
-              + (val('AnnualTips')*52) + (val('AnnualOtherMonthly')*12) + val('OtherAnnual');
-
-    // other household members (same logic you had)
-    document.querySelectorAll('#householdMembersContainer > div').forEach(div=>{
-      const incomeInput = div.querySelector('input[name^="memberIncome"]');
-      const freqSelect  = div.querySelector('select[name^="memberFrequency"]');
-      if (incomeInput && freqSelect && incomeInput.value){
-        const amt = parseFloat(incomeInput.value)||0;
-        let annual = amt;
-        if (freqSelect.value==='weekly')   annual = amt*52;
-        if (freqSelect.value==='biweekly') annual = amt*26;
-        if (freqSelect.value==='monthly')  annual = amt*12;
-        grand += annual;
-      }
+      tr.innerHTML = `
+        <td>${size}</td>
+        <td>≤ ${money(z)}</td>
+        <td>${money(z+1)} – ${money(a)}</td>
+        <td>${money(a+1)} – ${money(b)}</td>
+        <td>${money(b+1)} – ${money(c)}</td>
+        <td>≥ ${money(d)}</td>
+      `;
+      tbody.appendChild(tr);
     });
+}
 
-    $('grandTotal').textContent = grand.toFixed(2);
-    updateHouseholdIncome();
-  }
-  window.calculateGrandTotal = calculateGrandTotal;
+/* ---------- AWC table (single threshold per size) ---------- */
+function renderAWCChart(selectedSize){
+  const tbody = $('awcTableBody');
+  if (!tbody) return;
+  tbody.innerHTML = '';
 
-  function updateHouseholdIncome(){
-    const size   = parseInt($('householdSize').value) || 0;
-    const income = parseFloat($('grandTotal').textContent) || 0;
-    $('coverageLevel').textContent    = determineCoverageLevel(size, income);
-    $('awcQualification').textContent = determineAWCQualification(size, income);
-  }
-  window.updateHouseholdIncome = updateHouseholdIncome;
+  Object.keys(Scale.awcChart)
+    .sort((a,b)=>Number(a)-Number(b))
+    .forEach(size=>{
+      const tr = document.createElement('tr');
+      if (Number(size) === Number(selectedSize)) tr.classList.add('coverage-row--highlight');
+      tr.innerHTML = `<td>${size}</td><td>${money(Scale.awcChart[size])}</td>`;
+      tbody.appendChild(tr);
+    });
+}
+/* ---------- income calculators (condensed) ---------- */
+function calculateIncome(type) {
+  const get = id => parseFloat($(id).value) || 0;
+  let total=0, avg=0, ann=0;
 
-  // ---------- modals (unchanged, but using fixed IDs) ----------
-  const triggerModal1 = $('triggerModal1');
-  const modalOverlay1 = $('modalOverlay1');
-  const triggerModal2 = $('triggerModal2');
-  const modalOverlay2 = $('modalOverlay2');
+  if (type==='biweekly'){ total=get('paystub1')+get('paystub2'); avg=total/2; ann=avg*26; }
+  if (type==='weekly'  ){ total=get('weeklyPaystub1')+get('weeklyPaystub2'); avg=total/2; ann=avg*52; }
+  if (type==='twiceMonth'){ total=get('twiceMonthPaystub1')+get('twiceMonthPaystub2'); avg=total/2; ann=avg*24; }
+  if (type==='verbal'  ){ total=get('verbalHours')*get('verbalRate'); avg=total; ann=total*52; }
 
-  const openModal  = (ov)=>{ ov.style.display='flex'; document.body.style.overflow='hidden'; };
-  const closeModal = (ov)=>{ ov.style.display='none'; document.body.style.overflow=''; };
+  $(`${type}Total`).textContent   = ann ? (total.toFixed(2)) : '0.00';
+  $(`${type}Average`).textContent = ann ? (avg.toFixed(2))   : '0.00';
+  $(`${type}Annual`).textContent  = ann ? (ann.toFixed(2))   : '0.00';
+  calculateGrandTotal();
+}
+window.calculateIncome = calculateIncome;
 
-  triggerModal1.addEventListener('click', ()=>{
-    renderCoverageChart(parseInt($('householdSize').value)||1);
-    openModal(modalOverlay1);
+function calculateGrandTotal(){
+  const num = id => parseFloat($(id).textContent) || 0;
+  const val = id => parseFloat($(id).value) || 0;
+
+  let grand = num('biweeklyAnnual') + num('weeklyAnnual') + num('twiceMonthAnnual') + num('verbalAnnual')
+            + (val('AnnualTips')*52) + (val('AnnualOtherMonthly')*12) + val('OtherAnnual');
+
+  document.querySelectorAll('#householdMembersContainer > div').forEach(div=>{
+    const incomeInput = div.querySelector('input[name^="memberIncome"]');
+    const freqSelect  = div.querySelector('select[name^="memberFrequency"]');
+    if (incomeInput && freqSelect && incomeInput.value){
+      const amt = parseFloat(incomeInput.value)||0;
+      let annual = amt;
+      if (freqSelect.value==='weekly')   annual = amt*52;
+      if (freqSelect.value==='biweekly') annual = amt*26;
+      if (freqSelect.value==='monthly')  annual = amt*12;
+      grand += annual;
+    }
   });
-  modalOverlay1.addEventListener('click', e=>{ if (e.target===modalOverlay1) closeModal(modalOverlay1); });
 
-  triggerModal2.addEventListener('click', ()=>{
-    renderAWCChart(parseInt($('householdSize').value)||1);
-    openModal(modalOverlay2);
-  });
-  modalOverlay2.addEventListener('click', e=>{ if (e.target===modalOverlay2) closeModal(modalOverlay2); });
-  document.addEventListener('keydown', e=>{ if (e.key==='Escape'){ closeModal(modalOverlay1); closeModal(modalOverlay2); } });
+  $('grandTotal').textContent = grand.toFixed(2);
+  updateHouseholdIncome();
+}
+window.calculateGrandTotal = calculateGrandTotal;
 
-  // ---------- init ----------
-  calculateGrandTotal();               // also calls updateHouseholdIncome()
+function updateHouseholdIncome(){
+  const size   = parseInt($('householdSize').value) || 0;
+  const income = parseFloat($('grandTotal').textContent) || 0;
+  $('coverageLevel').textContent    = determineCoverageLevel(size, income);
+  $('awcQualification').textContent = determineAWCQualification(size, income);
+}
+window.updateHouseholdIncome = updateHouseholdIncome;
+
+/* ---------- modals (unchanged) ---------- */
+const triggerModal1 = $('triggerModal1');
+const modalOverlay1 = $('modalOverlay1');
+const triggerModal2 = $('triggerModal2');
+const modalOverlay2 = $('modalOverlay2');
+
+const openModal  = (ov)=>{ ov.style.display='flex'; document.body.style.overflow='hidden'; };
+const closeModal = (ov)=>{ ov.style.display='none'; document.body.style.overflow=''; };
+
+triggerModal1.addEventListener('click', ()=>{
+  renderCoverageChart(parseInt($('householdSize').value)||1);
+  openModal(modalOverlay1);
+});
+modalOverlay1.addEventListener('click', e=>{ if (e.target===modalOverlay1) closeModal(modalOverlay1); });
+
+triggerModal2.addEventListener('click', ()=>{
+  renderAWCChart(parseInt($('householdSize').value)||1);
+  openModal(modalOverlay2);
+});
+modalOverlay2.addEventListener('click', e=>{ if (e.target===modalOverlay2) closeModal(modalOverlay2); });
+document.addEventListener('keydown', e=>{ if (e.key==='Escape'){ closeModal(modalOverlay1); closeModal(modalOverlay2); } });
+
+/* ---------- init ---------- */
+calculateGrandTotal();
+renderCoverageChart(parseInt($('householdSize').value)||1);
+renderAWCChart(parseInt($('householdSize').value)||1);
+
+$('householdSize').addEventListener('change', ()=>{
+  updateHouseholdIncome();
   renderCoverageChart(parseInt($('householdSize').value)||1);
   renderAWCChart(parseInt($('householdSize').value)||1);
+});
 
-  $('householdSize').addEventListener('change', ()=>{
-    updateHouseholdIncome();
-    renderCoverageChart(parseInt($('householdSize').value)||1);
-    renderAWCChart(parseInt($('householdSize').value)||1);
-  });
-
-  // notes toggle (as you had)
-  document.querySelectorAll('.toggleNotes').forEach(btn=>{
-    btn.addEventListener('click', ()=>{
-      const notes = $('notesContainer');
-      notes.style.display = (notes.style.display==='none'||notes.style.display==='') ? 'block' : 'none';
-    });
-  });
-
-  // expose if you need copyIncomeInfo elsewhere
-  window.money = money;
-</script>
-</body>
-</html>
+/* expose if you need money() elsewhere */
+window.money = money;
+/* ---------- notes panel toggle ---------- */
+const notesBtn = document.querySelector('.toggleNotes');
+const notesContainer = document.getElementById('notesContainer');
+notesBtn.addEventListener('click', () => {
+  if (notesContainer.style.display === 'block') {
+    notesContainer.style.display = 'none';          
+  } else {
+    notesContainer.style.display = 'block';
+  } 
