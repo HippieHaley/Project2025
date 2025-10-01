@@ -183,16 +183,22 @@ function updateHouseholdMemberFields() {
 const triggerModal1 = document.getElementById('triggerModal1');
 const modalOverlay1 = document.getElementById('modalOverlay1');
 if (triggerModal1 && modalOverlay1) {
-  triggerModal1.addEventListener('click', () => { modalOverlay1.style.display = 'flex'; });
+  triggerModal1.addEventListener('click', () => { 
+    modalOverlay1.style.display = 'flex'; 
+    populateCoverageChart(); // Populate when modal opens
+  });
   modalOverlay1.addEventListener('click', e => { if (e.target === modalOverlay1) modalOverlay1.style.display = 'none'; });
 }
+
 const triggerModal2 = document.getElementById('triggerModal2');
 const modalOverlay2 = document.getElementById('modalOverlay2');
 if (triggerModal2 && modalOverlay2) {
-  triggerModal2.addEventListener('click', () => { modalOverlay2.style.display = 'flex'; });
+  triggerModal2.addEventListener('click', () => { 
+    modalOverlay2.style.display = 'flex'; 
+    populateAWCChart(); // Populate when modal opens
+  });
   modalOverlay2.addEventListener('click', e => { if (e.target === modalOverlay2) modalOverlay2.style.display = 'none'; });
 }
-
 // --- Copy (with fallback) ---
 function copyIncomeInfo() {
   const $ = id => document.getElementById(id);
@@ -327,34 +333,58 @@ window.updateHouseholdIncome = updateHouseholdIncome;
 window.copyIncomeInfo = copyIncomeInfo;
 window.updateHouseholdMemberFields = updateHouseholdMemberFields;
 // Function to populate coverage chart table
+// Function to populate coverage chart table WITH CELL HIGHLIGHTING
 function populateCoverageChart() {
   const tbody = document.getElementById('coverageChart');
   tbody.innerHTML = ''; // Clear existing content
+  
+  // Get current household size and income
+  const currentHouseholdSize = document.getElementById('householdSize')?.value || "1";
+  const yearlyIncome = parseFloat(document.getElementById('grandTotal')?.textContent) || 0;
+  
+  // Determine which coverage level applies for the current household
+  const currentCoverageLevel = determineCoverageLevel(currentHouseholdSize, yearlyIncome);
   
   for (const [size, values] of Object.entries(coverageChart)) {
     const [z, a, b, c, d] = values;
     const row = document.createElement('tr');
     
+    // Create cells with potential highlighting
+    const cells = [
+      `≤ $${z.toLocaleString()}`,
+      `$${(z + 1).toLocaleString()} - $${a.toLocaleString()}`,
+      `$${(a + 1).toLocaleString()} - $${b.toLocaleString()}`,
+      `$${(b + 1).toLocaleString()} - $${c.toLocaleString()}`,
+      `≥ $${d.toLocaleString()}`
+    ];
+    
     row.innerHTML = `
       <td>${size}</td>
-      <td>≤ $${z.toLocaleString()}</td>
-      <td>$${(z + 1).toLocaleString()} - $${a.toLocaleString()}</td>
-      <td>$${(a + 1).toLocaleString()} - $${b.toLocaleString()}</td>
-      <td>$${(b + 1).toLocaleString()} - $${c.toLocaleString()}</td>
-      <td>≥ $${d.toLocaleString()}</td>
+      <td class="${size === currentHouseholdSize && currentCoverageLevel === '0%' ? 'coverage-row--highlight' : ''}">${cells[0]}</td>
+      <td class="${size === currentHouseholdSize && currentCoverageLevel === '25%' ? 'coverage-row--highlight' : ''}">${cells[1]}</td>
+      <td class="${size === currentHouseholdSize && currentCoverageLevel === '50%' ? 'coverage-row--highlight' : ''}">${cells[2]}</td>
+      <td class="${size === currentHouseholdSize && currentCoverageLevel === '75%' ? 'coverage-row--highlight' : ''}">${cells[3]}</td>
+      <td class="${size === currentHouseholdSize && currentCoverageLevel === '100%' ? 'coverage-row--highlight' : ''}">${cells[4]}</td>
     `;
     
     tbody.appendChild(row);
   }
 }
-
-// Function to populate AWC table
+// Function to populate AWC table WITH ROW HIGHLIGHTING
 function populateAWCChart() {
   const tbody = document.getElementById('awcTableBody');
   tbody.innerHTML = ''; // Clear existing content
   
+  // Get current household size
+  const currentHouseholdSize = document.getElementById('householdSize')?.value || "1";
+  
   for (const [size, income] of Object.entries(awcChart)) {
     const row = document.createElement('tr');
+    
+    // Highlight the entire row if it matches current household size
+    if (size === currentHouseholdSize) {
+      row.classList.add('coverage-row--highlight');
+    }
     
     row.innerHTML = `
       <td>${size}</td>
@@ -364,7 +394,6 @@ function populateAWCChart() {
     tbody.appendChild(row);
   }
 }
-
 // Add click event listeners to populate tables when modals open
 document.getElementById('triggerModal1').addEventListener('click', populateCoverageChart);
 document.getElementById('triggerModal2').addEventListener('click', populateAWCChart);

@@ -151,10 +151,12 @@ th {
   #notesContainer textarea{
     width:100%; border-radius:10px; padding:10px; border:1px solid #ccc; resize:vertical; background:#fff;
   }
-  .coverage-row--highlight {
-    background: #f8c9f9;
-    font-weight: bold;
-  }
+ .coverage-row--highlight,
+.coverage-row--highlight td {
+  background: #f8c9f9 !important; /* Your pink color */
+  font-weight: bold;
+  border: 2px solid #333 !important; /* Dark border to make it stand out */
+}
   @media (max-width: 768px) {
     .card {
       flex: 0 0 100%;
