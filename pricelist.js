@@ -9,7 +9,6 @@ let showCodes = false;
 let percent = 1.0;
 let grandTotalValue = 0;
 let query = '';
-let activeVisitType = 'all';
 
 /** ========================
  *  DOM refs
@@ -28,7 +27,6 @@ const sections = {
 };
 
 // Controls
-const visitTypesGrid = $('#visitTypesGrid');
 const searchInput = $('#searchInput');
 const receiptItems = $('#receiptItems');
 const grandTotalEl = $('#grandTotal');
@@ -64,43 +62,6 @@ function matchesSearch(p, q) {
   return hay.includes(q.toLowerCase());
 }
 
-function visibleByVisitType(p) {
-  if (p.category !== 'visits') return true;
-  if (activeVisitType === 'all') return true;
-  return (p.visitType || '') === activeVisitType;
-}
-
-/** ========================
- *  Visit-type buttons
- *  ======================== */
-function buildVisitTypes() {
-  if (!visitTypesGrid) return;
-  visitTypesGrid.innerHTML = '';
-  const visitItems = procedures.filter(p => p.category === 'visits');
-  const types = Array.from(new Set(visitItems.map(v => v.visitType).filter(Boolean)));
-
-  function makeBtn(label, value, sub) {
-    const b = document.createElement('button');
-    b.type = 'button';
-    b.className = 'visit-type-btn' + (activeVisitType === value ? ' active' : '');
-    b.innerHTML = `<div>${label}</div>${sub ? `<div class="code">${sub}</div>` : ''}`;
-    b.addEventListener('click', () => {
-      activeVisitType = value;
-      $$('.visit-type-btn', visitTypesGrid).forEach(x => x.classList.remove('active'));
-      b.classList.add('active');
-      renderCatalog();
-    });
-    visitTypesGrid.appendChild(b);
-  }
-
-  makeBtn('All Visits', 'all', 'all visits');
-  types.forEach(t => {
-    // Capitalize first letter and replace hyphens
-    const label = t.replace(/-/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
-    makeBtn(label, t, t);
-  });
-}
-
 /** ========================
  *  Section definitions
  *  ======================== */
@@ -133,7 +94,6 @@ function renderCatalog() {
     if (!listContainer) return;
 
     if (!matchesSearch(proc, query)) return;
-    if (!visibleByVisitType(proc)) return;
 
     const name = (proc.name || '').split('\n')[0];
     const row = document.createElement('div');
@@ -165,7 +125,7 @@ function renderCatalog() {
     const codesSpan = document.createElement('span');
     codesSpan.className = 'codes' + (showCodes ? ' show' : '');
     const codes = getCodes(proc);
-    if (codes) codesSpan.textContent = ` (${codes})`;
+    if (codes && showCodes) codesSpan.textContent = ` (${codes})`;
     row.appendChild(codesSpan);
 
     // Checkbox sync
@@ -317,7 +277,7 @@ const percentSel = $('#percentSelector');
 if (percentSel) {
   percentSel.addEventListener('change', e => {
     percent = parseFloat(e.target.value) / 100;
-    for (const [k, entry] of selected) {
+    for (const [, entry] of selected) {
       entry.unitPrice = basePrice(entry.item) * percent;
     }
     renderReceipt();
@@ -357,7 +317,6 @@ if (document.readyState === "loading") {
 }
 
 function init() {
-  buildVisitTypes();
   renderCatalog();
   renderReceipt();
 }
