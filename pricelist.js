@@ -1,248 +1,232 @@
 import procedures from './catalog.js';
 
+/** ---- Helper Functions ---- **/
+function getFullPrice(serviceName) {
+  const procedure = procedures.find(p => p.name.split("\n")[0] === serviceName || p.name === serviceName);
+  return procedure ? procedure.fullprice : 0;
+}
+
+function money(amount) {
+  return `$${amount.toFixed(2)}`;
+}
+
 /** ---- Config ---- **/
-const MULT_X_BUTTONS = {                // x2/x3 quick buttons for these
-  "Chlamydia (CHL)": [2,3],
-  "Gonorrhea (GC)": [2,3]
+const MULT_X_BUTTONS = {
+  "Chlamydia (CHL)": [2, 3],
+  "Gonorrhea (GC)": [2, 3]
 };
-const OC_PREFIXES = ["Alese","Apri","Aubra","Aviane","Camila","Chateal","Cryselle","Cyred","Doxycycline","Enpresse","Jolivette","Levora","Lutera","Lyza","Mononessa","Nor QD","Nordette","Norethindrone","Nortrel 777","Orsythia","Portia","Reclipsen","Sprintec","Sronyx","Tri-Lo Marzia","Tri-Lo Sprintec","TriNessa Lo","Triphasil","Trivora","Vilbra"];
 
 /** ---- State ---- **/
 let percent = 1.0;
 let showCodes = false;
-let grandTotal = 0;
-const selected = {}; // key -> {qty, unit, total, span, lineEl}
-const getCodes = (service)=>{
-  const row = procedures.find(r=>r.service.split("\n")[0] === service || r.service === service);
-  if(!row) return "";
+let grandTotalValue = 0;
+const selected = {};
+
+const getCodes = (service) => {
+  const row = procedures.find(r => r.name.split("\n")[0] === service || r.name === service);
+  if (!row) return "";
   const bits = [];
-  if(row.cpt) bits.push(`CPT: ${row.cpt}`);
-  if(row.hcpcs) bits.push(`HCPCS: ${row.hcpcs}`);
-  if(row.icd10) bits.push(`ICD-10: ${row.icd10}`);
-  if(row.modifier) bits.push(`Modifier: ${row.modifier}`);
+  if (row.cpt) bits.push(`CPT: ${row.cpt}`);
+  if (row.hcpcs) bits.push(`HCPCS: ${row.hcpcs}`);
+  if (row.icd10) bits.push(`ICD-10: ${row.icd10}`);
   return bits.join(" • ");
 };
-const recomputeTotal = ()=>{
-  grandTotal = Object.values(selected).reduce((s,x)=> s + x.total, 0);
-  document.getElementById('grand-total').textContent = money(grandTotal);
+
+const recomputeTotal = () => {
+  grandTotalValue = Object.values(selected).reduce((s, x) => s + x.total, 0);
+  document.getElementById('grandTotal').textContent = money(grandTotalValue);
 };
 
 /** ---- Receipt ops ---- **/
-function addLine(service, qty=1){
+function addLine(service, qty = 1) {
   const unit = getFullPrice(service) * percent;
   const id = service;
-  if(selected[id]){
+  
+  if (selected[id]) {
     selected[id].qty += qty;
     selected[id].total = selected[id].qty * selected[id].unit;
     selected[id].span.textContent = `${service} x${selected[id].qty} — ${money(selected[id].total)}`;
     recomputeTotal();
     return;
   }
+
   const wrap = document.createElement('div');
-  wrap.className = 'receipt-row';
+  wrap.className = 'receipt-item';
 
   const span = document.createElement('span');
-  span.textContent = `${service} x${qty} — ${money(unit*qty)}`;
-  wrap.appendChild(span);
-
-  const multiBtn = document.createElement('button');
-  multiBtn.className = 'multiple-btn';
-  multiBtn.textContent = 'Multiple';
-  multiBtn.onclick = ()=>{
-    popover.style.display = (popover.style.display==='grid'?'none':'grid');
+  span.textContent = `${service} x${qty} — ${money(unit * qty)}`;
+  
+  const qtySelect = document.createElement('select');
+  qtySelect.className = 'qty-select';
+  for (let n = 1; n <= 10; n++) {
+    const opt = document.createElement('option');
+    opt.value = n;
+    opt.textContent = n;
+    if (n === qty) opt.selected = true;
+    qtySelect.appendChild(opt);
+  }
+  qtySelect.onchange = (e) => {
+    const newQty = parseInt(e.target.value, 10);
+    selected[id].qty = newQty;
+    selected[id].total = newQty * selected[id].unit;
+    selected[id].span.textContent = `${service} x${newQty} — ${money(selected[id].total)}`;
+    recomputeTotal();
   };
-  wrap.appendChild(multiBtn);
 
-  const remove = document.createElement('button');
-  remove.className = 'remove';
-  remove.textContent = 'X';
-  remove.onclick = ()=>{
+  const removeBtn = document.createElement('button');
+  removeBtn.className = 'remove';
+  removeBtn.textContent = 'X';
+  removeBtn.onclick = () => {
     wrap.remove();
     delete selected[id];
     recomputeTotal();
   };
-  wrap.appendChild(remove);
 
-  const popover = document.createElement('div');
-  popover.className = 'qty-popover';
-  popover.style.display = 'none';
-  const qtySel = document.createElement('select');
-  qtySel.className = 'qty-select';
-  for(let n=2;n<=13;n++){
-    const opt = document.createElement('option');
-    opt.value = n; opt.textContent = `x${n}`;
-    qtySel.appendChild(opt);
-  }
-  const apply = document.createElement('button');
-  apply.className = 'btn';
-  apply.textContent = 'Apply';
-  apply.onclick = ()=>{
-    const q = parseInt(qtySel.value,10);
-    selected[id].qty = q;
-    selected[id].total = q * selected[id].unit;
-    selected[id].span.textContent = `${service} x${q} — ${money(selected[id].total)}`;
-    popover.style.display = 'none';
-    recomputeTotal();
-  };
-  popover.appendChild(qtySel);
-  popover.appendChild(apply);
-  wrap.appendChild(popover);
+  wrap.appendChild(span);
+  wrap.appendChild(qtySelect);
+  wrap.appendChild(removeBtn);
 
-  document.getElementById('receipt-items').appendChild(wrap);
-  selected[id] = { qty, unit, total: unit*qty, span, lineEl: wrap };
-  selected[id].span = span;
+  document.getElementById('receiptItems').appendChild(wrap);
+  selected[id] = { qty, unit, total: unit * qty, span, lineEl: wrap };
   recomputeTotal();
 }
 
-function quickAdd(service, times){
+function quickAdd(service, times) {
   addLine(service, times);
 }
 
 /** ---- UI render ---- **/
 const sectionsDef = [
-  { title: "Visit Codes", match: (r)=> /^99(2|3)/.test(r.cpt||"") && !/Preventive/i.test(r.service) },
-  { title: "Preventive Exam (IE/AE)", match: (r)=> /^9938|^9939/.test(r.cpt||"") },
-  { title: "Procedures & Devices", match: (r)=> ["IUD Insertion","IUD Removal","Implant Insertion","Implant Removal","Implant Removal + Reinsertion"].includes(r.service) },
-  { title: "Screenings & Labs", match: (r)=> ["Chlamydia (CHL)","Gonorrhea (GC)","HPV","Pregnancy Test Urine","RPR (Syphilis)","TPPA (Syphilis)","HIV Rapid","HIV Serum","Wet Mount","Venipuncture","Urine Dipstick","Urine Dipstick (non-automated)","HSV PCR","HSV Serum "].includes(r.service) },
-  { title: "Meds & Treatments", match: (r)=> ["Doxycycline","Rocephin (ceftriaxone inj)","Bicillin L-A","Azithromycin","Suprax","Cefixime","Acyclovir","Metronidazole","Fluconazole","Ibuprofen","Clindamycin Cream","Clotrimazole Cream"].includes(r.service) },
-  { title: "Supplies", match: (r)=> ["Basal Thermometer","VCF Foam","Gynol II","Depo","Liletta IUD","Paragard IUD","Mirena IUD","Xulane Patch","NuvaRing","Nexplanon"].includes(r.service) },
-  { title: "Oral Contraceptives (dropdown)", special: "OC" }
+  { 
+    id: 'section-visits', 
+    title: "Visit Codes", 
+    match: (r) => /^992|^993/.test(r.cpt || "") && !/Preventive/i.test(r.name) 
+  },
+  { 
+    id: 'section-procedures', 
+    title: "Procedures", 
+    match: (r) => ["Implant Insertion", "Implant Removal", "Implant Removal + Reinsertion", "IUD Insertion", "IUD Removal"].includes(r.name.split("\n")[0]) 
+  },
+  { 
+    id: 'section-labs', 
+    title: "Labs", 
+    match: (r) => ["Chlamydia (CHL)", "Gonorrhea (GC)", "HPV", "Liquid Based PAP", "Conventional PAP"].includes(r.name.split("\n")[0]) 
+  },
+  { 
+    id: 'section-meds', 
+    title: "Medications & Supplies", 
+    match: (r) => ["Doxycycline", "Rocephin (Ceftriaxone inj)", "Bicillin L-A", "Depo (Medroxyprogesterone)", "Nexplanon", "NuvaRing", "Xulane Patch"].includes(r.name.split("\n")[0]) 
+  }
 ];
 
-function render(){
-  const host = document.getElementById('sections');
-  host.innerHTML = "";
+function render() {
+  // Render regular sections
+  sectionsDef.forEach(def => {
+    const section = document.getElementById(def.id);
+    const listContainer = section.querySelector('.list');
+    listContainer.innerHTML = '';
 
-  sectionsDef.forEach(def=>{
-    const box = document.createElement('div');
-    box.className = 'section';
-
-    const h = document.createElement('h2');
-    h.textContent = def.title;
-    box.appendChild(h);
-
-    if(def.special === "OC"){
-      // Alphabetical OC dropdown with checkboxes
-      const ocWrap = document.createElement('div');
-      ocWrap.className = 'oc-row';
-      const select = document.createElement('select');
-      select.id = "oc-select";
-      const blank = document.createElement('option');
-      blank.value = ""; blank.textContent = "Select OC…";
-      select.appendChild(blank);
-
-      // Build and sort OC list alphabetically (already alpha in OC_PREFIXES)
-      OC_PREFIXES.forEach(name=>{
-        const opt = document.createElement('option');
-        opt.value = name;
-        opt.textContent = name;
-        select.appendChild(opt);
-      });
+    const matchingProcedures = procedures.filter(def.match);
+    
+    matchingProcedures.forEach(procedure => {
+      const shortName = procedure.name.split("\n")[0];
+      
+      const itemEl = document.createElement('div');
+      itemEl.className = 'item';
 
       const addBtn = document.createElement('button');
       addBtn.className = 'btn';
       addBtn.textContent = 'Add';
-      addBtn.onclick = ()=>{
-        const name = select.value;
-        if(!name) return;
-        addLine(name, 1);
-        select.value = "";
-      };
-      ocWrap.appendChild(select);
-      ocWrap.appendChild(addBtn);
-      box.appendChild(ocWrap);
-      host.appendChild(box);
-      return;
-    }
+      addBtn.onclick = () => addLine(shortName, 1);
 
-    const list = procedures.filter(def.match);
-    // Render checkboxes in the incoming order (your “ticket” sequence),
-    // not alphabetical, per your requirement.
-    list.forEach(row=>{
-      const labelName = row.service.split("\n")[0];  // show short label before newline
+      const nameSpan = document.createElement('span');
+      nameSpan.textContent = shortName;
 
-      const rowEl = document.createElement('div');
-      rowEl.className = 'item';
-
-      const cb = document.createElement('input');
-      cb.type = 'checkbox';
-      cb.onchange = ()=>{
-        if(cb.checked){ addLine(labelName, 1); }
-        else {
-          // Remove if present (any qty); keep it simple: full remove
-          const id = labelName;
-          if(selected[id]){
-            selected[id].lineEl.remove();
-            delete selected[id];
-            recomputeTotal();
-          }
-        }
-      };
-      rowEl.appendChild(cb);
-
-      const lbl = document.createElement('label');
-      lbl.textContent = labelName;
-      rowEl.appendChild(lbl);
-
-      // x2/x3 quick buttons for CHL/GC
-      if(MULT_X_BUTTONS[labelName]){
-        MULT_X_BUTTONS[labelName].forEach(n=>{
-          const b = document.createElement('button');
-          b.className = 'mini-btn';
-          b.textContent = `x${n}`;
-          b.onclick = ()=> quickAdd(labelName, n);
-          rowEl.appendChild(b);
+      // Add quick buttons for CHL/GC
+      if (MULT_X_BUTTONS[shortName]) {
+        MULT_X_BUTTONS[shortName].forEach(multiplier => {
+          const quickBtn = document.createElement('button');
+          quickBtn.className = 'btn';
+          quickBtn.textContent = `x${multiplier}`;
+          quickBtn.onclick = () => quickAdd(shortName, multiplier);
+          itemEl.appendChild(quickBtn);
         });
       }
 
-      // Codes, toggleable
-      const codes = document.createElement('span');
-      codes.className = 'codes' + (showCodes?' show':'');
-      const codesText = getCodes(row.service);
-      if(codesText){
-        codes.textContent = ` — ${codesText}`;
-        rowEl.appendChild(codes);
+      // Codes display
+      const codesSpan = document.createElement('span');
+      codesSpan.className = 'codes' + (showCodes ? ' show' : '');
+      const codesText = getCodes(procedure.name);
+      if (codesText) {
+        codesSpan.textContent = ` (${codesText})`;
       }
 
-      box.appendChild(rowEl);
+      itemEl.appendChild(addBtn);
+      itemEl.appendChild(nameSpan);
+      itemEl.appendChild(codesSpan);
+      listContainer.appendChild(itemEl);
     });
-
-    host.appendChild(box);
   });
+
+  // Render OC dropdown
+  const ocProcedures = procedures.filter(p => 
+    ["Alese", "Apri", "Aviane", "Camila", "Cryselle", "Levora", "Lutera", "Sprintec", "Tri-Lo Marzia", "Trivora"].includes(p.name)
+  );
+  
+  const ocSelect = document.getElementById('ocSelect');
+  ocSelect.innerHTML = '<option value="">Select Oral Contraceptive...</option>';
+  
+  ocProcedures.forEach(oc => {
+    const option = document.createElement('option');
+    option.value = oc.name;
+    option.textContent = oc.name;
+    ocSelect.appendChild(option);
+  });
+
+  document.getElementById('addOC').onclick = () => {
+    const selectedOC = ocSelect.value;
+    if (selectedOC) {
+      addLine(selectedOC, 1);
+      ocSelect.value = "";
+    }
+  };
 }
 
 /** ---- Events ---- **/
-document.getElementById('percentSelector').addEventListener('change', (e)=>{
-  percent = parseFloat(e.target.value)/100;
-  // Recalculate all receipt lines at new percent
-  Object.keys(selected).forEach(k=>{
-    selected[k].unit = getFullPrice(k) * percent;
-    selected[k].total = selected[k].unit * selected[k].qty;
-    selected[k].span.textContent = `${k} x${selected[k].qty} — ${money(selected[k].total)}`;
+document.getElementById('percentSelector').addEventListener('change', (e) => {
+  percent = parseFloat(e.target.value) / 100;
+  Object.keys(selected).forEach(key => {
+    selected[key].unit = getFullPrice(key) * percent;
+    selected[key].total = selected[key].unit * selected[key].qty;
+    selected[key].span.textContent = `${key} x${selected[key].qty} — ${money(selected[key].total)}`;
   });
   recomputeTotal();
 });
 
-document.getElementById('toggleCodes').addEventListener('change', (e)=>{
+document.getElementById('toggleCodes').addEventListener('change', (e) => {
   showCodes = e.target.checked;
-  document.querySelectorAll('.codes').forEach(el=>{
-    if(showCodes){ el.classList.add('show'); } else { el.classList.remove('show'); }
+  document.querySelectorAll('.codes').forEach(el => {
+    el.classList.toggle('show', showCodes);
   });
 });
 
-document.getElementById('copy-receipt').addEventListener('click', ()=>{
-  const lines = Object.keys(selected).map(k=> `${k} x${selected[k].qty} — ${money(selected[k].total)}`);
+document.getElementById('copyReceipt').addEventListener('click', () => {
+  const lines = Object.keys(selected).map(k => 
+    `${k} x${selected[k].qty} — ${money(selected[k].total)}`
+  );
+  
   const txt = [
-    "=== Family Health Education Services ===",
-    `Date: ${new Date().toLocaleDateString([], { year:'numeric', month:'2-digit', day:'2-digit' })}`,
-    `Fee Percentage: ${Math.round(percent*100)}%`,
+    "=== Receipt ===",
+    `Date: ${new Date().toLocaleDateString()}`,
+    `Fee Percentage: ${Math.round(percent * 100)}%`,
     "Services:",
     ...lines,
-    `Total: ${money(grandTotal)}`
+    `Total: ${money(grandTotalValue)}`
   ].join("\n");
+  
   navigator.clipboard.writeText(txt)
-    .then(()=> alert('Receipt copied to clipboard!'))
-    .catch(()=> alert('Failed to copy receipt.'));
+    .then(() => alert('Receipt copied to clipboard!'))
+    .catch(() => alert('Failed to copy receipt.'));
 });
 
 /** ---- Init ---- **/
