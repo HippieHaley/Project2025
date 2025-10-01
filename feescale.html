@@ -136,6 +136,10 @@
   #notesContainer textarea{
     width:100%; border-radius:10px; padding:10px; border:1px solid #ccc; resize:vertical; background:#fff;
   }
+  .coverage-row--highlight {
+  background: #f8c9f9;
+  font-weight: bold;
+}
 @media (max-width: 768px) {
   .card {
     flex: 0 0 100%;
@@ -272,9 +276,7 @@
                   <th>50% Patient Pay</th><th>75% Patient Pay</th><th>100% Patient Pay</th>
                 </tr>
               </thead>
-              <tbody>
-             
-              </tbody>
+              <tbody id="renderingcoverageChart"></tbody>
             </table>
           </div>
         </div>
@@ -284,15 +286,12 @@
             <img src="images/heart.png" class="heart" alt="AWC limits">
           </span>
         </p>
-
         <div class="modal-overlay" id="modalOverlay2">
           <div class="modal">
             <h2>AWC! Program Eligibility</h2>
             <table>
               <thead><tr><th>Family Size</th><th>Max Annual Income</th></tr></thead>
-              <tbody>
-                <!-- … keep your AWC rows exactly as you had them … -->
-              </tbody>
+            <tbody id="rendingawcTableBody"></tbody>
             </table>
           </div>
         </div>
@@ -313,23 +312,62 @@
   </div>
 
 <script>
-    const Scale from 'charts.js'
+import Scale from 'charts.js';
 const { coverageChart, awcChart } = Scale;
-
-/* ===== Helpers ===== */
-const $ = (id) => document.getElementById(id);
-const money = (v) => `$${Number(v).toLocaleString()}`;
-const coverageLevels = ["100%", "75%", "50%", "25%", "0%"];
-
 /* ===== Coverage & AWC logic ===== */
-function determineCoverageLevel(householdSize, yearlyIncome){
-  const row = coverageChart[householdSize];
-  if (!row) return "N/A";
-  for (let i = 0; i < row.length; i++){
-    if (yearlyIncome <= row[i]) return coverageLevels[i];
+function renderCoverageChart(selectedSize){
+  const tbody = document.getElementById('coverageTableBody');
+  if (!tbody) return;
+  tr.innerHTML = `
+      <td>${size}</td>
+      <td>${money(vals[0])}</td>
+      <td>${money(vals[1])}</td>
+      <td>${money(vals[2])}</td>
+      <td>${money(vals[3])}</td>
+      <td>${money(vals[4])}</td>`;
+    tbody.appendChild(tr);
   }
-  return "0%";
+function determineCoverageLevel(householdSize, yearlyIncome){
+  Object.keys(coverageChart).sort((a,b)=>Number(a)-Number(b)).forEach(size=>{
+    const vals = coverageChart[size]; // [0,25,50,75,100]
+    const tr = document.createElement('tr');
+    if (Number(size) === Number(selectedSize)) tr.classList.add('coverage-row--highlight');
+    tr.innerHTML = `
+      <td>${size}</td>
+      <td>${fmt.format(z)}</td>
+      <td>${fmt.format(z+1)} – ${fmt.format(a)}</td>
+      <td>${fmt.format(a+1)} – ${fmt.format(b)}</td>
+      <td>${fmt.format(b+1)} – ${fmt.format(c)}</td>
+      <td>${fmt.format(d)}</td>
+    `;
+
+    tbody.appendChild(tr);
+  });
 }
+function renderAWCChart(selectedSize) {
+  const tbody = document.getElementById('awcTableBody');
+  if (!tbody) return;
+  tbody.innerHTML = '';
+
+  const fmt = new Intl.NumberFormat('en-US');
+
+  Object.keys(Scale.awcChart).sort((a, b) => a - b).forEach(size => {
+    const threshold = Scale.awcChart[size];
+    const tr = document.createElement('tr');
+
+    if (Number(size) === Number(selectedSize)) {
+      tr.classList.add('coverage-row--highlight');
+    }
+
+    tr.innerHTML = `
+      <td>${size}</td>
+      <td>${fmt.format(threshold)}</td>
+    `;
+
+    tbody.appendChild(tr);
+  });
+}
+
 function determineAWCQualification(householdSize, yearlyIncome){
   const max = awcChart[householdSize];
   if (!max) return "N/A";
