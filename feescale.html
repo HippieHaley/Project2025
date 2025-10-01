@@ -268,7 +268,6 @@
 
         <div class="modal-overlay" id="modalOverlay1">
           <div class="modal">
-            <!-- your coverage table unchanged -->
             <table>
               <thead>
                 <tr>
@@ -297,21 +296,19 @@
         </div>
       </section>
     </div>
-
     <!-- Household members -->
     <section id="householdMembersSection" class="card" style="margin-top:24px;">
       <h2>Other Household Members</h2>
       <div id="householdMembersContainer"></div>
     </section>
   </div>
-
   <!-- Notes panel -->
   <div id="notesContainer">
     <label for="userNotes">Notes:</label><br/>
     <textarea id="userNotes" placeholder="Enter any additional notes..." rows="8"></textarea>
   </div>
 <script type="module">
-  import Scale from './Scale.js'; // ensure filename/path matches
+   import { coverageChart, awcChart } from './charts.js';
 
   // ---------- helpers ----------
   const $ = (id) => document.getElementById(id);
