@@ -350,13 +350,6 @@ function init() {
     });
   });
 }
-
-// Expose for inline handlers already in HTML
-window.calculateIncome = calculateIncome;
-window.calculateGrandTotal = calculateGrandTotal;
-window.updateHouseholdIncome = updateHouseholdIncome;
-window.copyIncomeInfo = copyIncomeInfo;
-window.updateHouseholdMemberFields = updateHouseholdMemberFields;
 // Function to populate coverage chart table
 // Function to populate coverage chart table WITH CELL HIGHLIGHTING
 function populateCoverageChart() {
@@ -431,3 +424,9 @@ if (document.readyState === 'loading') {
 }
 updateHouseholdIncome();
 updateHouseholdMemberFields();
+// Expose for inline handlers already in HTML
+window.calculateIncome = calculateIncome;
+window.calculateGrandTotal = calculateGrandTotal;
+window.updateHouseholdIncome = updateHouseholdIncome;
+window.copyIncomeInfo = copyIncomeInfo;
+window.updateHouseholdMemberFields = updateHouseholdMemberFields;
