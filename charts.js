@@ -1,5 +1,4 @@
-class Scale {
-  static coverageChart = {
+coverageChart = {
       1: [15650, 23474, 31300, 39124, 39125],
       2: [21150, 31724, 42299, 52874, 52875],
       3: [26650, 39974, 53299, 66624, 66625],
@@ -16,7 +15,7 @@ class Scale {
       14: [87150, 130724, 174299, 217874, 217875],
       15: [92650, 138974, 185299, 231624, 231625]
     };
-    static awcChart = {
+awcChart = {
       1: 39125, 
       2: 52875, 
       3: 66625, 
@@ -33,5 +32,4 @@ class Scale {
       14: 217875, 
       15: 231625
     };
-}
-export default Scale;
+export default { coverageChart, awcChart };
