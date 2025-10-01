@@ -1,4 +1,3 @@
-// app.js
 import procedures from './catalog.js';
 
 /** ========================
@@ -75,7 +74,7 @@ const sectionDefs = [
   { id: 'section-procedures', match: r => r.category === 'procedures', bucket: 'procedures' },
   { id: 'section-labs', match: r => r.category === 'labs', bucket: 'labs' },
   { id: 'section-meds', match: r => r.category === 'meds', bucket: 'meds' },
-  { id: 'section-contraceptives', match: r => r.category === 'contraceptives', bucket: 'contraceptives' }
+  { id: 'section-contraceptives', match: r => r.category === 'oral contraceptives', bucket: 'contraceptives' }
 ];
 
 /** ========================
@@ -123,9 +122,12 @@ function renderCatalog() {
     }
     // Codes
     const codesSpan = document.createElement('span');
-    codesSpan.className = 'codes' + (showCodes ? ' show' : '');
-    const codes = getCodes(proc);
-    if (codes && showCodes) codesSpan.textContent = ` (${codes})`;
+    codesSpan.className = 'codes';
+    if (showCodes) {
+      codesSpan.classList.add('show');
+      const codes = getCodes(proc);
+      if (codes) codesSpan.textContent = ` (${codes})`;
+    }
     row.appendChild(codesSpan);
 
     // Checkbox sync
@@ -141,7 +143,7 @@ function renderCatalog() {
 
   // Oral Contraceptives dropdown
   if (ocSelect) {
-    const ocItems = procedures.filter(p => p.category === ' oral contraceptives');
+    const ocItems = procedures.filter(p => p.category === 'oral contraceptives');
     ocSelect.innerHTML = '<option value="">Select Oral Contraceptive...</option>';
     ocItems.forEach(oc => {
       const opt = document.createElement('option');
@@ -288,7 +290,7 @@ const toggleCodesBtn = $('#toggleCodes');
 if (toggleCodesBtn) {
   toggleCodesBtn.addEventListener('click', () => {
     showCodes = !showCodes;
-    $$('.codes').forEach(el => el.classList.toggle('show', showCodes));
+    renderCatalog(); // Re-render so codes visibility matches state
   });
 }
 
