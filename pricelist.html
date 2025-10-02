@@ -39,10 +39,10 @@
       width:fit-content;
       font-family: Arial, sans-serif;
     }
-    .mh-searchbar label{
+    .searchbar label{
       font-weight:600; color:var(--ink); margin-right:.25rem;
     }
-    .mh-searchbar input[type="text"], #searchInput {
+    .searchbar input[type="text"], #searchInput {
       font: inherit;
       font-size: 1rem;
       padding: .35em .9em;
@@ -53,7 +53,7 @@
       outline: none;
       transition: border .2s, background .2s;
     }
-    .mh-searchbar input[type="text"]:focus, #searchInput:focus {
+    .searchbar input[type="text"]:focus, #searchInput:focus {
       border-color:#8aa9ff; background:#fff;
     }
       #toggleCodes{ 
@@ -68,13 +68,15 @@
         font-size: 1rem;
         }
 
-    .flex-container {
-      display: flex;
-      flex-direction: column;
-      max-width: 1400px;
-      margin: 0 auto;
-      padding: 32px 32px;
-    }
+.flex-container {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 32px;
+}
+
 
     .flex-row {
       display: flex;
@@ -97,18 +99,16 @@
     justify-content: center;
   }
 
-  .card {
-    flex: 0 0 calc((100% - 48px) / 3);
-    max-width: calc((100% - 48px) / 3);
-      border: 2px solid var(--primary);
-    position:relative;
-    display:flex;
-    flex-direction:column;
-      padding: 24px 20px;
-      border-radius: 14px;
-      background: white;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.08);
-  }
+.card {
+  border: 2px solid var(--primary);
+  border-radius: 14px;
+  background: white;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+  padding: 24px 20px;
+  display: flex;
+  flex-direction: column;
+}
+
     .card:hover,
     .section:hover {
       transform: translateY(-3px);
@@ -151,7 +151,15 @@
       letter-spacing: 0.01em;
       line-height: 1.45;
     }
-
+    #section-visits {
+      grid-column: 1 / span 2;
+    }
+    #section-visits .list {
+      align-content: center;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 18px;
+    }
     .item {
       display: flex;
       align-items: center;
@@ -379,6 +387,24 @@
       border-top: 2px solid var(--border);
       font-size: 1.1rem;
     }
+    .pricelist {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 24px;
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 32px;
+}
+.section {
+  border: 2px solid var(--primary);
+  border-radius: 14px;
+  background: white;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+  padding: 24px 20px;
+  display: flex;
+  flex-direction: column;
+}
+
 </style>
 </head>
 <body>
