@@ -257,7 +257,15 @@ h1 {
       grid-row: 3 ;
     }
 #section-meds h3::before { content: "💊"; }
-
+/* For the visit codes section specifically */
+#section-visits .list {
+  display: flex;
+  flex-direction: column;
+  grid-column: 1 / span 2;
+      display: grid;
+  gap: 0;
+  padding: 24px 0;
+}
 #section-labs .list,
 #section-procedures .list {
   display: flex;
