@@ -85,7 +85,7 @@
       display: grid;
       grid-template-columns: 3fr 1fr;
       gap: 20px;
-      align-items: flex-start;
+      align-items: center;
     }
 
     .pricelist {
@@ -115,7 +115,7 @@
 
     .section-card h3,
     .section h3 {
-      margin: 0 0 16px;
+      margin: 0 0 0;
       font-size: 1.15rem;
       text-align: center;
       border-bottom: 1px solid var(--border);
@@ -143,6 +143,7 @@
     #section-visits h3::before { content: "🩺"; }
 
     #section-visits .list {
+      align-content: center;
       display: grid;
       grid-template-columns: 1fr 1fr;
       gap: 18px 0;
@@ -157,6 +158,7 @@
 
     #section-visits .item label span {
       font-weight: 600;
+      align-content: center;
     }
 
     .item {
@@ -219,12 +221,12 @@
       display: flex;
       gap: 30px;
       justify-content: center;
-      align-items: flex-start;
+      align-items: center;
     }
 
     .section-card {
       flex: 1 1 0;
-      min-width: 320px;
+      min-width: 200px;
       max-width: 400px;
       background: #bfe2fc;
     }
@@ -251,6 +253,8 @@
     #section-meds .list,
     #section-contraceptives .list {
       display: grid;
+      justify-content: center;
+      align-items: center;
       grid-template-columns: 1fr 1fr;
       gap: 18px;
       padding: 24px 0;
