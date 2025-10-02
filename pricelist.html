@@ -149,16 +149,42 @@
       letter-spacing: 0.01em;
       line-height: 1.45;
     }
-.sublist {
-  border: 1.5px solid var(--border);
-  border-radius: 8px;
-  padding: 12px;
-  display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr)); /* 4 columns inside group */
-  gap: 12px 18px;
-  background: #fff;
-}
+       .list.has-sublists {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 18px;
+      align-items: stretch;
+    }
+        .sublist {
+ border: 1.5px solid var(--border);
+      border-radius: 8px;
+      padding: 12px;
+      background: #fff;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      height: 100%;
+    }
 
+    .subgroup-title {
+      font-weight: 600;
+      color: var(--ink);
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 6px;
+      margin-bottom: 6px;
+    }
+    .sublist .item {
+      min-width: 0;
+      width: 100%;
+    }
+    .sublist .item label {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      line-height: 1.25;
+    }
+    .sublist .item input[type="checkbox"] { flex: 0 0 auto; }
+    .sublist .item input[type="checkbox"] { flex: 0 0 auto; }
 .subgroup-title {
   grid-column: 1 / -1;
   font-weight: 600;
@@ -182,26 +208,18 @@
     }
     #section-visits .list {
       display: flex;
-      flex-direction: column;  /* stack sublists top → bottom */
+      flex-direction: row;  /* stack sublists top → bottom */
       flex-wrap: wrap;
       gap: 18px; 
     grid-template-columns: repeat(4, 1fr); /* 4 boxes across */
    gap: 16px;
     }
-    .sections-row {
-  display: flex;
-  gap: 30px;
-  justify-content: center;
-  align-items: flex-start;
-}
-
-.section-card {
-  flex: 1 1 0;
-  min-width: 320px;
-  max-width: 400px;
-  background: #bfe2fc;
-}
-
+    .section-card {
+      flex: 1 1 0;
+      min-width: 320px;
+      max-width: 400px;
+      background: #bfe2fc;
+    }
 #section-procedures {
       grid-column: 2;
       grid-row: 2;
@@ -216,8 +234,10 @@
       grid-column: 1 / span 2;
       grid-row: 3 ;
     }
+/* x2 x3 buttons */
     .item {
       display: flex;
+      flex-direction: row; 
       align-items: center;
       gap: 14px;
       margin: 0;
@@ -276,7 +296,7 @@
       display: flex;
       gap: 30px;
       justify-content: center;
-      align-items: center;
+      align-items: flex-start;
     }
 
     #receipt {
