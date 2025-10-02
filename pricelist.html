@@ -149,32 +149,44 @@
       letter-spacing: 0.01em;
       line-height: 1.45;
     }
-    .sublist {
+.sublist {
   border: 1.5px solid var(--border);
   border-radius: 8px;
   padding: 12px;
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr)); /* 4 columns inside the sublist */
+  grid-template-columns: repeat(4, minmax(0, 1fr)); /* 4 columns inside group */
   gap: 12px 18px;
   background: #fff;
 }
 
 .subgroup-title {
-  grid-column: 1 / -1;   /* span all columns */
+  grid-column: 1 / -1;
   font-weight: 600;
   color: var(--ink);
   border-bottom: 1px solid var(--border);
   padding-bottom: 6px;
   margin-bottom: 6px;
 }
+.sublist .item { min-width: 0; }            /* lets nowrap actually work in grid cells */
+.sublist .item label {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  line-height: 1.25;
+}
+.sublist .item input[type="checkbox"] { flex: 0 0 auto; }
+
     #section-visits {
       grid-column: 1 / span 2;
+     
     }
     #section-visits .list {
-      align-content: center;
       display: flex;
+      flex-direction: column;  /* stack sublists top → bottom */
       flex-wrap: wrap;
-      gap: 18px;
+      gap: 18px; 
+    grid-template-columns: repeat(4, 1fr); /* 4 boxes across */
+   gap: 16px;
     }
     .sections-row {
   display: flex;

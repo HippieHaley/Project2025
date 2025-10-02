@@ -102,70 +102,148 @@ const sectionDefs = [
 function clearSections() {
   Object.values(sections).forEach(el => { if (el) el.innerHTML = ''; });
 }
-
 function renderCatalog() {
   clearSections();
 
-  procedures.forEach(proc => {
-    const def = sectionDefs.find(d => d.match(proc));
-    const listContainer = def ? sections[def.bucket] : null;
+  sectionDefs.forEach(def => {
+    const listContainer = sections[def.bucket];
     if (!listContainer) return;
 
-    if (!matchesSearch(proc, query)) return;
+    // Filter catalog to this section + search
+    const items = procedures.filter(p => def.match(p) && matchesSearch(p, query));
 
-    const name = (proc.name || '').split('\n')[0];
-    const row = document.createElement('div');
-    row.className = 'item';
+    // ===== VISITS: group by keywords into sublists =====
+    if (def.bucket === "visits") {
+      const groups = new Map(); // key -> {label, items[]}
+      for (const p of items) {
+        const g = detectVisitSubgroup(p);
+        if (!groups.has(g.key)) groups.set(g.key, { label: g.label, items: [] });
+        groups.get(g.key).items.push(p);
+      }
 
-    // Checkbox + name
-    const label = document.createElement('label');
-    const checkbox = document.createElement('input');
-    checkbox.type = 'checkbox';
-    checkbox.dataset.name = name;
-    label.appendChild(checkbox);
+      // Order the groups for the visual layout you want
+      const orderedGroups = Array.from(groups.entries())
+        .sort((a, b) => SUBGROUP_ORDER.indexOf(a[0]) - SUBGROUP_ORDER.indexOf(b[0]));
 
-    const nameSpan = document.createElement('span');
-    nameSpan.textContent = name;
-    label.appendChild(nameSpan);
-    row.appendChild(label);
+      for (const [, group] of orderedGroups) {
+        if (!group.items.length) continue;
 
-    // Quick-add buttons
-    if (MULT_X_BUTTONS[name]) {
-      MULT_X_BUTTONS[name].forEach(mult => {
-        const qb = document.createElement('button');
-        qb.className = 'btn';
-        qb.textContent = `x${mult}`;
-        qb.addEventListener('click', () => addLine(name, mult));
-        row.appendChild(qb);
+        // Mini-box like your printed ticket
+        const sub = document.createElement("div");
+        sub.className = "sublist";
+
+        if (group.label) {
+          const title = document.createElement("div");
+          title.className = "subgroup-title";
+          title.textContent = group.label;
+          sub.appendChild(title);
+        }
+
+        group.items.forEach(proc => {
+          const name = (proc.name || "").split("\n")[0];
+
+          const row = document.createElement("div");
+          row.className = "item";
+
+          // Checkbox + label
+          const label = document.createElement("label");
+          const checkbox = document.createElement("input");
+          checkbox.type = "checkbox";
+          checkbox.dataset.name = name;
+          label.appendChild(checkbox);
+
+          const nameSpan = document.createElement("span");
+          nameSpan.textContent = name;
+          label.appendChild(nameSpan);
+          row.appendChild(label);
+
+          // Quick-add buttons (if any)
+          if (MULT_X_BUTTONS[name]) {
+            MULT_X_BUTTONS[name].forEach(mult => {
+              const qb = document.createElement("button");
+              qb.className = "btn";
+              qb.textContent = `x${mult}`;
+              qb.addEventListener("click", () => addLine(name, mult));
+              row.appendChild(qb);
+            });
+          }
+
+          // Codes (show/hide)
+          const codesSpan = document.createElement("span");
+          codesSpan.className = "codes";
+          if (showCodes) {
+            codesSpan.classList.add("show");
+            const codes = getCodes(proc);
+            if (codes) codesSpan.textContent = ` (${codes})`;
+          }
+          row.appendChild(codesSpan);
+
+          // Sync selection
+          checkbox.addEventListener("change", e => {
+            if (e.target.checked) addLine(name, 1); else removeLine(name);
+          });
+          if (selected.has(name)) checkbox.checked = true;
+
+          sub.appendChild(row);
+        });
+
+        listContainer.appendChild(sub);
+      }
+
+      return; // finished visits; move to next section
+    }
+
+    // ===== NON-VISITS: flat list like before =====
+    items.forEach(proc => {
+      const name = (proc.name || "").split("\n")[0];
+      const row = document.createElement("div");
+      row.className = "item";
+
+      const label = document.createElement("label");
+      const checkbox = document.createElement("input");
+      checkbox.type = "checkbox";
+      checkbox.dataset.name = name;
+      label.appendChild(checkbox);
+
+      const nameSpan = document.createElement("span");
+      nameSpan.textContent = name;
+      label.appendChild(nameSpan);
+      row.appendChild(label);
+
+      if (MULT_X_BUTTONS[name]) {
+        MULT_X_BUTTONS[name].forEach(mult => {
+          const qb = document.createElement("button");
+          qb.className = "btn";
+          qb.textContent = `x${mult}`;
+          qb.addEventListener("click", () => addLine(name, mult));
+          row.appendChild(qb);
+        });
+      }
+
+      const codesSpan = document.createElement("span");
+      codesSpan.className = "codes";
+      if (showCodes) {
+        codesSpan.classList.add("show");
+        const codes = getCodes(proc);
+        if (codes) codesSpan.textContent = ` (${codes})`;
+      }
+      row.appendChild(codesSpan);
+
+      checkbox.addEventListener("change", e => {
+        if (e.target.checked) addLine(name, 1); else removeLine(name);
       });
-    }
-    // Codes
-    const codesSpan = document.createElement('span');
-    codesSpan.className = 'codes';
-    if (showCodes) {
-      codesSpan.classList.add('show');
-      const codes = getCodes(proc);
-      if (codes) codesSpan.textContent = ` (${codes})`;
-    }
-    row.appendChild(codesSpan);
+      if (selected.has(name)) checkbox.checked = true;
 
-    // Checkbox sync
-    checkbox.addEventListener('change', e => {
-      const checked = e.target.checked;
-      if (checked) addLine(name, 1);
-      else removeLine(name);
+      listContainer.appendChild(row);
     });
-    if (selected.has(name)) checkbox.checked = true;
-
-    listContainer.appendChild(row);
   });
 
-  // Oral Contraceptives dropdown
+  // Oral Contraceptives dropdown (unchanged)
   if (ocSelect) {
-    const ocItems = procedures.filter(p => p.category === 'oral contraceptives');
+    const ocItems = procedures.filter(p => p.category === "oral contraceptives");
     ocSelect.innerHTML = '<option value="">Select Oral Contraceptive...</option>';
     ocItems.forEach(oc => {
-      const opt = document.createElement('option');
+      const opt = document.createElement("option");
       opt.value = oc.name;
       opt.textContent = oc.name;
       ocSelect.appendChild(opt);
