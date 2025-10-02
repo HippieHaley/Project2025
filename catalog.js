@@ -35,6 +35,11 @@ const procedures = [
     visitType: "new",
     keywords: ["comprehensive-new", "new pt", "99204"]
   },
+{
+  break: true,
+  category: "visits" // still needs to know what section to drop into
+}
+,
   {
     name: "Est Pt Minimal (RN)",
     cpt: "99211",
