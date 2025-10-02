@@ -28,6 +28,34 @@
       margin: 0;
       padding: 0;
     }
+    .searchbar{
+      margin: 1rem auto 1.5rem;
+      padding: 1rem 1.25rem;
+      background: var(--blue);
+      border: 1.5px solid var(--blue);
+      border-radius: 12px;
+      box-shadow: 0 4px 16px rgba(190,190,190,0.13);
+      display:flex; flex-wrap:wrap; align-items:center; gap:.7rem;
+      width:fit-content;
+      font-family: Arial, sans-serif;
+    }
+    .mh-searchbar label{
+      font-weight:600; color:var(--ink); margin-right:.25rem;
+    }
+    .mh-searchbar input[type="text"], #searchInput {
+      font: inherit;
+      font-size: 1rem;
+      padding: .35em .9em;
+      border: 1px solid var(--pink);
+      border-radius: 7px;
+      background: var(--pink);
+      color: #222;
+      outline: none;
+      transition: border .2s, background .2s;
+    }
+    .mh-searchbar input[type="text"]:focus, #searchInput:focus {
+      border-color:#8aa9ff; background:#fff;
+    }
       #toggleCodes{ 
           margin-top: 10px;
           padding: 0.5rem 1.5rem;
