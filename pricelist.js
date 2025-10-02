@@ -15,6 +15,25 @@ let query = '';
 const $ = (s, r = document) => r.querySelector(s);
 const $$ = (s, r = document) => Array.from(r.querySelectorAll(s));
 const fmt = n => `$${(n ?? 0).toFixed(2)}`;
+// Map certain keywords → subgroup key + label shown in the mini-box header
+const SUBGROUP_MAP = [
+  { test: /(^|\s)preventive new\b/i,      key: "prevNew", label: "Preventive New Pt" },
+  { test: /(^|\s)preventive established\b/i, key: "prevEst", label: "Preventive Est Pt" },
+  { test: /(^|\s)new pt\b/i,              key: "newpt",   label: "New Pt Office" },
+  { test: /(^|\s)est pt\b/i,              key: "estpt",   label: "Est Pt Office" },
+  { test: /(^|\s)established\b/i,         key: "estpt",   label: "Est Pt Office" }, // safety net
+];
+
+const SUBGROUP_ORDER = ["newpt","estpt","prevNew","prevEst","default"];
+
+// Decide subgroup from keywords array
+function detectVisitSubgroup(proc) {
+  const blob = (proc.keywords || []).join(" ").toLowerCase();
+  for (const rule of SUBGROUP_MAP) {
+    if (rule.test.test(blob)) return { key: rule.key, label: rule.label };
+  }
+  return { key: "default", label: "" };
+}
 
 // Section containers
 const sections = {

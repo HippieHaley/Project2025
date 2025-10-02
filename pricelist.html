@@ -149,6 +149,24 @@
       letter-spacing: 0.01em;
       line-height: 1.45;
     }
+    .sublist {
+  border: 1.5px solid var(--border);
+  border-radius: 8px;
+  padding: 12px;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr)); /* 4 columns inside the sublist */
+  gap: 12px 18px;
+  background: #fff;
+}
+
+.subgroup-title {
+  grid-column: 1 / -1;   /* span all columns */
+  font-weight: 600;
+  color: var(--ink);
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 6px;
+  margin-bottom: 6px;
+}
     #section-visits {
       grid-column: 1 / span 2;
     }
