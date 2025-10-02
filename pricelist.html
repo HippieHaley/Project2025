@@ -7,424 +7,396 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Service Pricelist</title>
   <style>
-      :root {
-  --blue: #acdbf9;
-  --pink: #f8c9f9;
-  --ink: #000;
-  --text: #333;
-  --border: #d3d3d3;
-  --primary:  #f8c9f9;
-  --primary-light:#acdbf9;
-  --secondary: #f8c9f9;
-  --accent: #e91e63;
-  --gray: #888;
-  --dark: #222;
-}
+    :root {
+      --blue: #acdbf9;
+      --pink: #f8c9f9;
+      --ink: #000;
+      --text: #333;
+      --border: #d3d3d3;
+      --primary: #f8c9f9;
+      --primary-light: #acdbf9;
+      --secondary: #f8c9f9;
+      --accent: #e91e63;
+      --gray: #888;
+      --dark: #222;
+    }
 
-body {
-  background: var(--blue);
-  color: var(--text);
-  font-family: 'Inter', Arial, sans-serif;
-  margin: 0;
-  padding: 0;
-}
+    body {
+      background: var(--blue);
+      color: var(--text);
+      font-family: 'Inter', Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+    }
 
-.container {
-  max-width: 1400px;
-  margin: 0 auto;
-  padding: 32px 18px;
-}
+    .container {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 32px 18px;
+    }
 
-/* HEADER & CONTROLS */
-h1 {
-  font-size: 2rem;
-  margin-bottom: 20px;
-  color: var(--dark);
-  text-align: left;
-  font-weight: 700;
-}
+    h1 {
+      font-size: 2rem;
+      margin-bottom: 20px;
+      color: var(--dark);
+      text-align: left;
+      font-weight: 700;
+    }
 
-.controls-row {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  margin-bottom: 22px;
-}
+    .controls-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 22px;
+    }
 
-#searchInput {
-  padding: 8px 12px;
-  border-radius: 6px;
-  border: 1px solid var(--border);
-  font-size: 1rem;
-}
+    #searchInput,
+    #percentSelector {
+      padding: 8px 12px;
+      border-radius: 6px;
+      border: 1px solid var(--border);
+      font-size: 1rem;
+    }
 
-#percentSelector {
-  padding: 6px 12px;
-  border-radius: 6px;
-  border: 1px solid var(--border);
-  font-size: 1rem;
-  background: var(--pink);
-  color: var(--dark);
-  font-weight: 600;
-}
+    #percentSelector {
+      background: var(--pink);
+      color: var(--dark);
+      font-weight: 600;
+      padding: 6px 12px;
+    }
 
-#toggleCodes {
-  background: var(--primary-light);
-  color: #000000;
-  border: none;
-  padding: 12px 20px;
-  border-radius: 8px;
-  cursor: pointer;
-  font-weight: 500;
-  margin-left: 10px;
-  transition: background 0.3s;
-}
+    #toggleCodes {
+      background: var(--primary-light);
+      color: #000000;
+      border: none;
+      padding: 12px 20px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: 500;
+      margin-left: 10px;
+      transition: background 0.3s;
+    }
 
-#toggleCodes:hover {
-  background: var(--primary);
-}
+    #toggleCodes:hover {
+      background: var(--primary);
+    }
 
-/* MAIN CONTENT LAYOUT */
-.page {
-  display: grid;
-  grid-template-columns: 3fr 1fr;
-  gap: 36px;
-  align-items: flex-start;
-}
+    .page {
+      display: grid;
+      grid-template-columns: 3fr 1fr;
+      gap: 20px;
+      align-items: flex-start;
+    }
 
-/* PRICELIST STYLING */
-.pricelist {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 28px;
-  grid-template-rows: auto auto auto;
-  grid-auto-flow: row;
-  align-content: start;
-}
+    .pricelist {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 28px;
+      grid-template-rows: auto auto auto;
+      grid-auto-flow: row;
+      align-content: center;
+    }
 
-/* Section Card Styling */
-.section-card,
-.section {
-  border: 2px solid var(--ink);
-  padding: 20px 18px;
-  border-radius: 12px;
-  box-shadow: 0 10px 6px rgba(0,0,0,0.05);
-  margin-bottom: 0;
-  transition: transform 0.2s ease;
-}
+    .section-card,
+    .section {
+      border: 2px solid var(--ink);
+      padding: 20px 18px;
+      border-radius: 12px;
+      box-shadow: 0 10px 6px rgba(0,0,0,0.05);
+      margin-bottom: 0;
+      transition: transform 0.2s ease;
+    }
 
-.section-card:hover,
-.section:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
-}
+    .section-card:hover,
+    .section:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    }
 
-.section-card h3,
-.section h3 {
-  margin: 0 0 16px;
-  font-size: 1.15rem;
-  text-align: center;
-  border-bottom: 1px solid var(--border);
-  padding-bottom: 10px;
-  color: var(--primary);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-weight: 600;
-}
+    .section-card h3,
+    .section h3 {
+      margin: 0 0 16px;
+      font-size: 1.15rem;
+      text-align: center;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 10px;
+      color: var(--primary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 600;
+    }
 
-.section-card h3::before,
-.section h3::before {
-  margin-right: 8px;
-}
+    .section-card h3::before,
+    .section h3::before {
+      margin-right: 8px;
+    }
 
-/* Make Visit Codes section span both columns */
-#section-visits {
-  align-content: center;
-  grid-column: 1 / span 2;
-  grid-row: 1;
-  display: grid;
-  padding: 0;
-}
+    #section-visits {
+      align-content: center;
+      grid-column: 1 / span 2;
+      grid-row: 1;
+      display: grid;
+      padding: 0;
+    }
 
-#section-visits h3::before { content: "🩺"; }
+    #section-visits h3::before { content: "🩺"; }
 
-/* Visit Codes List - 2 columns, edge-to-edge, better font */
-#section-visits .list {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 18px 0;      /* vertical gap, no horizontal gap */
-  padding: 24px 0;  /* remove left/right padding */
-  font-size: 1.09rem;
-  font-weight: 500;
-  color: var(--dark);
-  font-family: 'Inter', Arial, sans-serif;
-  letter-spacing: 0.01em;
-  line-height: 1.45;
-}
+    #section-visits .list {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 18px 0;
+      padding: 24px 0;
+      font-size: 1.09rem;
+      font-weight: 500;
+      color: var(--dark);
+      font-family: 'Inter', Arial, sans-serif;
+      letter-spacing: 0.01em;
+      line-height: 1.45;
+    }
 
-/* Make labels bolder in Visit Codes */
-#section-visits .item label span {
-  font-weight: 600;
-}
+    #section-visits .item label span {
+      font-weight: 600;
+    }
 
-/* Items */
-.item {
-  display: flex;
-  align-items: center;
-  gap: 14px;
-  margin: 0;
-  padding: 10px 12px;
-  border-radius: 6px;
-  transition: background 0.2s;
-  background: transparent;
-}
+    .item {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      margin: 0;
+      padding: 10px 12px;
+      border-radius: 6px;
+      transition: background 0.2s;
+      background: transparent;
+    }
 
-.item:hover {
-  background: #f8f9fa;
-}
+    .item:hover {
+      background: #f8f9fa;
+    }
 
-.item label {
-  flex: 1;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  cursor: pointer;
-  font-size: 0.97rem;
-}
+    .item label {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      cursor: pointer;
+      font-size: 0.97rem;
+    }
 
-.item input[type="checkbox"] {
-  margin-right: 10px;
-  transform: scale(1.2);
-}
+    .item input[type="checkbox"] {
+      margin-right: 10px;
+      transform: scale(1.2);
+    }
 
-/* Quick-add buttons */
-.item .btn {
-  margin-left: 8px;
-  margin-right: 2px;
-  padding: 4px 9px;
-  border-radius: 6px;
-  font-size: 0.85rem;
-  background: var(--primary-light);
-  color: white;
-  border: none;
-  cursor: pointer;
-  transition: background 0.2s;
-}
-.item .btn:hover {
-  background: var(--primary);
-}
+    .item .btn {
+      margin-left: 8px;
+      margin-right: 2px;
+      padding: 4px 9px;
+      border-radius: 6px;
+      font-size: 0.85rem;
+      background: var(--primary-light);
+      color: white;
+      border: none;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .item .btn:hover {
+      background: var(--primary);
+    }
 
-.codes {
-  display: none;
-  font-size: 0.85rem;
-  color: var(--gray);
-  margin-left: 8px;
-}
-.codes.show {
-  display: block;
-  margin-top: 4px;
-}
+    .codes {
+      display: none;
+      font-size: 0.85rem;
+      color: var(--gray);
+      margin-left: 8px;
+    }
+    .codes.show {
+      display: block;
+      margin-top: 4px;
+    }
 
-/* Labs and Procedures side by side */
-.sections-row {
-  display: flex;
-  gap: 30px;
-  justify-content: center;
-  align-items: flex-start;
-}
+    .sections-row {
+      display: flex;
+      gap: 30px;
+      justify-content: center;
+      align-items: flex-start;
+    }
 
-.section-card {
-  flex: 1 1 0;
-  min-width: 320px;
-  max-width: 400px;
-  background: #bfe2fc;
-}
+    .section-card {
+      flex: 1 1 0;
+      min-width: 320px;
+      max-width: 400px;
+      background: #bfe2fc;
+    }
 
-#section-procedures {
-  grid-column: 2;
-  grid-row: 2;
-}
-#section-labs {
-  grid-column: 1;
-  grid-row: 2;
-}
-#section-procedures h3::before { content: "🔧"; }
-#section-labs h3::before { content: "🧪"; }
-#section-meds {
-  grid-column: 1 / span 2;
-  grid-row: 3 ;
-}
-#section-meds h3::before { content: "💊"; }
+    #section-procedures {
+      grid-column: 2;
+      grid-row: 2;
+    }
+    #section-labs {
+      grid-column: 1;
+      grid-row: 2;
+    }
+    #section-procedures h3::before { content: "🔧"; }
+    #section-labs h3::before { content: "🧪"; }
+    #section-meds {
+      grid-column: 1 / span 2;
+      grid-row: 3 ;
+    }
+    #section-meds h3::before { content: "💊"; }
 
-/* Consistent list spacing for all sections except visits */
-#section-labs .list,
-#section-procedures .list,
-#section-meds .list {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 18px;
-  padding: 24px 0;
-}
+    /* Consistent list spacing for all sections except visits */
+    #section-labs .list,
+    #section-procedures .list,
+    #section-meds .list,
+    #section-contraceptives .list {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 18px;
+      padding: 24px 0;
+    }
 
-/* Visit codes: 2 columns, similar spacing */
-#section-visits .list {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 18px;
-  padding: 24px 0;
-}
+    #receipt {
+      border: 2px solid var(--primary);
+      padding: 24px 20px;
+      border-radius: 14px;
+      background: white;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+      position: sticky;
+      top: 20px;
+      height: fit-content;
+    }
 
-/* Contraceptives section (if used elsewhere) */
-#section-contraceptives .list {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 18px;
-  padding: 24px 0;
-}
+    #receipt h2 {
+      margin-top: 0;
+      text-align: center;
+      color: var(--primary);
+      padding-bottom: 14px;
+      border-bottom: 2px solid var(--border);
+      margin-bottom: 18px;
+    }
 
-/* RECEIPT STYLING */
-#receipt {
-  border: 2px solid var(--primary);
-  padding: 24px 20px;
-  border-radius: 14px;
-  background: white;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
-  position: sticky;
-  top: 20px;
-  height: fit-content;
-}
+    .receipt-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin: 12px 0;
+      padding: 10px 0;
+      border-bottom: 1px dashed var(--border);
+    }
 
-#receipt h2 {
-  margin-top: 0;
-  text-align: center;
-  color: var(--primary);
-  padding-bottom: 14px;
-  border-bottom: 2px solid var(--border);
-  margin-bottom: 18px;
-}
+    .receipt-item:last-child {
+      border-bottom: none;
+    }
 
-.receipt-item {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin: 12px 0;
-  padding: 10px 0;
-  border-bottom: 1px dashed var(--border);
-}
+    .receipt-item-info {
+      flex: 1;
+    }
 
-.receipt-item:last-child {
-  border-bottom: none;
-}
+    .receipt-item-name {
+      font-weight: 500;
+    }
 
-.receipt-item-info {
-  flex: 1;
-}
+    .receipt-item-codes {
+      font-size: 0.8rem;
+      color: var(--gray);
+      margin-top: 2px;
+    }
 
-.receipt-item-name {
-  font-weight: 500;
-}
+    .qty-select {
+      margin: 0 8px;
+      width: 50px;
+      padding: 4px;
+      border: 1px solid var(--border);
+      border-radius: 4px;
+    }
 
-.receipt-item-codes {
-  font-size: 0.8rem;
-  color: var(--gray);
-  margin-top: 2px;
-}
+    .remove {
+      background: var(--accent);
+      color: white;
+      border: none;
+      padding: 4px 8px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 0.8rem;
+      transition: background 0.2s;
+    }
 
-.qty-select {
-  margin: 0 8px;
-  width: 50px;
-  padding: 4px;
-  border: 1px solid var(--border);
-  border-radius: 4px;
-}
+    .remove:hover {
+      background: #d90452;
+    }
 
-.remove {
-  background: var(--accent);
-  color: white;
-  border: none;
-  padding: 4px 8px;
-  border-radius: 4px;
-  cursor: pointer;
-  font-size: 0.8rem;
-  transition: background 0.2s;
-}
+    #grandTotal {
+      font-weight: bold;
+      font-size: 1.3rem;
+      color: var(--primary);
+    }
 
-.remove:hover {
-  background: #d90452;
-}
+    @media (max-width: 1100px) {
+      .page {
+        grid-template-columns: 1fr;
+        gap: 24px;
+      }
+      #receipt {
+        position: static;
+        margin-top: 28px;
+      }
+      .sections-row {
+        flex-direction: column;
+        gap: 18px;
+      }
+    }
 
-#grandTotal {
-  font-weight: bold;
-  font-size: 1.3rem;
-  color: var(--primary);
-}
+    @media (max-width: 900px) {
+      .pricelist {
+        grid-template-columns: 1fr;
+        gap: 18px;
+      }
+      .section-card {
+        min-width: unset;
+        max-width: 100%;
+        margin-bottom: 18px;
+      }
+      #section-visits .list {
+        grid-template-columns: 1fr;
+        gap: 18px;
+      }
+    }
 
-/* Responsive adjustments */
-@media (max-width: 1100px) {
-  .page {
-    grid-template-columns: 1fr;
-    gap: 24px;
-  }
-  #receipt {
-    position: static;
-    margin-top: 28px;
-  }
-  .sections-row {
-    flex-direction: column;
-    gap: 18px;
-  }
-}
+    @media (max-width: 768px) {
+      .pricelist {
+        grid-template-columns: 1fr;
+        gap: 18px;
+      }
+      .visit-types-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 12px;
+      }
+    }
 
-@media (max-width: 900px) {
-  .pricelist {
-    grid-template-columns: 1fr;
-    gap: 18px;
-  }
-  .section-card {
-    min-width: unset;
-    max-width: 100%;
-    margin-bottom: 18px;
-  }
-  #section-visits .list {
-    grid-template-columns: 1fr;
-    gap: 18px;
-  }
-}
+    @media (max-width: 480px) {
+      .visit-types-grid {
+        grid-template-columns: 1fr;
+        gap: 8px;
+      }
+    }
 
-@media (max-width: 768px) {
-  .pricelist {
-    grid-template-columns: 1fr;
-    gap: 18px;
-  }
-  .visit-types-grid {
-    grid-template-columns: repeat(2, 1fr);
-    gap: 12px;
-  }
-}
+    .empty-receipt {
+      text-align: center;
+      color: var(--gray);
+      padding: 22px 0;
+      font-style: italic;
+    }
 
-@media (max-width: 480px) {
-  .visit-types-grid {
-    grid-template-columns: 1fr;
-    gap: 8px;
-  }
-}
-
-/* Receipt empty message */
-.empty-receipt {
-  text-align: center;
-  color: var(--gray);
-  padding: 22px 0;
-  font-style: italic;
-}
-
-.total-row {
-  display: flex;
-  justify-content: space-between;
-  margin-top: 18px;
-  padding-top: 18px;
-  border-top: 2px solid var(--border);
-  font-size: 1.1rem;
+    .total-row {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 18px;
+      padding-top: 18px;
+      border-top: 2px solid var(--border);
+      font-size: 1.1rem;
+    }
+  </style>
 }
   </style>
 </head>
