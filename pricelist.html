@@ -27,6 +27,15 @@ body {
   margin: 0;
   padding: 0;
 }
+.pricelist {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 24px;
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 32px;
+}
+
 .searchbar{
   margin: 1rem auto 1.5rem;
   padding: 1rem 1.25rem;
@@ -132,7 +141,15 @@ body {
 .section h3::before {
   margin-right: 8px;
 }
-
+.section {
+  border: 2px solid var(--primary);
+  border-radius: 14px;
+  background: var(--blue);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+  padding: 24px 20px;
+  display: flex;
+  flex-direction: column;
+}
 #section-visits h3::before { content: "🩺"; }
 #section-procedures h3::before { content: "🔧"; }
 #section-labs h3::before { content: "🧪"; }
@@ -292,24 +309,27 @@ body {
       border-radius: 14px;
       background: white;
       box-shadow: 0 4px 12px rgba(0,0,0,0.08);
-      position: sticky;
+      position: fixed;
       top: 20px;
+      right: 10px;
       height: fit-content;
       min-width: 320px;
       max-width: 400px;
       flex: 1 1 320px;
       display: flex;
       flex-direction: column;
-       width: 30%;
-          padding: 20px;
-          border-radius: 10px;
-          font-size: 1rem;
-          color: #333;
-          position: fixed;
-          top: 20px;
-          right: 10px;
+      width: 30%;
+      font-size: 1rem;
+      color: #333;
+      opacity: 0.5;
+      transition: opacity 0.2s;
     }
-
+    .empty-receipt {
+      text-align: center;
+      color: var(--gray);
+      padding: 22px 0;
+      font-style: italic;
+    }
     #receipt h2 {
       margin-top: 0;
       text-align: center;
@@ -318,15 +338,11 @@ body {
       border-bottom: 2px solid var(--border);
       margin-bottom: 18px;
     }
-
-    #receipt {
-      opacity: 0.5;
-      transition: opacity 0.2s;
-    }
+    
     #receipt:hover {
       opacity: 1;
     }
-
+    
     .receipt-item {
       display: flex;
       justify-content: space-between;
@@ -335,35 +351,35 @@ body {
       padding: 10px 0;
       border-bottom: 1px dashed var(--border);
     }
-
+    
     .receipt-item:last-child {
       border-bottom: none;
     }
-
+    
     .receipt-item-info {
       flex: 1;
     }
-
+    
     .receipt-item-name {
       font-weight: 500;
     }
-
+    
     .receipt-item-codes {
       font-size: 0.8rem;
       color: var(--gray);
       margin-top: 2px;
     }
-      #copyReceipt{ 
-        margin-top: 10px;
-        padding: 0.5rem 1.5rem;
-        background-color: #acdbf9;
-        border: 1px solid #000;
-        border-radius: 20px;
-        text-decoration: none;
-        color: #333;
-        font-weight: bold;
+    #copyReceipt{ 
+      margin-top: 10px;
+      padding: 0.5rem 1.5rem;
+      background-color: #acdbf9;
+      border: 1px solid #000;
+      border-radius: 20px;
+      text-decoration: none;
+      color: #333;
+      font-weight: bold;
       font-size: 1rem;
-      }
+    }
     .qty-select {
       margin: 0 8px;
       width: 50px;
@@ -371,7 +387,7 @@ body {
       border: 1px solid var(--border);
       border-radius: 4px;
     }
-
+    
     .remove {
       background: var(--accent);
       color: white;
@@ -382,15 +398,17 @@ body {
       font-size: 0.8rem;
       transition: background 0.2s;
     }
-
+    
     .remove:hover {
       background: #d90452;
     }
-
-    #grandTotal {
-      font-weight: bold;
-      font-size: 1.3rem;
-      color: var(--primary);
+    .total-row {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 18px;
+      padding-top: 18px;
+      border-top: 2px solid var(--border);
+      font-size: 1.1rem;
     }
 
     @media (max-width: 1100px) {
@@ -443,38 +461,6 @@ body {
       }
     }
 
-    .empty-receipt {
-      text-align: center;
-      color: var(--gray);
-      padding: 22px 0;
-      font-style: italic;
-    }
-
-    .total-row {
-      display: flex;
-      justify-content: space-between;
-      margin-top: 18px;
-      padding-top: 18px;
-      border-top: 2px solid var(--border);
-      font-size: 1.1rem;
-    }
-    .pricelist {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 24px;
-  max-width: 1400px;
-  margin: 0 auto;
-  padding: 32px;
-}
-.section {
-  border: 2px solid var(--primary);
-  border-radius: 14px;
-  background: var(--blue);
-  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
-  padding: 24px 20px;
-  display: flex;
-  flex-direction: column;
-}
 
 </style>
 </head>
