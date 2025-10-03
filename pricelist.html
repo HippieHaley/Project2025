@@ -137,7 +137,7 @@
     #section-labs h3::before { content: "🧪"; }
     #section-meds h3::before { content: "💊"; }
 
-    .list {
+.list {
       display: flex;
       flex-wrap: wrap;
       gap: 18px;
@@ -149,21 +149,24 @@
       letter-spacing: 0.01em;
       line-height: 1.45;
     }
-       .list.has-sublists {
+    .list.has-sublists {
       display: grid;
       grid-template-columns: repeat(4, minmax(0, 1fr));
       gap: 18px;
-      align-items: stretch;
+      align-items: start;
     }
-        .sublist {
- border: 1.5px solid var(--border);
-      border-radius: 8px;
-      padding: 12px;
+    .list.has-sublists .sublist {
+      height: 100%;
+    }
+    .sublist {
+      border: 1.5px solid var(--border);
+      border-radius: 10px;
+      padding: 16px 14px;
       background: #fff;
       display: flex;
       flex-direction: column;
       gap: 12px;
-      height: 100%;
+      box-shadow: inset 0 0 0 1px rgba(255,255,255,0.3);
     }
 
     .subgroup-title {
@@ -194,8 +197,8 @@
       flex-direction: row;  /* stack sublists top → bottom */
       flex-wrap: wrap;
       gap: 18px; 
-    grid-template-columns: repeat(4, 1fr); /* 4 boxes across */
-   gap: 16px;
+      grid-template-columns: repeat(4, 1fr); /* 4 boxes across */
+      gap: 16px;
     }
     .section-card {
       flex: 1 1 0;
@@ -203,7 +206,7 @@
       max-width: 400px;
       background: #bfe2fc;
     }
-#section-procedures {
+    #section-procedures {
       grid-column: 2;
       grid-row: 2;
     }
