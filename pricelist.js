@@ -13,7 +13,8 @@ let query = '';
  *  DOM refs
  *  ======================== */
 const $ = (s, r = document) => r.querySelector(s);
-const $$ = (s, r = document) => Array.from(r.querySelectorAll(s));
+// const $$ = (s, r = document) => Array.from(r.querySelectorAll(s));
+// Removed unused variable warning
 const fmt = n => `$${(n ?? 0).toFixed(2)}`;
 // Map certain keywords → subgroup key + label shown in the mini-box header
 const SUBGROUP_MAP = [
@@ -104,6 +105,11 @@ function clearSections() {
 }
 function renderCatalog() {
   clearSections();
+  Object.values(sections).forEach(el => {
+    if (!el) return;
+    el.innerHTML = '';
+    el.classList.remove('has-sublists');
+  });
 
   sectionDefs.forEach(def => {
     const listContainer = sections[def.bucket];
@@ -125,75 +131,73 @@ function renderCatalog() {
       const orderedGroups = Array.from(groups.entries())
         .sort((a, b) => SUBGROUP_ORDER.indexOf(a[0]) - SUBGROUP_ORDER.indexOf(b[0]));
 
-      for (const [, group] of orderedGroups) {
-        if (!group.items.length) continue;
+  for (const [, group] of orderedGroups) {
+    if (!group.items.length) continue;
 
-        // Mini-box like your printed ticket
-        const sub = document.createElement("div");
-        sub.className = "sublist";
+    // Mini-box like your printed ticket
+    const sub = document.createElement("div");
+    sub.className = "sublist";
 
-        if (group.label) {
-          const title = document.createElement("div");
-          title.className = "subgroup-title";
-          title.textContent = group.label;
-          sub.appendChild(title);
-        }
-
-        group.items.forEach(proc => {
-          const name = (proc.name || "").split("\n")[0];
-
-          const row = document.createElement("div");
-          row.className = "item";
-
-          // Checkbox + label
-          const label = document.createElement("label");
-          const checkbox = document.createElement("input");
-          checkbox.type = "checkbox";
-          checkbox.dataset.name = name;
-          label.appendChild(checkbox);
-
-          const nameSpan = document.createElement("span");
-          nameSpan.textContent = name;
-          label.appendChild(nameSpan);
-          row.appendChild(label);
-
-          // Quick-add buttons (if any)
-          if (MULT_X_BUTTONS[name]) {
-            MULT_X_BUTTONS[name].forEach(mult => {
-              const qb = document.createElement("button");
-              qb.className = "btn";
-              qb.textContent = `x${mult}`;
-              qb.addEventListener("click", () => addLine(name, mult));
-              row.appendChild(qb);
-            });
-          }
-
-          // Codes (show/hide)
-          const codesSpan = document.createElement("span");
-          codesSpan.className = "codes";
-          if (showCodes) {
-            codesSpan.classList.add("show");
-            const codes = getCodes(proc);
-            if (codes) codesSpan.textContent = ` (${codes})`;
-          }
-          row.appendChild(codesSpan);
-
-          // Sync selection
-          checkbox.addEventListener("change", e => {
-            if (e.target.checked) addLine(name, 1); else removeLine(name);
-          });
-          if (selected.has(name)) checkbox.checked = true;
-
-          sub.appendChild(row);
-        });
-
-        listContainer.appendChild(sub);
-      }
-
-      return; // finished visits; move to next section
+    if (group.label) {
+      const title = document.createElement("div");
+      title.className = "subgroup-title";
+      title.textContent = group.label;
+      sub.appendChild(title);
     }
 
-    // ===== NON-VISITS: flat list like before =====
+    group.items.forEach(proc => {
+      const name = (proc.name || "").split("\n")[0];
+
+      const row = document.createElement("div");
+      row.className = "item";
+
+      // Checkbox + label
+      const label = document.createElement("label");
+      const checkbox = document.createElement("input");
+      checkbox.type = "checkbox";
+      checkbox.dataset.name = name;
+      label.appendChild(checkbox);
+
+      const nameSpan = document.createElement("span");
+      nameSpan.textContent = name;
+      label.appendChild(nameSpan);
+      row.appendChild(label);
+
+      // Quick-add buttons (if any)
+      if (MULT_X_BUTTONS[name]) {
+        MULT_X_BUTTONS[name].forEach(mult => {
+          const qb = document.createElement("button");
+          qb.className = "btn";
+          qb.textContent = `x${mult}`;
+          qb.addEventListener("click", () => addLine(name, mult));
+          row.appendChild(qb);
+        });
+      }
+
+      // Codes (show/hide)
+      const codesSpan = document.createElement("span");
+      codesSpan.className = "codes";
+      if (showCodes) {
+        codesSpan.classList.add("show");
+        const codes = getCodes(proc);
+        if (codes) codesSpan.textContent = ` (${codes})`;
+      }
+      row.appendChild(codesSpan);
+      // Sync selection
+      checkbox.addEventListener("change", e => {
+        if (e.target.checked) addLine(name, 1); else removeLine(name);
+      });
+      if (selected.has(name)) checkbox.checked = true;
+
+      sub.appendChild(row);
+    });
+
+    listContainer.appendChild(sub);
+  }
+  listContainer.classList.toggle('has-sublists', groups.size > 0);
+  return; // finished visits; move to next section
+}
+
     items.forEach(proc => {
       const name = (proc.name || "").split("\n")[0];
       const row = document.createElement("div");
@@ -250,7 +254,6 @@ function renderCatalog() {
     });
   }
 }
-
 /** ========================
  *  Receipt logic
  *  ======================== */
