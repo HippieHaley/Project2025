@@ -831,4 +831,5 @@ const procedures = [
 }
 ];
 
-window.procedures = procedures;
+export default procedures;
+
