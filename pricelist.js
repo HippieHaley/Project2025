@@ -66,6 +66,27 @@ function getCodes(obj) {
   return codes.join(' • ');
 }
 
+function createCodesContainer(proc) {
+  const container = document.createElement('span');
+  container.className = 'item-text-codes';
+
+  const codesSpan = document.createElement('span');
+  codesSpan.className = 'codes';
+
+  const codesText = getCodes(proc);
+  const shouldShow = Boolean(showCodes && codesText);
+
+  if (shouldShow) {
+    codesSpan.classList.add('show');
+    codesSpan.textContent = `(${codesText})`;
+  } else {
+    container.hidden = true;
+  }
+
+  container.appendChild(codesSpan);
+  return container;
+}
+
 function basePrice(item) {
   return Number(item.fullprice || 0);
 }
@@ -158,9 +179,18 @@ function renderCatalog() {
       checkbox.dataset.name = name;
       label.appendChild(checkbox);
 
+      const textWrap = document.createElement("span");
+      textWrap.className = "item-text";
+
       const nameSpan = document.createElement("span");
+      nameSpan.className = "item-name";
       nameSpan.textContent = name;
-      label.appendChild(nameSpan);
+      textWrap.appendChild(nameSpan);
+
+      const codesContainer = createCodesContainer(proc);
+      textWrap.appendChild(codesContainer);
+
+      label.appendChild(textWrap);
       row.appendChild(label);
 
       // Quick-add buttons (if any)
@@ -175,14 +205,7 @@ function renderCatalog() {
       }
 
       // Codes (show/hide)
-      const codesSpan = document.createElement("span");
-      codesSpan.className = "codes";
-      if (showCodes) {
-        codesSpan.classList.add("show");
-        const codes = getCodes(proc);
-        if (codes) codesSpan.textContent = ` (${codes})`;
-      }
-      row.appendChild(codesSpan);
+      // Codes are nested inside the text wrapper so they render beneath the name
       // Sync selection
       checkbox.addEventListener("change", e => {
         if (e.target.checked) addLine(name, 1); else removeLine(name);
@@ -209,9 +232,18 @@ function renderCatalog() {
       checkbox.dataset.name = name;
       label.appendChild(checkbox);
 
+      const textWrap = document.createElement("span");
+      textWrap.className = "item-text";
+
       const nameSpan = document.createElement("span");
+      nameSpan.className = "item-name";
       nameSpan.textContent = name;
-      label.appendChild(nameSpan);
+      textWrap.appendChild(nameSpan);
+
+      const codesContainer = createCodesContainer(proc);
+      textWrap.appendChild(codesContainer);
+
+      label.appendChild(textWrap);
       row.appendChild(label);
 
       if (MULT_X_BUTTONS[name]) {
@@ -224,14 +256,7 @@ function renderCatalog() {
         });
       }
 
-      const codesSpan = document.createElement("span");
-      codesSpan.className = "codes";
-      if (showCodes) {
-        codesSpan.classList.add("show");
-        const codes = getCodes(proc);
-        if (codes) codesSpan.textContent = ` (${codes})`;
-      }
-      row.appendChild(codesSpan);
+      // Codes are nested inside the text wrapper so they render beneath the name
 
       checkbox.addEventListener("change", e => {
         if (e.target.checked) addLine(name, 1); else removeLine(name);
