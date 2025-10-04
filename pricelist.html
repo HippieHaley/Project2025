@@ -212,12 +212,11 @@ body {
  
 }
 #section-visits .list {
-  display: flex;
-  flex-direction: row;  /* stack sublists top → bottom */
-  flex-wrap: wrap;
-  align-items: stretch;
-  gap: 16px;
-}
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 18px;
+    align-content: stretch;
+  }
 .section-card {
   flex: 1 1 0;
   min-width: 320px;
