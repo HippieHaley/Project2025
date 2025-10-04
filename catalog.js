@@ -574,7 +574,7 @@ const procedures = [
     hcpcs: "S4993",
     icd10: "Z30.011",
     fullprice: 5,
-    category: " oral contraceptives",
+    category: "oral contraceptives",
     keywords: ["alese", "oc", "pill", "s4993"]
   },
   {
@@ -583,7 +583,7 @@ const procedures = [
     hcpcs: "S4993",
     icd10: "Z30.011",
     fullprice: 5,
-    category: " oral contraceptives",
+    category: "oral contraceptives",
     keywords: ["apri", "oc", "pill", "s4993"]
   },
   {
@@ -592,7 +592,7 @@ const procedures = [
     hcpcs: "S4993",
     icd10: "Z30.011",
     fullprice: 5,
-    category: " oral contraceptives",
+    category: "oral contraceptives",
     keywords: ["aviane", "oc", "pill", "s4993"]
   },
   {
@@ -601,7 +601,7 @@ const procedures = [
     hcpcs: "S4993",
     icd10: "Z30.011",
     fullprice: 28,
-    category: " oral contraceptives",
+    category: "oral contraceptives",
     keywords: ["camila", "oc", "pop", "progestin"]
   },
   {
@@ -610,7 +610,7 @@ const procedures = [
     hcpcs: "S4993",
     icd10: "Z30.011",
     fullprice: 5,
-    category: " oral contraceptives",
+    category: "oral contraceptives",
     keywords: ["cryselle", "oc", "pill"]
   },
   {
@@ -619,7 +619,7 @@ const procedures = [
     hcpcs: "S4993",
     icd10: "Z30.011",
     fullprice: 14,
-    category: " oral contraceptives",
+    category: "oral contraceptives",
     keywords: ["levora", "oc", "pill"]
   },
   {
@@ -628,7 +628,7 @@ const procedures = [
     hcpcs: "S4993",
     icd10: "Z30.011",
     fullprice: 16,
-    category: " oral contraceptives",
+    category: "oral contraceptives",
     keywords: ["lutera", "oc", "pill"]
   },
   {
@@ -637,7 +637,7 @@ const procedures = [
     hcpcs: "S4993",
     icd10: "Z30.011",
     fullprice: 5,
-    category: " oral contraceptives",
+    category: "oral contraceptives",
     keywords: ["sprintec", "oc", "pill"]
   },
   {
@@ -646,7 +646,7 @@ const procedures = [
     hcpcs: "S4993",
     icd10: "Z30.011",
     fullprice: 14,
-    category: " oral contraceptives",
+    category: "oral contraceptives",
     keywords: ["tri-lo marzia", "oc", "pill"]
   },
   {
@@ -655,7 +655,7 @@ const procedures = [
     hcpcs: "S4993",
     icd10: "Z30.011",
     fullprice: 14,
-    category: " oral contraceptives",
+    category: "oral contraceptives",
     keywords: ["trivora", "oc", "pill"]
   },
   {
@@ -831,4 +831,4 @@ const procedures = [
 }
 ];
 
-export default procedures;
+window.procedures = procedures;
