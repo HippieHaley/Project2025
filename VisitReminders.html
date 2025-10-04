@@ -1,0 +1,487 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <style>
+    body {
+            font-family: Arial, sans-serif;
+            background-color: #acdbf9; /* Light blue background */
+            color: #333;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            text-align: center;
+        }
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 20px 0;
+  background-color: #f8c9f9;
+  border: 2px solid #333;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+th, td {
+  padding: 15px;
+  border: 1px solid #333;
+  background-color: #f8c9f9;
+  color: #333;
+  text-align: center;
+}
+input[type="email"],
+input[type="date"],
+input[type="time"] {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #000;
+  border-radius: 20px;
+  background-color: #ffffff;
+  color: #333;
+  font-size: 1rem;
+  text-align: center;
+}
+input:focus {
+  background-color: #acdbf9; 
+  outline: none;
+  box-shadow: 0 0 5px rgba(232, 184, 232, 0.5);
+}
+input.dimmed {
+  background-color: #e0e0e0 !important;
+  color: #666 !important;
+  pointer-events: none;
+}
+
+button {
+  padding: 8px 16px;
+  font-size: 0.9rem;
+  font-weight: bold;
+  color: #333;
+  background-color: #acdbf9; 
+  border: 1px solid #000;
+  border-radius: 20px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+button:hover {
+  background-color: #acdbf9; 
+}
+.alt-button {
+  padding: 8px 16px;
+  font-size: 0.9rem;
+  font-weight: bold;
+  color: #333;
+  background-color: #f8c9f9; /* pastel pink */
+  border: 1px solid #000;
+  border-radius: 20px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.alt-button:hover {
+  background-color: #e8b3e8; /* slightly darker pink on hover */
+}
+
+#preview {
+  margin-top: 30px;
+  background-color:#e8b3e8;
+  border-radius: 30px;
+  color: #333;
+  font-size: 1rem;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+/* Back Home Button */
+.back-home {
+          display: inline-block;
+          padding: 12px 24px;
+          background-color: #f8c9f9;
+          color: #333;
+          text-decoration: none;
+          font-size: 1rem;
+          font-weight: bold;
+          border-radius: 20px;
+          text-align: center;
+          border: 1px solid #000;
+          top: 20px;
+          left: 20px;
+          z-index: 999; /* Ensures it stays above other elements */
+          transition: background-color 0.2s ease;
+          position: absolute;
+        }
+        .back-home:hover {
+          background-color: #e8b3e8;
+        }
+        .alert-preview {
+  position: fixed;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  background-color: #e8b3e8;
+  padding: 20px;
+  border-radius: 50%;
+  width: 40px;   /* suspect issue here */
+  height: 40px;  /* suspect issue here */
+  display: none; /* should be hidden by default */
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  z-index: 1000;
+}
+#preview {
+  display: none; /* initially hidden, JS shows this as needed */
+  position: fixed;
+  right: 20px;
+  top: 50%;
+  transform: translateY(-50%);
+  background-color: #e8b3e8;
+  padding: 15px;
+  border-radius: 10px;
+  border: 1px solid #000;
+  max-width: 300px;
+  z-index: 1000;
+  overflow-y: auto;
+  text-align: center; /* makes your default message look nice */
+}
+.notification {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background-color: #acdbf9; 
+  color: #333;
+  padding: 10px 15px;
+  border: 2px solid #333;
+  border-radius: 20px;
+  font-weight: bold;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+  pointer-events: none;
+  z-index: 9999;
+  max-width: 90%;
+  text-align: center;
+}
+.notification.show {
+  opacity: 1;
+}
+.template-selector {
+  padding: 8px 12px;
+  border-radius: 20px;
+  border: 1px solid #333;
+  background-color: #acdbf9; 
+  color: #333;
+  font-size: 1rem;
+  font-weight: bold;
+  text-align: center;
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  cursor: pointer;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  margin-left: 8px;
+  margin-right: 8px;
+}
+.template-selector:focus {
+  outline: none;
+  border-color: #000;
+  background-color:  #acdbf9; 
+}
+.sms-email-input {
+  padding: 10px 15px;
+  border-radius: 30px;
+  border: 1px solid #333;
+  font-size: 1rem;
+  font-weight: normal;
+  background-color:  #acdbf9; 
+  color: #333;
+  width: 100%;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+  transition: border-color 0.2s ease, background-color 0.2s ease;
+}
+.sms-email-input::placeholder {
+  color: #030303; 
+}
+.sms-email-input:focus {
+  outline: none;
+  border-color: #000;
+  background-color:  #acdbf9; 
+}
+  </style>
+</head>
+<body>
+  <a href="index.html" class="back-home">Back to Home</a>
+  <h1>Email Draft Generator</h1><div style="margin-bottom: 20px;"></div>
+  <div id="previewPopup" class="notification"></div>
+  <table id="emailTable">
+    <thead>
+      <tr>
+        <th>Email</th>
+        <th>Date</th>
+        <th>Time</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><input type="email" class="sms-email-input" placeholder=""></td>
+        <td><input type="date"></td>
+        <td><input type="time"></td>
+        <td>
+          <label style="display:inline-flex;align-items:center;margin-bottom:4px;">
+            <input type="checkbox" class="income-doc-checkbox" style="margin-right:6px;"> Income Doc Reminder
+          </label>
+          <button onclick="addRow()">+ Add Row</button>
+          <button onclick="deleteRow(this)">Delete</button>
+          <button onclick="createDraft(this)">Create Draft</button>
+          <select class="template-selector">
+            <option value="default">Appt Reminder</option>
+            <option value="reschedule">Reschedule</option>
+            <option value="CallClinic">Call Clinic</option>
+            <option value="AEDue">AE Due</option>
+            <option value="MissedAppt">Missed Appt</option>
+            <option value="IncomeDocReminder">Income Doc Reminder </option>
+          </select>      
+        </td>
+      </tr>
+    </tbody>
+  </table>
+ <button class="alt-button" onclick="previewAll()">Preview All</button>
+  <div id="preview" class="alert-preview"></div>
+  <script>
+    function addRow() {
+      const table = document.getElementById('emailTable').getElementsByTagName('tbody')[0];
+      const newRow = table.rows[0].cloneNode(true);
+      const inputs = newRow.getElementsByTagName('input');
+      for (let input of inputs) {
+        input.value = '';
+      }
+      table.appendChild(newRow);
+    }
+    function setupSmsAutocomplete() {
+      // Remove any existing listeners and rebind to all current .sms-email-input fields
+      document.querySelectorAll('.sms-email-input').forEach(input => {
+        // Remove previous event listener if any
+        input.removeEventListener('input', handleSmsAutocomplete);
+        input.addEventListener('input', handleSmsAutocomplete);
+        input.dataset.bound = 'true';
+      });
+    }
+
+    function handleSmsAutocomplete(e) {
+      const input = e.target;
+      const sanitized = input.value.replace(/\D/g, '');
+
+      const providers = [
+        '@txt.att.net',
+        '@tmomail.net',
+        '@vtext.com',
+        '@messaging.sprintpcs.com',
+        '@vmobl.com',
+        '@mypixmessages.com',
+        '@mymetropcs.com',
+        '@sms.cricketwireless.net'
+      ];
+
+      if (sanitized.length >= 7) {
+        showSmsSuggestions(input, sanitized, providers);
+      } else {
+        clearSmsSuggestions();
+      }
+    }
+    function showSmsSuggestions(input, number, providers) {
+      clearSmsSuggestions();
+      const container = document.createElement('div');
+      container.setAttribute('id', 'smsSuggestionContainer');
+      container.style.border = '1px solid #333';
+      container.style.background = '#fff';
+      container.style.position = 'absolute';
+      container.style.zIndex = '9999';
+      container.style.width = `${input.offsetWidth}px`;
+      // Position relative to input field
+      const rect = input.getBoundingClientRect();
+      container.style.left = `${rect.left + window.scrollX}px`;
+      container.style.top = `${rect.bottom + window.scrollY}px`;
+
+      const labeledProviders = [
+        { label: 'Verizon', domain: '@vtext.com' },
+        { label: 'AT&T', domain: '@txt.att.net' },
+        { label: 'T-Mobile', domain: '@tmomail.net' },
+        { label: 'Sprint', domain: '@messaging.sprintpcs.com' },
+        { label: 'Virgin', domain: '@vmobl.com' },
+        { label: 'MetroPCS', domain: '@mymetropcs.com' },
+        { label: 'Cricket', domain: '@sms.cricketwireless.net' },
+        { label: 'Pix Wireless', domain: '@mypixmessages.com' }
+      ];
+
+      labeledProviders.forEach(({ label, domain }) => {
+        const item = document.createElement('div');
+        const fullAddress = number + domain;
+        item.textContent = `(${label}) ${fullAddress}`;
+        item.style.padding = '8px';
+        item.style.cursor = 'pointer';
+        item.style.backgroundColor = '#f8c9f9';
+        item.addEventListener('click', () => {
+          input.value = fullAddress;
+          clearSmsSuggestions();
+        });
+        container.appendChild(item);
+      });
+      document.body.appendChild(container);
+    }
+
+  function clearSmsSuggestions() {
+    const existing = document.getElementById('smsSuggestionContainer');
+    if (existing) existing.remove();
+  }
+  function updateInputVisibility(row) {
+  const templateSelector = row.querySelector('.template-selector');
+  const selectedTemplate = templateSelector ? templateSelector.value : 'default';
+
+  const dateInput = row.querySelector('input[type="date"]');
+  const timeInput = row.querySelector('input[type="time"]');
+
+  // Reset all inputs first
+  dateInput.classList.remove('dimmed');
+  timeInput.classList.remove('dimmed');
+  dateInput.removeAttribute('disabled');
+  timeInput.removeAttribute('disabled');
+
+  // Apply dimmed style based on template logic
+  if (selectedTemplate === 'AEDue') {
+    timeInput.classList.add('dimmed');
+    timeInput.setAttribute('disabled', true);
+  } else if (selectedTemplate === 'CallClinic') {
+    dateInput.classList.add('dimmed');
+    dateInput.setAttribute('disabled', true);
+    timeInput.classList.add('dimmed');
+    timeInput.setAttribute('disabled', true);
+  }
+}
+function setupTemplateListeners() {
+  document.querySelectorAll('.template-selector').forEach(selector => {
+    selector.addEventListener('change', () => {
+      const row = selector.closest('tr');
+      updateInputVisibility(row); // This is the function from Step 2
+    });
+  });
+}
+
+  document.addEventListener('click', (e) => {
+    if (!e.target.classList.contains('sms-email-input')) {
+      clearSmsSuggestions();
+    }
+  });
+
+  // Hook it on load
+  window.addEventListener('DOMContentLoaded', setupSmsAutocomplete);
+
+  const originalAddRow = addRow;
+addRow = function () {
+  originalAddRow();
+  setupSmsAutocomplete();
+  setupTemplateListeners(); // NEW!
+};
+
+    function deleteRow(button) {
+      const row = button.closest('tr');
+      const table = document.getElementById('emailTable').getElementsByTagName('tbody')[0];
+      if (table.rows.length > 1) {
+        row.remove();
+      } else {
+        alert("You must have at least one row.");
+      }
+    }
+function getEmailRowData(row) {
+  const inputs = row.getElementsByTagName('input');
+  const email = inputs[0].value;
+  const date = inputs[1].value;
+  const time = inputs[2].value;
+
+  const templateSelector = row.querySelector('.template-selector');
+  const selectedTemplate = templateSelector ? templateSelector.value : 'default';
+
+  const templates = {
+    default: `Please send YES to confirm your appt on ${date} @ ${time}.\nCall to cancel, reschedule, or if you have questions.\n605-717-8920. Thank you.`,
+    reschedule: `We need to reschedule your appt originally set for ${date} @ ${time}.\nPlease call us at 605-717-8920. Thank you.`,
+    CallClinic: `We called you on ${new Date().toLocaleDateString()}.\nIt's important you get in touch with the clinic.\nPlease call us at 605-717-8920. Thank you.`,
+    AEDue: `Its about that time! Your annual exam is due ${date}.\nPlease call us at 605-717-8920 to schedule your appointment. Thank you.`,
+    MissedAppt: `We missed you at your appointment on ${date} @ ${time}.\nPlease call us at 605-717-8920 to reschedule. Thank you.`,
+    IncomeDocReminder: `Please bring some sort of income documentation for your appointment on ${date}. This could be w-2s or a month of paystubs. Thank you.`,
+  };
+
+  const subject = 'SECUREMAIL From Monument Health FHES.';
+  const body = templates[selectedTemplate] || templates.default;
+
+  return { email, subject, body };
+}
+function getEmailRowData(row) {
+  const inputs = row.getElementsByTagName('input');
+  const email = inputs[0].value;
+  const date = inputs[1].value;
+  const time = inputs[2].value;
+
+  const templateSelector = row.querySelector('.template-selector');
+  const selectedTemplate = templateSelector ? templateSelector.value : 'default';
+
+  const templates = {
+    default: `Please send YES to confirm your appt on ${date} @ ${time}.\nCall to cancel, reschedule, or if you have questions.\n605-717-8920. Thank you.`,
+    reschedule: `We need to reschedule your appt originally set for ${date} @ ${time}.\nPlease call us at 605-717-8920. Thank you.`,
+    CallClinic: `We called you on ${new Date().toLocaleDateString()}.\nIt's important you get in touch with the clinic.\nPlease call us at 605-717-8920. Thank you.`,
+    AEDue: `Its about that time! Your annual exam is due ${date}.\nPlease call us at 605-717-8920 to schedule your appointment. Thank you.`,
+    MissedAppt: `We missed you at your appointment on ${date} @ ${time}.\nPlease call us at 605-717-8920 to reschedule. Thank you.`,
+    IncomeDocReminder: `Please bring some sort of income documentation for your appointment on ${date}. This could be w-2s or a month of paystubs. Thank you.`,
+  };
+
+  const subject = 'SECUREMAIL From Monument Health FHES.';
+  const body = templates[selectedTemplate] || templates.default;
+
+  return { email, subject, body };
+}
+function createDraft(button) {
+  const row = button.closest('tr');
+  const { email, subject, body } = getEmailRowData(row);
+  let mailto = `mailto:${email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+  window.open(mailto, '_blank');
+
+  // Only create Income Doc Reminder draft if checkbox is checked
+  const incomeDocCheckbox = row.querySelector('.income-doc-checkbox');
+  if (incomeDocCheckbox && incomeDocCheckbox.checked) {
+    const inputs = row.getElementsByTagName('input');
+    const date = inputs[1].value;
+    const incomeDocSubject = 'SECUREMAIL From Monument Health.';
+    const incomeDocBody = `Please bring some sort of income documentation for your appointment on ${date}. This could be w-2s or a month of paystubs. Thank you.`;
+    const incomeMailto = `mailto:${email}?subject=${encodeURIComponent(incomeDocSubject)}&body=${encodeURIComponent(incomeDocBody)}`;
+    setTimeout(() => {
+      window.open(incomeMailto, '_blank');
+    }, 500);
+  }
+}
+    function previewAll() {
+  const rows = document.getElementById('emailTable').getElementsByTagName('tbody')[0].rows;
+  let previewHTML = '';
+
+  for (let row of rows) {
+    const { email, subject, body } = getEmailRowData(row);
+    if (email && email.trim() !== '') {
+      previewHTML += `<strong>To:</strong> ${email}<br>
+                      <strong>Subject:</strong> ${subject}<br>
+                      <strong>Body:</strong><br>${body.replace(/\n/g, '<br>')}<br><hr>`;
+    }
+  }
+
+  const popup = document.getElementById('previewPopup');
+
+  popup.innerHTML = previewHTML || '<em>No valid emails to preview.</em>';
+  popup.classList.add('show');
+
+  // Hide it after 3 seconds
+  setTimeout(() => {
+    popup.classList.remove('show');
+  }, 3000);
+}
+window.addEventListener('DOMContentLoaded', () => {
+  setupSmsAutocomplete();
+  setupTemplateListeners(); // NEW!
+});
+  </script>
+</body>
+</html>
