@@ -1,0 +1,1053 @@
+ <!DOCTYPE html>
+  <html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Billing Toolkit</title>
+    <style>
+      :root {
+        --blue: #acdbf9;
+        --pink: #f8c9f9;
+        --pink-dark: #e8b3e8;
+        --ink: #333;
+        --border: #000;
+        --table-border: #333;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: Arial, sans-serif;
+        background-color: var(--blue);
+        color: var(--ink);
+        margin: 0;
+        padding: 80px 20px 40px;
+      }
+
+      .back-home {
+        position: fixed;
+        top: 20px;
+        left: 20px;
+        display: inline-block;
+        padding: 12px 24px;
+        background-color: var(--pink);
+        color: var(--ink);
+        text-decoration: none;
+        font-size: 1rem;
+        font-weight: bold;
+        border-radius: 30px;
+        border: 1px solid var(--border);
+        transition: background-color 0.2s ease;
+        z-index: 999;
+      }
+
+      .back-home:hover {
+        background-color: var(--pink-dark);
+      }
+
+      .container {
+        max-width: 1100px;
+        margin: 0 auto;
+        display: flex;
+        flex-direction: column;
+        gap: 24px;
+      }
+
+      h1 {
+        text-align: center;
+        margin: 0;
+        font-size: 2.1rem;
+        letter-spacing: 0.02em;
+      }
+
+      .workflow {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 20px;
+      }
+
+      .card {
+        background-color: #ffffff;
+        border: 2px solid var(--border);
+        border-radius: 16px;
+        padding: 24px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+      }
+
+      .card h2 {
+        margin: 0;
+        text-align: center;
+        border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+        padding-bottom: 12px;
+      }
+
+      .help-text {
+        margin: 0;
+        font-size: 0.95rem;
+        line-height: 1.4;
+        text-align: center;
+      }
+
+      input[type="file"] {
+        padding: 12px 24px;
+        border: 1px solid var(--border);
+        border-radius: 30px;
+        background-color: var(--pink);
+        color: var(--ink);
+        cursor: pointer;
+        font-size: 1rem;
+        font-weight: bold;
+        align-self: center;
+        transition: background-color 0.2s ease;
+      }
+
+      input[type="file"]:hover {
+        background-color: var(--pink-dark);
+      }
+
+      input[type="file"]::file-selector-button {
+        font-size: 1rem;
+        padding: 10px 20px;
+        border: 1px solid var(--border);
+        border-radius: 30px;
+        background-color: var(--pink);
+        color: var(--ink);
+        font-weight: bold;
+        cursor: pointer;
+        transition: background-color 0.2s ease;
+      }
+
+      input[type="file"]::file-selector-button:hover {
+        background-color: var(--pink-dark);
+      }
+
+      button {
+        display: inline-block;
+        padding: 12px 24px;
+        background-color: var(--pink);
+        color: var(--ink);
+        font-size: 1rem;
+        font-weight: bold;
+        border: 1px solid var(--border);
+        border-radius: 30px;
+        text-align: center;
+        cursor: pointer;
+        transition: background-color 0.2s ease;
+      }
+
+      button:hover {
+        background-color: var(--pink-dark);
+      }
+
+      button:disabled {
+        background-color: #f0d4f0;
+        color: #999;
+        border: 1px solid #999;
+        cursor: not-allowed;
+      }
+
+      .actions {
+        display: flex;
+        justify-content: center;
+        gap: 12px;
+        flex-wrap: wrap;
+      }
+
+      .summary-list {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+        font-size: 0.95rem;
+      }
+
+      .summary-list li {
+        padding: 8px 12px;
+        background: rgba(172, 219, 249, 0.35);
+        border-radius: 8px;
+        border: 1px solid rgba(0, 0, 0, 0.12);
+      }
+
+      .client-picker {
+        display: flex;
+        gap: 10px;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .client-picker select {
+        padding: 8px 12px;
+        border-radius: 12px;
+        border: 1px solid var(--border);
+        background: #fff;
+        font-size: 1rem;
+      }
+
+      #preview-card h2 {
+        border-bottom: none;
+        text-align: left;
+        margin-bottom: -4px;
+      }
+
+      #previewStatus {
+        margin: 0;
+        font-size: 0.95rem;
+        color: rgba(51, 51, 51, 0.75);
+      }
+
+      .client-info h3 {
+        margin: 8px 0 4px;
+        font-size: 1.3rem;
+      }
+
+      .client-info p {
+        margin: 0;
+        line-height: 1.35;
+      }
+
+      .table-wrap {
+        overflow-x: auto;
+        border: 2px solid var(--table-border);
+        border-radius: 12px;
+        background: var(--blue);
+      }
+
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        min-width: 900px;
+      }
+
+      th,
+      td {
+        border: 1px solid var(--table-border);
+        padding: 10px;
+        white-space: nowrap;
+        background-color: var(--blue);
+        color: var(--ink);
+        font-size: 0.92rem;
+      }
+
+      th {
+        background-color: var(--pink);
+        font-weight: bold;
+      }
+
+      td.numeric {
+        text-align: right;
+      }
+
+      #balanceSummary {
+        margin: 10px 0 0;
+        font-weight: 600;
+        text-align: right;
+      }
+
+      .notification {
+        position: fixed;
+        top: 16px;
+        right: 16px;
+        padding: 10px 18px;
+        background-color: var(--pink);
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        font-weight: 600;
+        display: none;
+        z-index: 1000;
+      }
+
+      @media (max-width: 640px) {
+        body {
+          padding-top: 120px;
+        }
+
+        .back-home {
+          position: static;
+          margin: 10px auto 0;
+          display: block;
+          text-align: center;
+        }
+
+        .card {
+          padding: 20px;
+        }
+
+        .workflow {
+          grid-template-columns: 1fr;
+        }
+      }
+    </style>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.10.377/pdf.min.js" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/docx@7.5.0/build/index.js"></script>
+  </head>
+  <body>
+    <a href="index.html" class="back-home">Back to Home</a>
+    <div class="container">
+      <h1>Billing Toolkit</h1>
+
+      <div class="workflow">
+        <section class="card" id="pdf-section">
+          <h2>Step 1. Extract From PDF</h2>
+          <p class="help-text">
+            Upload a PDF statement to identify invoice tables and export them into an Excel workbook.
+          </p>
+          <input type="file" id="pdfInput" accept="application/pdf" />
+          <div class="actions">
+            <button id="exportExcelBtn" disabled>Export Extracted Excel</button>
+          </div>
+          <ul id="pdfSummary" class="summary-list"></ul>
+        </section>
+
+        <section class="card" id="excel-section">
+          <h2>Step 2. Clean Excel & Generate Word</h2>
+          <p class="help-text">
+            Load the Excel file (from Step&nbsp;1 or another source) to normalize the data and build client
+  statements.
+          </p>
+          <input type="file" id="excelInput" accept=".xlsx" />
+          <div class="actions">
+            <button id="processExcelBtn">Process Excel</button>
+            <button id="downloadWordBtn" disabled>Download Word Statements</button>
+          </div>
+          <div id="clientPicker" class="client-picker" hidden>
+            <label>
+              <span>Select client preview:</span>
+              <select id="clientSelector"></select>
+            </label>
+          </div>
+        </section>
+      </div>
+
+      <section class="card" id="preview-card">
+        <div class="preview-header">
+          <h2>Live Preview</h2>
+          <p id="previewStatus">No client loaded.</p>
+        </div>
+        <div class="client-info">
+          <h3 id="clientName"></h3>
+          <div id="clientAddress"></div>
+        </div>
+        <div class="table-wrap">
+          <table id="dataTable">
+            <thead>
+              <tr>
+                <th>Claim Number</th>
+                <th>Service Date</th>
+                <th>Procedure (and Codes)</th>
+                <th>Units</th>
+                <th>Unit Rate</th>
+                <th>Total Charge</th>
+                <th>Patient Charge</th>
+                <th>Total Paid</th>
+                <th>Insurance Paid</th>
+                <th>Patient Paid</th>
+                <th>Total Adjustment</th>
+                <th>Total Balance</th>
+                <th>Insurance Balance</th>
+                <th>Balance Owed</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+        <div id="balanceSummary"></div>
+      </section>
+    </div>
+
+    <div id="notification" class="notification"></div>
+
+    <script>
+      pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.10.377/
+  pdf.worker.min.js';
+
+      const pdfState = { sheets: [], clientInfo: [] };
+      const excelState = { clients: [], currentIndex: 0 };
+
+      const pdfInput = document.getElementById('pdfInput');
+      const exportExcelBtn = document.getElementById('exportExcelBtn');
+      const pdfSummary = document.getElementById('pdfSummary');
+
+      const excelInput = document.getElementById('excelInput');
+      const processExcelBtn = document.getElementById('processExcelBtn');
+      const downloadWordBtn = document.getElementById('downloadWordBtn');
+      const clientPicker = document.getElementById('clientPicker');
+      const clientSelector = document.getElementById('clientSelector');
+
+      const notification = document.getElementById('notification');
+      const previewStatus = document.getElementById('previewStatus');
+      const clientNameEl = document.getElementById('clientName');
+      const clientAddressEl = document.getElementById('clientAddress');
+      const tableBody = document.querySelector('#dataTable tbody');
+      const balanceSummary = document.getElementById('balanceSummary');
+
+      pdfInput.addEventListener('change', handlePdfFile);
+      exportExcelBtn.addEventListener('click', exportPdfSheets);
+      processExcelBtn.addEventListener('click', processExcelFile);
+      downloadWordBtn.addEventListener('click', downloadWordDocument);
+      clientSelector.addEventListener('change', event => {
+        const index = parseInt(event.target.value, 10);
+        renderClient(index);
+      });
+
+      async function handlePdfFile(event) {
+        const file = event.target.files[0];
+        if (!file) return;
+
+        exportExcelBtn.disabled = true;
+        pdfState.sheets = [];
+        pdfState.clientInfo = [];
+        pdfSummary.innerHTML = '';
+        showNotification('Reading PDF…');
+
+        try {
+          const arrayBuffer = await file.arrayBuffer();
+          const pdfData = new Uint8Array(arrayBuffer);
+          const pdf = await pdfjsLib.getDocument({ data: pdfData }).promise;
+
+          let currentSheet = [];
+
+          for (let pageNumber = 1; pageNumber <= pdf.numPages; pageNumber++) {
+            const page = await pdf.getPage(pageNumber);
+            const textContent = await page.getTextContent();
+            let line = '';
+            let lastY = null;
+
+            textContent.items.forEach(item => {
+              const currentY = item.transform[5];
+              if (lastY !== null && Math.abs(currentY - lastY) > 10) {
+                commitLine(line, currentSheet);
+                line = '';
+              }
+              line += item.str + ' ';
+              lastY = currentY;
+            });
+
+            if (line.trim()) {
+              commitLine(line, currentSheet);
+            }
+          }
+
+          if (currentSheet.length) {
+            processExtractedSheet(currentSheet);
+          }
+
+          if (pdfState.sheets.length) {
+            exportExcelBtn.disabled = false;
+            showNotification(`Extracted ${pdfState.sheets.length} invoice section(s).`);
+            renderPdfSummary();
+          } else {
+            showNotification('No invoice tables detected in the PDF.');
+          }
+        } catch (error) {
+          console.error('Error extracting PDF data:', error);
+          alert('Failed to extract data. Check the console for details.');
+        }
+      }
+
+      function commitLine(rawLine, currentSheet) {
+        if (!rawLine) return;
+        const cleaned = cleanText(rawLine);
+        if (!cleaned) return;
+
+        const disclaimer = 'Disclaimer: Charges/Adjustments made after statement date';
+        if (cleaned.includes(disclaimer)) {
+          if (currentSheet.length) {
+            processExtractedSheet(currentSheet);
+            currentSheet.length = 0;
+          }
+          return;
+        }
+
+        currentSheet.push([cleaned.trim()]);
+      }
+
+      function cleanText(text) {
+        return text
+          .replace(/State\s+of\s+South\s+Dakota\s+Department\s+of\s+Health/gi, '')
+          .replace(/600\s+E\s+Capitol\s+Ave/gi, '')
+          .replace(/Pierre,\s+SD\s+57501/gi, '')
+          .replace(/\s{2,}/g, ' ')
+          .trim();
+      }
+
+      function processExtractedSheet(rawLines) {
+        const flattened = rawLines
+          .map(row => (row[0] || '').trim())
+          .filter(Boolean);
+
+        if (!flattened.length) {
+          return;
+        }
+
+        const headerIndex = flattened.findIndex(line =>
+          line.toLowerCase().includes('claim number')
+        );
+
+        const metadataLines = headerIndex === -1 ? flattened : flattened.slice(0, headerIndex);
+        const tableRows = extractTableRows(flattened, headerIndex);
+        const structured = buildStructuredTable(tableRows);
+
+        const wsData = [
+          ...metadataLines.map(line => [line]),
+          [],
+          ...structured
+        ];
+
+        pdfState.sheets.push(wsData);
+
+        const clientName = extractClientName(flattened);
+        const address = extractClientAddress(flattened);
+        pdfState.clientInfo.push({ clientName, address });
+      }
+
+      function extractTableRows(lines, headerIndex) {
+        if (headerIndex === -1) return [];
+        return lines
+          .slice(headerIndex + 1)
+          .filter(line => line.includes('CL-') || line.includes('Service Line#'));
+      }
+
+      function buildStructuredTable(rows) {
+        const headers = [
+          'Claim Number', 'Service Date', 'Procedure (and Codes)', 'Units', 'Unit Rate',
+          'Total Charge', 'Patient Charge', 'Total Paid', 'Insurance Paid', 'Patient Paid',
+          'Total Adjustment', 'Total Balance', 'Insurance Balance', 'Balance Owed'
+        ];
+
+        const body = rows.map(line => {
+          const parts = line.trim().split(/\s+/);
+          const dateIndex = parts.findIndex(part => /^\d{1,2}\/\d{1,2}\/\d{4}$/.test(part));
+
+          const claimOrServiceLine = parts.slice(0, dateIndex).join(' ');
+          const serviceDate = parts[dateIndex] || '';
+
+          let unitsIndex = dateIndex + 1;
+          while (unitsIndex < parts.length && isNaN(parts[unitsIndex].replace(/[$,]/g, ''))) {
+            unitsIndex++;
+          }
+
+          const procedure = parts.slice(dateIndex + 1, unitsIndex).join(' ');
+          const cells = [];
+          for (let i = unitsIndex; i < unitsIndex + 10; i++) {
+            cells.push(parts[i] || '');
+          }
+
+          return [
+            claimOrServiceLine,
+            serviceDate,
+            procedure,
+            ...cells
+          ];
+        });
+
+        return [headers, ...body];
+      }
+
+      function extractClientName(lines) {
+        const nameLine = lines.find(line => line.includes('Client Name(s):'));
+        if (!nameLine) return '[CLIENT NAME]';
+
+        let name = nameLine.split('Client Name(s):')[1].split('(')[0].trim();
+        if (name.includes(',')) {
+          const [last, first] = name.split(',');
+          name = `${first.trim()} ${last.trim()}`;
+        }
+        return name || '[CLIENT NAME]';
+      }
+
+      function extractClientAddress(lines) {
+        const commaIndex = lines.findIndex(line => line.includes(','));
+        if (commaIndex === -1) {
+          return ['[ADDRESS LINE 1]', '[CITY, STATE ZIP]'];
+        }
+
+        const raw = lines
+          .slice(commaIndex + 1, commaIndex + 4)
+          .map(line => line.trim())
+          .filter(Boolean);
+
+        return [
+          raw[0] || '[ADDRESS LINE 1]',
+          raw.find(line => /\d{5}/.test(line)) || '[CITY, STATE ZIP]'
+        ];
+      }
+
+      function renderPdfSummary() {
+        pdfSummary.innerHTML = pdfState.clientInfo
+          .map((info, index) => {
+            const addressPreview = info.address.filter(Boolean).join(', ');
+            return `<li><strong>Invoice ${index + 1}:</strong> ${info.clientName} — ${addressPreview}</li>`;
+          })
+          .join('');
+      }
+
+      function exportPdfSheets() {
+        if (!pdfState.sheets.length) {
+          alert('No sheets were generated from the PDF.');
+          return;
+        }
+
+        const workbook = XLSX.utils.book_new();
+        pdfState.sheets.forEach((sheetData, index) => {
+          const worksheet = XLSX.utils.aoa_to_sheet(sheetData);
+          worksheet['!cols'] = [
+            { wch: 20 }, { wch: 15 }, { wch: 40 }, { wch: 8 }, { wch: 12 },
+            { wch: 14 }, { wch: 14 }, { wch: 12 }, { wch: 14 }, { wch: 12 },
+            { wch: 16 }, { wch: 14 }, { wch: 18 }, { wch: 14 }
+          ];
+          XLSX.utils.book_append_sheet(workbook, worksheet, `Invoice ${index + 1}`);
+        });
+
+        XLSX.writeFile(workbook, 'Invoice_Statement.xlsx');
+      }
+
+      async function processExcelFile() {
+        const file = excelInput.files[0];
+        if (!file) {
+          alert('Please select an Excel file first.');
+          return;
+        }
+
+        try {
+          const data = await file.arrayBuffer();
+          const workbook = XLSX.read(new Uint8Array(data), { type: 'array' });
+          const clients = [];
+
+          workbook.SheetNames.forEach(sheetName => {
+            const sheet = workbook.Sheets[sheetName];
+            const rows = XLSX.utils.sheet_to_json(sheet, { header: 1 });
+
+            const headerIndex = rows.findIndex(row =>
+              (row[0] || '').toString().toLowerCase().includes('claim number')
+            );
+            if (headerIndex === -1) return;
+
+            const topLines = rows.slice(0, headerIndex).map(row => (row[0] || '').toString());
+            const { name, addressLines } = parseExcelHeader(topLines, rows);
+
+            const bodyRows = rows
+              .slice(headerIndex + 1)
+              .filter(row => row.some(cell => (cell || '').toString().trim().length > 0));
+
+            const cleanedRows = bodyRows.map(row => sanitizeRow(row));
+            const filteredRows = cleanedRows.filter(row =>
+              !row.claimOrServiceLine.includes('Disclaimer: Charges/Adjustments made after statement date')
+            );
+
+            const balanceTotal = filteredRows.reduce(
+              (sum, row) => sum + parseCurrency(row.balanceOwedRow),
+              0
+            );
+
+            clients.push({
+              name,
+              addressLines,
+              rows: filteredRows,
+              balanceTotal
+            });
+          });
+
+          excelState.clients = clients;
+
+          if (!clients.length) {
+            showNotification('No structured tables found in the Excel workbook.');
+            downloadWordBtn.disabled = true;
+            clientPicker.hidden = true;
+            clearPreview();
+            return;
+          }
+
+          populateClientSelector(clients);
+          renderClient(0);
+          downloadWordBtn.disabled = false;
+          showNotification(`Processed ${clients.length} sheet(s) from Excel.`);
+        } catch (error) {
+          console.error('Error processing Excel:', error);
+          alert('Unable to read the Excel file. See console for details.');
+        }
+      }
+
+      function parseExcelHeader(topLines, allRows) {
+        let name = '[CLIENT NAME]';
+        const nameLine = topLines.find(line => line.includes('Client Name(s):'));
+        if (nameLine) {
+          name = nameLine.split('Client Name(s):')[1]?.split('(')[0]?.trim() || name;
+          if (name.includes(',')) {
+            const [last, first] = name.split(',');
+            name = `${first.trim()} ${last.trim()}`;
+          }
+        }
+
+        const addressLines = [];
+        topLines.forEach(line => {
+          const trimmed = line.trim();
+          if (!trimmed || trimmed.includes('Client Name(s):')) return;
+          if (addressLines.length < 2 && (/\d/.test(trimmed) || /[A-Za-z]/.test(trimmed))) {
+            addressLines.push(trimmed);
+          }
+        });
+
+        const fallback1 = allRows[10]?.[0];
+        const fallback2 = allRows[11]?.[0];
+        if (addressLines.length < 1 && fallback1) addressLines.push(fallback1.toString().trim());
+        if (addressLines.length < 2 && fallback2) addressLines.push(fallback2.toString().trim());
+
+        return {
+          name: name || '[CLIENT NAME]',
+          addressLines: [
+            addressLines[0] || '[ADDRESS LINE 1]',
+            addressLines[1] || '[CITY, STATE ZIP]'
+          ]
+        };
+      }
+
+      function sanitizeRow(row) {
+        const cell = index => {
+          const value = row[index];
+          return value === undefined || value === null ? '' : value.toString().trim();
+        };
+
+        return {
+          claimOrServiceLine: cell(0),
+          serviceDate: normalizeDate(cell(1)),
+          procedure: cell(2),
+          units: cell(3),
+          unitRate: normalizeCurrency(cell(4)),
+          totalCharge: normalizeCurrency(cell(5)),
+          patientCharge: normalizeCurrency(cell(6)),
+          totalPaid: normalizeCurrency(cell(7)),
+          insurancePaid: normalizeCurrency(cell(8)),
+          patientPaid: normalizeCurrency(cell(9)),
+          adjustment: normalizeCurrency(cell(10)),
+          totalBalance: normalizeCurrency(cell(11)),
+          insuranceBalance: normalizeCurrency(cell(12)),
+          balanceOwedRow: normalizeCurrency(cell(13))
+        };
+      }
+
+      function normalizeDate(value) {
+        if (!value) return '';
+        const trimmed = value.trim();
+        if (/^\d{1,2}\/\d{1,2}\/\d{4}$/.test(trimmed)) {
+          return trimmed;
+        }
+        const date = new Date(trimmed);
+        if (!Number.isNaN(date.getTime())) {
+          const mm = String(date.getMonth() + 1).padStart(2, '0');
+          const dd = String(date.getDate()).padStart(2, '0');
+          const yyyy = date.getFullYear();
+          return `${mm}/${dd}/${yyyy}`;
+        }
+        return trimmed;
+      }
+
+      function normalizeCurrency(value) {
+        if (!value) return '';
+        const numeric = parseFloat(value.replace(/[^0-9.-]/g, ''));
+        if (Number.isNaN(numeric)) return value;
+        return `$${numeric.toFixed(2)}`;
+      }
+
+      function parseCurrency(value) {
+        if (!value) return 0;
+        const numeric = parseFloat(value.toString().replace(/[^0-9.-]/g, ''));
+        return Number.isNaN(numeric) ? 0 : numeric;
+      }
+
+      function populateClientSelector(clients) {
+        clientSelector.innerHTML = '';
+        clients.forEach((client, index) => {
+          const option = document.createElement('option');
+          option.value = index;
+          option.textContent = `${index + 1}. ${client.name}`;
+          clientSelector.appendChild(option);
+        });
+        clientPicker.hidden = clients.length < 2;
+      }
+
+      function clearPreview() {
+        previewStatus.textContent = 'No client loaded.';
+        clientNameEl.textContent = '';
+        clientAddressEl.innerHTML = '';
+        tableBody.innerHTML = '';
+        balanceSummary.textContent = '';
+      }
+
+      function renderClient(index) {
+        const clients = excelState.clients;
+        if (!clients.length) {
+          clearPreview();
+          return;
+        }
+
+        const safeIndex = Math.max(0, Math.min(index, clients.length - 1));
+        excelState.currentIndex = safeIndex;
+        clientSelector.value = String(safeIndex);
+
+        const client = clients[safeIndex];
+        previewStatus.textContent = `Showing ${safeIndex + 1} of ${clients.length} client${clients.length > 1 ?
+  's' : ''}.`;
+        clientNameEl.textContent = client.name;
+        clientAddressEl.innerHTML = client.addressLines.map(line => `<p>${line}</p>`).join('');
+
+        tableBody.innerHTML = '';
+        client.rows.forEach(row => {
+          const tr = document.createElement('tr');
+          [
+            row.claimOrServiceLine,
+            row.serviceDate,
+            row.procedure,
+            row.units,
+            row.unitRate,
+            row.totalCharge,
+            row.patientCharge,
+            row.totalPaid,
+            row.insurancePaid,
+            row.patientPaid,
+            row.adjustment,
+            row.totalBalance,
+            row.insuranceBalance,
+            row.balanceOwedRow
+          ].forEach((value, columnIndex) => {
+            const td = document.createElement('td');
+            td.textContent = value || '';
+            if (columnIndex >= 4) {
+              td.classList.add('numeric');
+            }
+            tr.appendChild(td);
+          });
+          tableBody.appendChild(tr);
+        });
+
+        balanceSummary.textContent = `Balance owed total: ${formatCurrencyNumber(client.balanceTotal)}`;
+      }
+
+      function formatCurrencyNumber(value) {
+        if (typeof value !== 'number' || Number.isNaN(value)) {
+          return '$0.00';
+        }
+        return `$${value.toFixed(2)}`;
+      }
+
+      function showNotification(message) {
+        notification.textContent = message;
+        notification.style.display = 'block';
+        clearTimeout(showNotification.timer);
+        showNotification.timer = setTimeout(() => {
+          notification.style.display = 'none';
+        }, 3500);
+      }
+
+      async function downloadWordDocument() {
+        if (!excelState.clients.length) {
+          alert('Process an Excel file first.');
+          return;
+        }
+
+        const {
+          Document,
+          Packer,
+          Paragraph,
+          Table,
+          TableRow,
+          TableCell,
+          WidthType,
+          TextRun,
+          AlignmentType,
+          BorderStyle,
+          PageOrientation
+        } = docx;
+
+        const currentDate = new Date().toLocaleDateString('en-US', {
+          year: 'numeric',
+          month: '2-digit',
+          day: '2-digit'
+        });
+
+        const sections = excelState.clients.map((client, index) => {
+          const headerRow = new TableRow({
+            children: [
+              'Claim Number', 'Service Date', 'Procedure (and Codes)', 'Units', 'Unit Rate', 'Total Charge',
+              'Patient Charge', 'Total Paid', 'Insurance Paid', 'Patient Paid', 'Total Adjustment',
+              'Total Balance', 'Insurance Balance', 'Balance Owed'
+            ].map(text =>
+              new TableCell({
+                children: [new Paragraph({ text, bold: true })],
+                shading: { fill: 'D3D3D3' }
+              })
+            )
+          });
+
+          const bodyRows = client.rows.map((row, rowIndex, arr) => {
+            const isClaimRow = row.claimOrServiceLine.includes('CL-');
+            const nextRow = arr[rowIndex + 1];
+            const whiteOut = isClaimRow && nextRow && nextRow.claimOrServiceLine.includes('Service Line#');
+
+            const txt = (value, overrideWhite) => new TextRun({
+              text: value || '',
+              size: 22,
+              color: overrideWhite ? 'FFFFFF' : '000000'
+            });
+
+            return new TableRow({
+              children: [
+                new TableCell({ children: [new Paragraph({ children: [txt(row.claimOrServiceLine,
+  false)] })] }),
+                new TableCell({ children: [new Paragraph({ children: [txt(row.serviceDate, false)] })] }),
+                new TableCell({ children: [new Paragraph({ children: [txt(row.procedure, whiteOut)] })] }),
+                new TableCell({ children: [new Paragraph({ children: [txt(row.units, whiteOut)] })] }),
+                new TableCell({ children: [new Paragraph({ children: [txt(row.unitRate, whiteOut)] })] }),
+                new TableCell({ children: [new Paragraph({ children: [txt(row.totalCharge, false)] })] }),
+                new TableCell({ children: [new Paragraph({ children: [txt(row.patientCharge, false)] })] }),
+                new TableCell({ children: [new Paragraph({ children: [txt(row.totalPaid, false)] })] }),
+                new TableCell({ children: [new Paragraph({ children: [txt(row.insurancePaid, false)] })] }),
+                new TableCell({ children: [new Paragraph({ children: [txt(row.patientPaid, false)] })] }),
+                new TableCell({ children: [new Paragraph({ children: [txt(row.adjustment, false)] })] }),
+                new TableCell({ children: [new Paragraph({ children: [txt(row.totalBalance, false)] })] }),
+                new TableCell({ children: [new Paragraph({ children: [txt(row.insuranceBalance, false)] })] }),
+                new TableCell({ children: [new Paragraph({ children: [txt(row.balanceOwedRow, false)] })] })
+              ]
+            });
+          });
+
+          const totalRow = new TableRow({
+            children: [
+              new TableCell({
+                children: [new Paragraph({ text: 'Total', bold: true })],
+                columnSpan: 13,
+                shading: { fill: 'D3D3D3' }
+              }),
+              new TableCell({
+                children: [new Paragraph({ text: formatCurrencyNumber(client.balanceTotal), bold: true })],
+                shading: { fill: 'D3D3D3' }
+              })
+            ]
+          });
+
+          const payAmountBox = new Table({
+            alignment: AlignmentType.RIGHT,
+            width: { size: 50, type: WidthType.PERCENTAGE },
+            rows: [
+              new TableRow({
+                children: [
+                  new TableCell({
+                    children: [
+                      new Paragraph({
+                        alignment: AlignmentType.CENTER,
+                        indent: { left: 750 },
+                        children: [
+                          new TextRun({
+                            text: `PAY THIS AMOUNT: ${formatCurrencyNumber(client.balanceTotal)}`,
+                            alignment: AlignmentType.CENTER,
+                            bold: true,
+                            size: 28
+                          })
+                        ]
+                      })
+                    ],
+                    borders: {
+                      top: { style: BorderStyle.SINGLE, size: 4 },
+                      bottom: { style: BorderStyle.SINGLE, size: 4 },
+                      left: { style: BorderStyle.SINGLE, size: 4 },
+                      right: { style: BorderStyle.SINGLE, size: 4 }
+                    }
+                  })
+                ]
+              })
+            ]
+          });
+
+          const addressParagraphs = client.addressLines.map(line =>
+            new Paragraph({
+              children: [new TextRun({ text: line, size: 24, bold: true })],
+              indent: { left: 1440 },
+              spacing: { after: 150 }
+            })
+          );
+
+          return {
+            properties: {
+              page: {
+                size: { width: 12240, height: 15840, orientation: PageOrientation.PORTRAIT },
+                margin: { top: 360, bottom: 360, left: 360, right: 360 }
+              }
+            },
+            children: [
+              new Paragraph({
+                alignment: AlignmentType.RIGHT,
+                children: [new TextRun({ text: `Statement Date: ${currentDate}`, bold: true, size: 24 })],
+                spacing: { after: 200 },
+                indent: { left: 750 }
+              }),
+              payAmountBox,
+              new Paragraph({ spacing: { after: 200 }, alignment: AlignmentType.CENTER, indent: { left:
+  750 } }),
+              new Paragraph({ text: '', spacing: { after: 800 } }),
+              new Paragraph({
+                children: [new TextRun({ text: client.name, bold: true, size: 24 })],
+                indent: { left: 1440 },
+                spacing: { after: 150 }
+              }),
+              ...addressParagraphs,
+              new Paragraph({ spacing: { after: 750 } }),
+              new Table({
+                width: { size: 100, type: WidthType.PERCENTAGE },
+                rows: [headerRow, ...bodyRows, totalRow]
+              }),
+              new Paragraph({
+                children: [
+                  new TextRun({
+                    text: 'Disclaimer: The Adjustment column shows total reductions applied to your charges.
+  These include write-offs and adjustments from your insurance provider, as well as any discounts you received
+  through our South Dakota sliding fee scale program. These amounts are not owed and have already been deducted
+  from your balance.',
+                    italics: true
+                  })
+                ],
+                spacing: { before: 200 }
+              }),
+              new Paragraph({
+                children: [
+                  new TextRun({
+                    text: 'For any questions, concerns, or to make a payment over the phone, please call Family
+  Health Education Services at (605) 717-8920. Our billing team is available Monday - Thursday, 8:00 AM to 5:00
+  PM. We offer payment plans in any amount and are happy to work with you on a schedule that fits your needs.
+  Please note that accounts with no payment activity or effort to resolve the balance within 90 days of the
+  billing date may be subject to collections.',
+                    bold: true
+                  })
+                ],
+                spacing: { before: 200 }
+              }),
+              ...(index < excelState.clients.length - 1
+                ? [new Paragraph({ children: [], pageBreakBefore: true })]
+                : [])
+            ]
+          };
+        });
+
+        const document = new Document({ sections });
+
+        try {
+          const blob = await Packer.toBlob(document);
+          const link = document.createElement('a');
+          link.href = URL.createObjectURL(blob);
+          link.download = `Invoices_${currentDate.replaceAll('/', '-')}.docx`;
+          link.click();
+          URL.revokeObjectURL(link.href);
+        } catch (error) {
+          console.error('Error generating Word doc:', error);
+          alert('Word document generation failed. See console for details.');
+        }
+      }
+    </script>
+  </body>
+  </html>
