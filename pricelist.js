@@ -175,14 +175,25 @@ function renderCatalog() {
       }
 
       // Codes (show/hide)
-      const codesSpan = document.createElement("span");
-      codesSpan.className = "codes";
-      if (showCodes) {
-        codesSpan.classList.add("show");
-        const codes = getCodes(proc);
-        if (codes) codesSpan.textContent = ` (${codes})`;
+      const codesText = getCodes(proc);
+      if (codesText) {
+        const codesBreak = document.createElement("br");
+        codesBreak.style.display = showCodes ? "" : "none";
+        label.appendChild(codesBreak);
+
+        const codesContainer = document.createElement("span");
+        codesContainer.className = "codes-container";
+        codesContainer.style.display = showCodes ? "" : "none";
+
+        const codesSpan = document.createElement("span");
+        codesSpan.className = "codes";
+        if (showCodes) {
+          codesSpan.classList.add("show");
+          codesSpan.textContent = codesText;
+        }
+        codesContainer.appendChild(codesSpan);
+        label.appendChild(codesContainer);
       }
-      row.appendChild(codesSpan);
       // Sync selection
       checkbox.addEventListener("change", e => {
         if (e.target.checked) addLine(name, 1); else removeLine(name);
@@ -224,14 +235,25 @@ function renderCatalog() {
         });
       }
 
-      const codesSpan = document.createElement("span");
-      codesSpan.className = "codes";
-      if (showCodes) {
-        codesSpan.classList.add("show");
-        const codes = getCodes(proc);
-        if (codes) codesSpan.textContent = ` (${codes})`;
+      const codesText = getCodes(proc);
+      if (codesText) {
+        const codesBreak = document.createElement("br");
+        codesBreak.style.display = showCodes ? "" : "none";
+        label.appendChild(codesBreak);
+
+        const codesContainer = document.createElement("span");
+        codesContainer.className = "codes-container";
+        codesContainer.style.display = showCodes ? "" : "none";
+
+        const codesSpan = document.createElement("span");
+        codesSpan.className = "codes";
+        if (showCodes) {
+          codesSpan.classList.add("show");
+          codesSpan.textContent = codesText;
+        }
+        codesContainer.appendChild(codesSpan);
+        label.appendChild(codesContainer);
       }
-      row.appendChild(codesSpan);
 
       checkbox.addEventListener("change", e => {
         if (e.target.checked) addLine(name, 1); else removeLine(name);
