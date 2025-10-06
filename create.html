@@ -139,16 +139,16 @@
 
 <script>
 /* =========================
-   COMBINED SCRIPT (PDF → Excel/Preview/Word) + (Excel → Preview/Word)
-   - Keeps your original functions & globals
-   - Adds bridge helpers so both flows work in one page
-   Requirements on the page:
-     - pdf.js (pdfjsLib global)
-     - SheetJS/xlsx (XLSX global)
-     - docx (docx global)
-   DOM ids used:
-     fileInput (PDF), exportExcelBtn, notification, fileUpload (Excel, optional),
-     clientName, clientAddress, dataTable (with <tbody>)
+    COMBINED SCRIPT (PDF → Excel/Preview/Word) + (Excel → Preview/Word)
+    - Keeps your original functions & globals
+    - Adds bridge helpers so both flows work in one page
+    Requirements on the page:
+      - pdf.js (pdfjsLib global)
+      - SheetJS/xlsx (XLSX global)
+      - docx (docx global)
+    DOM ids used:
+      fileInput (PDF), btnExportExcel, btnDownloadWord, notification,
+      clientName, clientAddress, dataTable (with <tbody>)
 ========================= */
 
 /* ---------- GLOBAL STATE (union of both files) ---------- */
@@ -163,7 +163,7 @@ let allClients = [];             // canonical per-client objects for preview/Wor
 /* ---------- pdf.js worker ---------- */
 if (window.pdfjsLib) {
   pdfjsLib.GlobalWorkerOptions.workerSrc =
-    'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.10.377/pdf.worker.min.js';
+     'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.10.377/pdf.worker.min.js';
 }
 
 /* ---------- SMALL UTILS ---------- */
@@ -174,14 +174,16 @@ function showNotification(message) {
   notification.style.display = 'block';
   const exportBtn = document.getElementById('btnExportExcel');
   if (exportBtn) exportBtn.disabled = false;
+  const wordBtn = document.getElementById('btnDownloadWord');
+  if (wordBtn) wordBtn.disabled = false;
   setTimeout(() => { notification.style.display = 'none'; }, 3000);
 }
 function cleanText(text) {
   return String(text || '')
-    .replace(/State\s+of\s+South\s+Dakota\s+Department\s+of\s+Health/gi, '')
-    .replace(/600\s+E\s+Capitol\s+Ave/gi, '')
-    .replace(/Pierre,\s+SD\s+57501/gi, '')
-    .trim();
+     .replace(/State\s+of\s+South\s+Dakota\s+Department\s+of\s+Health/gi, '')
+     .replace(/600\s+E\s+Capitol\s+Ave/gi, '')
+     .replace(/Pierre,\s+SD\s+57501/gi, '')
+     .trim()
 }
 function styledCell(value) {
   return `<td style="color: ${value ? 'black' : 'white'}">${value ?? ''}</td>`;
@@ -199,261 +201,261 @@ function formatMoney(n){
 }
 
 /* =========================================================
-   PART A — PDF → SHEETS (from your first file)
+    PART A — PDF → SHEETS (from your first file)
 ========================================================= */
 async function handleFile(event) {
-    const file = event.target.files?.[0];
-    if (!file) return;
+     const file = event.target.files?.[0];
+     if (!file) return;
 
-    try {
-        const arrayBuffer = await file.arrayBuffer();
-        const pdfData = new Uint8Array(arrayBuffer);
+     try {
+          const arrayBuffer = await file.arrayBuffer();
+          const pdfData = new Uint8Array(arrayBuffer);
 
-        const pdf = await pdfjsLib.getDocument({ data: pdfData }).promise;
+          const pdf = await pdfjsLib.getDocument({ data: pdfData }).promise;
 
-        // reset
-        sheets = [];
-        clientInfo = [];
+          // reset
+          sheets = [];
+          clientInfo = [];
 
-        let currentSheetData = [];
+          let currentSheetData = [];
 
-        for (let i = 1; i <= pdf.numPages; i++) {
-            const page = await pdf.getPage(i);
-            const textContent = await page.getTextContent();
+          for (let i = 1; i <= pdf.numPages; i++) {
+                const page = await pdf.getPage(i);
+                const textContent = await page.getTextContent();
 
-            let line = '';
-            let lastY = null;
+                let line = '';
+                let lastY = null;
 
-            textContent.items.forEach(item => {
-                if (lastY !== null && Math.abs(item.transform[5] - lastY) > 10) {
-                    line = cleanText(line);
+                textContent.items.forEach(item => {
+                     if (lastY !== null && Math.abs(item.transform[5] - lastY) > 10) {
+                          line = cleanText(line);
 
-                    if (line.includes("Disclaimer: Charges/Adjustments made after statement date")) {
-                        if (currentSheetData.length > 0) {
-                            processExtractedSheet(currentSheetData);
-                            currentSheetData = [];
-                        }
-                    } else {
-                        currentSheetData.push([line.trim()]);
-                    }
+                          if (line.includes("Disclaimer: Charges/Adjustments made after statement date")) {
+                                if (currentSheetData.length > 0) {
+                                     processExtractedSheet(currentSheetData);
+                                     currentSheetData = [];
+                                }
+                          } else {
+                                currentSheetData.push([line.trim()]);
+                          }
 
-                    line = '';
+                          line = '';
+                     }
+
+                     line += item.str + ' ';
+                     lastY = item.transform[5];
+                });
+
+                // capture dangling line
+                if (line.trim()) {
+                     line = cleanText(line);
+                     if (line.includes("Disclaimer: Charges/Adjustments made after statement date")) {
+                          if (currentSheetData.length > 0) {
+                                processExtractedSheet(currentSheetData);
+                                currentSheetData = [];
+                          }
+                     } else {
+                          currentSheetData.push([line.trim()]);
+                     }
                 }
+          }
 
-                line += item.str + ' ';
-                lastY = item.transform[5];
-            });
+          // Finalize last sheet
+          if (currentSheetData.length > 0) {
+                processExtractedSheet(currentSheetData);
+          }
 
-            // capture dangling line
-            if (line.trim()) {
-                line = cleanText(line);
-                if (line.includes("Disclaimer: Charges/Adjustments made after statement date")) {
-                    if (currentSheetData.length > 0) {
-                        processExtractedSheet(currentSheetData);
-                        currentSheetData = [];
-                    }
-                } else {
-                    currentSheetData.push([line.trim()]);
-                }
-            }
-        }
-
-        // Finalize last sheet
-        if (currentSheetData.length > 0) {
-            processExtractedSheet(currentSheetData);
-        }
-
-        if (sheets.length > 0) {
-            showNotification('PDF data extracted successfully!');
-            // Build the unified client objects and render preview
-            buildAllClientsFromSheets();
-            // show first client in preview
-            if (allClients.length) renderFromClientObject(allClients[0]);
-        } else {
-            alert('No readable text extracted.');
-        }
-    } catch (error) {
-        console.error('Error extracting PDF data:', error);
-        alert('Failed to extract data. Check the console for details.');
-    }
+          if (sheets.length > 0) {
+                showNotification('PDF data extracted successfully!');
+                // Build the unified client objects and render preview
+                buildAllClientsFromSheets();
+                // show first client in preview
+                if (allClients.length) renderFromClientObject(allClients[0]);
+          } else {
+                alert('No readable text extracted.');
+          }
+     } catch (error) {
+          console.error('Error extracting PDF data:', error);
+          alert('Failed to extract data. Check the console for details.');
+     }
 }
 function processExtractedSheet(rawLines) {
-    const flattened = rawLines.map(r => r[0]?.trim()).filter(Boolean);
-    const name = extractClientName(flattened);
-    const address = extractClientAddress(flattened);
-    clientInfo.push({ name, address });
+     const flattened = rawLines.map(r => r[0]?.trim()).filter(Boolean);
+     const name = extractClientName(flattened);
+     const address = extractClientAddress(flattened);
+     clientInfo.push({ name, address });
 
-    const headerIndex = flattened.findIndex(line =>
-        line.toLowerCase().includes("claim number")
-    );
+     const headerIndex = flattened.findIndex(line =>
+          line.toLowerCase().includes("claim number")
+     );
 
-    const rawTop = flattened.slice(0, headerIndex).map(line => [line]);
+     const rawTop = flattened.slice(0, headerIndex).map(line => [line]);
 
-    const tableRows = extractTableRows(flattened, headerIndex);
-    const structured = buildStructuredTable(tableRows);
+     const tableRows = extractTableRows(flattened, headerIndex);
+     const structured = buildStructuredTable(tableRows);
 
-    const wsData = [
-        ...rawTop,
-        [],
-        ...structured
-    ];
+     const wsData = [
+          ...rawTop,
+          [],
+          ...structured
+     ];
 
-    sheets.push(wsData);
+     sheets.push(wsData);
 }
 function extractClientName(lines) {
-    const nameLine = lines.find(line => line.includes("Client Name(s):"));
-    if (!nameLine) return "[CLIENT NAME]";
+     const nameLine = lines.find(line => line.includes("Client Name(s):"));
+     if (!nameLine) return "[CLIENT NAME]";
 
-    let name = nameLine.split("Client Name(s):")[1].trim().split(" (")[0];
+     let name = nameLine.split("Client Name(s):")[1].trim().split(" (")[0];
 
-    if (name.includes(",")) {
-        const [last, first] = name.split(",");
-        name = `${first.trim()} ${last.trim()}`;
-    }
+     if (name.includes(",")) {
+          const [last, first] = name.split(",");
+          name = `${first.trim()} ${last.trim()}`;
+     }
 
-    return name;
+     return name;
 }
 function extractClientAddress(lines) {
-    const index = lines.findIndex(line => line.includes(","));
-    if (index === -1) return ["[ADDRESS LINE 1]", "[CITY, STATE ZIP]"];
+     const index = lines.findIndex(line => line.includes(","));
+     if (index === -1) return ["[ADDRESS LINE 1]", "[CITY, STATE ZIP]"];
 
-    const raw = lines.slice(index + 1, index + 4)
-        .map(line => line.trim())
-        .filter(line => line.length > 0);
+     const raw = lines.slice(index + 1, index + 4)
+          .map(line => line.trim())
+          .filter(line => line.length > 0);
 
-    return [
-        raw[0] || "[ADDRESS LINE 1]",
-        raw.find(line => /\d{5}/.test(line)) || "[CITY, STATE ZIP]"
-    ];
+     return [
+          raw[0] || "[ADDRESS LINE 1]",
+          raw.find(line => /\d{5}/.test(line)) || "[CITY, STATE ZIP]"
+     ];
 }
 function extractTableRows(lines, headerIndex) {
-    if (headerIndex === -1) return [];
+     if (headerIndex === -1) return [];
 
-    return lines
-        .slice(headerIndex + 1)
-        .filter(line =>
-            line.includes("CL-") || line.includes("Service Line#")
-        );
+     return lines
+          .slice(headerIndex + 1)
+          .filter(line =>
+                line.includes("CL-") || line.includes("Service Line#")
+          );
 }
 function buildStructuredTable(rows) {
-    const headers = [
-        "Claim Number", "Service Date", "Procedure (and Codes)", "Units", "Unit Rate",
-        "Total Charge", "Patient Charge", "Total Paid", "Insurance Paid", "Patient Paid",
-        "Total Adjustment", "Total Balance", "Insurance Balance", "Balance Owed"
-    ];
+     const headers = [
+          "Claim Number", "Service Date", "Procedure (and Codes)", "Units", "Unit Rate",
+          "Total Charge", "Patient Charge", "Total Paid", "Insurance Paid", "Patient Paid",
+          "Total Adjustment", "Total Balance", "Insurance Balance", "Balance Owed"
+     ];
 
-    const body = [];
+     const body = [];
 
-    rows.forEach((line) => {
-        const parts = line.trim().split(/\s+/);
-        const dateIndex = parts.findIndex(part => /^\d{1,2}\/\d{1,2}\/\d{4}$/.test(part));
-        if (dateIndex === -1) return;
+     rows.forEach((line) => {
+          const parts = line.trim().split(/\s+/);
+          const dateIndex = parts.findIndex(part => /^\d{1,2}\/\d{1,2}\/\d{4}$/.test(part));
+          if (dateIndex === -1) return;
 
-        const claimOrServiceLine = parts.slice(0, dateIndex).join(' ');
-        const serviceDate = parts[dateIndex];
+          const claimOrServiceLine = parts.slice(0, dateIndex).join(' ');
+          const serviceDate = parts[dateIndex];
 
-        // Find first numeric value after the date (typically units)
-        let unitsIndex = dateIndex + 1;
-        while (unitsIndex < parts.length && isNaN(parts[unitsIndex]?.replace?.(/[$,]/g, ''))) {
-            unitsIndex++;
-        }
+          // Find first numeric value after the date (typically units)
+          let unitsIndex = dateIndex + 1;
+          while (unitsIndex < parts.length && isNaN(parts[unitsIndex]?.replace?.(/[$,]/g, ''))) {
+                unitsIndex++;
+          }
 
-        const procedure = parts.slice(dateIndex + 1, unitsIndex).join(' ');
-        const units = parts[unitsIndex] || '';
-        const unitRate = parts[unitsIndex + 1] || '';
-        const totalCharge = parts[unitsIndex + 2] || '';
-        const patientCharge = parts[unitsIndex + 3] || '';
-        const totalPaid = parts[unitsIndex + 4] || '';
-        const insurancePaid = parts[unitsIndex + 5] || '';
-        const patientPaid = parts[unitsIndex + 6] || '';
-        const adjustment = parts[unitsIndex + 7] || '';
-        const totalBalance = parts[unitsIndex + 8] || '';
-        const insuranceBalance = parts[unitsIndex + 9] || '';
-        const balanceOwedRow = parts[unitsIndex + 10] || '';
+          const procedure = parts.slice(dateIndex + 1, unitsIndex).join(' ');
+          const units = parts[unitsIndex] || '';
+          const unitRate = parts[unitsIndex + 1] || '';
+          const totalCharge = parts[unitsIndex + 2] || '';
+          const patientCharge = parts[unitsIndex + 3] || '';
+          const totalPaid = parts[unitsIndex + 4] || '';
+          const insurancePaid = parts[unitsIndex + 5] || '';
+          const patientPaid = parts[unitsIndex + 6] || '';
+          const adjustment = parts[unitsIndex + 7] || '';
+          const totalBalance = parts[unitsIndex + 8] || '';
+          const insuranceBalance = parts[unitsIndex + 9] || '';
+          const balanceOwedRow = parts[unitsIndex + 10] || '';
 
-        body.push([
-            claimOrServiceLine,
-            serviceDate,
-            procedure,
-            units,
-            unitRate,
-            totalCharge,
-            patientCharge,
-            totalPaid,
-            insurancePaid,
-            patientPaid,
-            adjustment,
-            totalBalance,
-            insuranceBalance,
-            balanceOwedRow
-        ]);
-    });
+          body.push([
+                claimOrServiceLine,
+                serviceDate,
+                procedure,
+                units,
+                unitRate,
+                totalCharge,
+                patientCharge,
+                totalPaid,
+                insurancePaid,
+                patientPaid,
+                adjustment,
+                totalBalance,
+                insuranceBalance,
+                balanceOwedRow
+          ]);
+     });
 
-    return [headers, ...body];
+     return [headers, ...body];
 }
 function exportToExcel() {
-    if (sheets.length === 0) {
-        alert("No sheets were generated from the PDF. Please check the file and try again.");
-        return;
-    }
+     if (sheets.length === 0) {
+          alert("No sheets were generated from the PDF. Please check the file and try again.");
+          return;
+     }
 
-    const wb = XLSX.utils.book_new();
+     const wb = XLSX.utils.book_new();
 
-    sheets.forEach((sheetData, index) => {
-        const ws = XLSX.utils.aoa_to_sheet(sheetData);
+     sheets.forEach((sheetData, index) => {
+          const ws = XLSX.utils.aoa_to_sheet(sheetData);
 
-        ws['!cols'] = [
-            { wch: 20 }, { wch: 15 }, { wch: 40 }, { wch: 8 }, { wch: 12 },
-            { wch: 14 }, { wch: 14 }, { wch: 12 }, { wch: 14 }, { wch: 12 },
-            { wch: 16 }, { wch: 14 }, { wch: 18 }, { wch: 14 }
-        ];
+          ws['!cols'] = [
+                { wch: 20 }, { wch: 15 }, { wch: 40 }, { wch: 8 }, { wch: 12 },
+                { wch: 14 }, { wch: 14 }, { wch: 12 }, { wch: 14 }, { wch: 12 },
+                { wch: 16 }, { wch: 14 }, { wch: 18 }, { wch: 14 }
+          ];
 
-        XLSX.utils.book_append_sheet(wb, ws, `Invoice ${index + 1}`);
-    });
+          XLSX.utils.book_append_sheet(wb, ws, `Invoice ${index + 1}`);
+     });
 
-    XLSX.writeFile(wb, "Invoice_Statement.xlsx");
+     XLSX.writeFile(wb, "Invoice_Statement.xlsx");
 }
 
 /* =========================================================
-   PART B — EXCEL → PREVIEW/WORD (from your second file)
-   (unchanged public API: processFile(), downloadWord(), extractData())
+    PART B — EXCEL → PREVIEW/WORD (from your second file)
+    (unchanged public API: processFile(), downloadWord(), extractData())
 ========================================================= */
 function processFile() {
   const file = document.getElementById('fileUpload')?.files?.[0];
   if (!file) {
-    alert("Please select a file first.");
-    return;
+     alert("Please select a file first.");
+     return;
   }
 
   const reader = new FileReader();
   reader.onload = (e) => {
-    const data = new Uint8Array(e.target.result);
-    const workbook = XLSX.read(data, { type: 'array' });
+     const data = new Uint8Array(e.target.result);
+     const workbook = XLSX.read(data, { type: 'array' });
 
-    // reset
-    allClients = [];
+     // reset
+     allClients = [];
 
-    // Build clients from workbook (re-using the same shape as PDF path)
-    buildAllClientsFromWorkbook(workbook);
+     // Build clients from workbook (re-using the same shape as PDF path)
+     buildAllClientsFromWorkbook(workbook);
 
-    // Display first client
-    if (allClients.length) {
-      const first = allClients[0];
-      clientName = first.clientName;
-      formattedAddressLines = first.addressLines;
-      sortedData = first.tableRows;
-      balanceOwed = first.balanceOwed;
+     // Display first client
+     if (allClients.length) {
+        const first = allClients[0];
+        clientName = first.clientName;
+        formattedAddressLines = first.addressLines;
+        sortedData = first.tableRows;
+        balanceOwed = first.balanceOwed;
 
-      const cn = document.getElementById('clientName');
-      if (cn) cn.innerText = clientName;
+        const cn = document.getElementById('clientName');
+        if (cn) cn.innerText = clientName;
 
-      const ca = document.getElementById('clientAddress');
-      if (ca) {
-        ca.innerHTML = `<p>${formattedAddressLines[0] ?? ''}</p><p>${formattedAddressLines[1] ?? ''}</p>`;
-      }
+        const ca = document.getElementById('clientAddress');
+        if (ca) {
+          ca.innerHTML = `<p>${formattedAddressLines[0] ?? ''}</p><p>${formattedAddressLines[1] ?? ''}</p>`;
+        }
 
-      extractData(sortedData);
-    }
+        extractData(sortedData);
+     }
   };
 
   reader.readAsArrayBuffer(file);
@@ -466,271 +468,271 @@ function extractData(rows) {
   balanceOwed = 0;
 
   rows.forEach((row) => {
-    const {
-      claimOrServiceLine,
-      serviceDate,
-      procedure,
-      units,
-      unitRate,
-      totalCharge,
-      patientCharge,
-      totalPaid,
-      insurancePaid,
-      patientPaid,
-      adjustment,
-      totalBalance,
-      insuranceBalance,
-      balanceOwedRow
-    } = row;
+     const {
+        claimOrServiceLine,
+        serviceDate,
+        procedure,
+        units,
+        unitRate,
+        totalCharge,
+        patientCharge,
+        totalPaid,
+        insurancePaid,
+        patientPaid,
+        adjustment,
+        totalBalance,
+        insuranceBalance,
+        balanceOwedRow
+     } = row;
 
-    const tr = document.createElement('tr');
-    tr.innerHTML =
-      styledCell(claimOrServiceLine) +
-      styledCell(serviceDate) +
-      styledCell(procedure) +
-      styledCell(units) +
-      styledCell(unitRate) +
-      styledCell(totalCharge) +
-      styledCell(patientCharge) +
-      styledCell(totalPaid) +
-      styledCell(insurancePaid) +
-      styledCell(patientPaid) +
-      styledCell(adjustment) +
-      styledCell(totalBalance) +
-      styledCell(insuranceBalance) +
-      styledCell(balanceOwedRow);
-    tableBody.appendChild(tr);
+     const tr = document.createElement('tr');
+     tr.innerHTML =
+        styledCell(claimOrServiceLine) +
+        styledCell(serviceDate) +
+        styledCell(procedure) +
+        styledCell(units) +
+        styledCell(unitRate) +
+        styledCell(totalCharge) +
+        styledCell(patientCharge) +
+        styledCell(totalPaid) +
+        styledCell(insurancePaid) +
+        styledCell(patientPaid) +
+        styledCell(adjustment) +
+        styledCell(totalBalance) +
+        styledCell(insuranceBalance) +
+        styledCell(balanceOwedRow);
+     tableBody.appendChild(tr);
 
-    balanceOwed += currencyToNumber(balanceOwedRow);
+     balanceOwed += currencyToNumber(balanceOwedRow);
   });
 }
 
 async function downloadWord() {
   if (!allClients.length) {
-    alert('No data to export.');
-    return;
+     alert('No data to export.');
+     return;
   }
 
   const {
-    Document, Packer, Paragraph, Table, TableRow, TableCell,
-    WidthType, TextRun, AlignmentType, BorderStyle, PageOrientation
+     Document, Packer, Paragraph, Table, TableRow, TableCell,
+     WidthType, TextRun, AlignmentType, BorderStyle, PageOrientation
   } = docx;
 
   const currentDate = new Date().toLocaleDateString('en-US', {
-    year: 'numeric', month: '2-digit', day: '2-digit'
+     year: 'numeric', month: '2-digit', day: '2-digit'
   });
 
   const sections = allClients.map((client, index) => {
-    const {
-      clientName,
-      addressLines,
-      tableRows,
-      balanceOwed
-    } = client;
+     const {
+        clientName,
+        addressLines,
+        tableRows,
+        balanceOwed
+     } = client;
 
-    // Filter out any tableRows that contain the disclaimer text.
-    const validRows = tableRows.filter(row =>
-      !row.claimOrServiceLine?.includes("Disclaimer: Charges/Adjustments made after statement date will appear on your next statement")
-    );
+     // Filter out any tableRows that contain the disclaimer text.
+     const validRows = tableRows.filter(row =>
+        !row.claimOrServiceLine?.includes("Disclaimer: Charges/Adjustments made after statement date will appear on your next statement")
+     );
 
-    // Header row
-    const headerRow = new TableRow({
-      children: [
-        "Claim Number", "Service Date", "Procedure (and Codes)", "Units", "Unit Rate", "Total Charge",
-        "Patient Charge", "Total Paid", "Insurance Paid", "Patient Paid", "Total Adjustment",
-        "Total Balance", "Insurance Balance", "Balance Owed"
-      ].map(text =>
-        new TableCell({
-          children: [new Paragraph({ children: [new TextRun({ text, bold: true })] })],
-          shading: { fill: "D3D3D3" }
-        })
-      )
-    });
-
-    // Body rows built from validRows only
-    const bodyRows = validRows.map((row, idx) => {
-      const isClaimRow = row.claimOrServiceLine?.includes("CL-");
-      const nextRow = validRows[idx + 1];
-      const nextIsServiceLine = nextRow && nextRow.claimOrServiceLine?.includes("Service Line#");
-      const whiteOut = isClaimRow && nextIsServiceLine;
-
-      const blackText = (text) => new TextRun({ text: text ?? '', size: 22, color: '000000' });
-      const whiteText = (text) => new TextRun({ text: text ?? '', size: 22, color: 'FFFFFF' });
-
-      return new TableRow({
+     // Header row
+     const headerRow = new TableRow({
         children: [
-          new TableCell({ children: [new Paragraph({ children: [blackText(row.claimOrServiceLine)] })] }),
-          new TableCell({ children: [new Paragraph({ children: [blackText(row.serviceDate)] })] }),
-          new TableCell({ children: [new Paragraph({ children: [whiteOut ? whiteText(row.procedure) : blackText(row.procedure)] })] }),
-          new TableCell({ children: [new Paragraph({ children: [whiteOut ? whiteText(row.units) : blackText(row.units)] })] }),
-          new TableCell({ children: [new Paragraph({ children: [whiteOut ? whiteText(row.unitRate) : blackText(row.unitRate)] })] }),
-          new TableCell({ children: [new Paragraph({ children: [blackText(row.totalCharge)] })] }),
-          new TableCell({ children: [new Paragraph({ children: [blackText(row.patientCharge)] })] }),
-          new TableCell({ children: [new Paragraph({ children: [blackText(row.totalPaid)] })] }),
-          new TableCell({ children: [new Paragraph({ children: [blackText(row.insurancePaid)] })] }),
-          new TableCell({ children: [new Paragraph({ children: [blackText(row.patientPaid)] })] }),
-          new TableCell({ children: [new Paragraph({ children: [blackText(row.adjustment)] })] }),
-          new TableCell({ children: [new Paragraph({ children: [blackText(row.totalBalance)] })] }),
-          new TableCell({ children: [new Paragraph({ children: [blackText(row.insuranceBalance)] })] }),
-          new TableCell({ children: [new Paragraph({ children: [blackText(row.balanceOwedRow)] })] }),
-        ]
-      });
-    });
-
-    // Total row
-    const totalRow = new TableRow({
-      children: [
-        new TableCell({
-          children: [new Paragraph({ text: "Total", bold: true })],
-          columnSpan: 13,
-          shading: { fill: "D3D3D3" }
-        }),
-        new TableCell({
-          children: [new Paragraph({ text: formatMoney(balanceOwed), bold: true })],
-          shading: { fill: "D3D3D3" }
-        })
-      ]
-    });
-
-    // PAY THIS AMOUNT table box
-    const payAmountBox = new Table({
-      alignment: AlignmentType.RIGHT,
-      width: { size: 50, type: WidthType.PERCENTAGE },
-      rows: [
-        new TableRow({
-          children: [
-            new TableCell({
-              children: [
-                new Paragraph({
-                  alignment: AlignmentType.CENTER,
-                  indent: { left: 750 },
-                  children: [
-                    new TextRun({
-                      text: `PAY THIS AMOUNT: ${formatMoney(balanceOwed)}`,
-                      alignment: AlignmentType.CENTER,
-                      bold: true,
-                      size: 28
-                    })
-                  ]
-                })
-              ],
-              borders: {
-                top: { style: BorderStyle.SINGLE, size: 4 },
-                bottom: { style: BorderStyle.SINGLE, size: 4 },
-                left: { style: BorderStyle.SINGLE, size: 4 },
-                right: { style: BorderStyle.SINGLE, size: 4 }
-              }
-            })
-          ]
-        })
-      ]
-    });
-
-    return {
-      properties: {
-        page: {
-          size: { width: 12240, height: 15840, orientation: PageOrientation.PORTRAIT },
-          margin: { top: 360, bottom: 360, left: 360, right: 360 }
-        }
-      },
-      children: [
-        new Paragraph({
-          alignment: AlignmentType.RIGHT,
-          children: [new TextRun({ text: `Statement Date: ${currentDate}`, bold: true, size: 24 })],
-          spacing: { after: 200 },
-          indent: { left: 750 }
-        }),
-        payAmountBox,
-        new Paragraph({ spacing: { after: 200 }, alignment: AlignmentType.CENTER, indent: { left: 750 } }),
-        new Paragraph({ text: "", spacing: { after: 800 } }),
-        // Client Info
-        new Paragraph({
-          children: [new TextRun({ text: clientName, bold: true, size: 24 })],
-          indent: { left: 1440 },
-          spacing: { after: 150 }
-        }),
-        ...addressLines.map(line =>
-          new Paragraph({
-            children: [new TextRun({ text: line, size: 24, bold: true })],
-            indent: { left: 1440 },
-            spacing: { after: 150 }
+          "Claim Number", "Service Date", "Procedure (and Codes)", "Units", "Unit Rate", "Total Charge",
+          "Patient Charge", "Total Paid", "Insurance Paid", "Patient Paid", "Total Adjustment",
+          "Total Balance", "Insurance Balance", "Balance Owed"
+        ].map(text =>
+          new TableCell({
+             children: [new Paragraph({ children: [new TextRun({ text, bold: true })] })],
+             shading: { fill: "D3D3D3" }
           })
-        ),
-        new Paragraph({ spacing: { after: 750 } }),
-        new Table({
-          width: { size: 100, type: WidthType.PERCENTAGE },
-          rows: [headerRow, ...bodyRows, totalRow]
-        }),
-        new Paragraph({
+        )
+     });
+
+     // Body rows built from validRows only
+     const bodyRows = validRows.map((row, idx) => {
+        const isClaimRow = row.claimOrServiceLine?.includes("CL-");
+        const nextRow = validRows[idx + 1];
+        const nextIsServiceLine = nextRow && nextRow.claimOrServiceLine?.includes("Service Line#");
+        const whiteOut = isClaimRow && nextIsServiceLine;
+
+        const blackText = (text) => new TextRun({ text: text ?? '', size: 22, color: '000000' });
+        const whiteText = (text) => new TextRun({ text: text ?? '', size: 22, color: 'FFFFFF' });
+
+        return new TableRow({
           children: [
-            new TextRun({
-              text: "Disclaimer: The Adjustment column shows total reductions applied to your charges. These include write-offs and adjustments from your insurance provider, as well as any discounts you received through our South Dakota sliding fee scale program. These amounts are not owed and have already been deducted from your balance.",
-              italics: true
-            })
-          ],
-          spacing: { before: 200 }
-        }),
-        new Paragraph({
-          children: [
-            new TextRun({
-              text: "For any questions, concerns, or to make a payment over the phone, please call Family Health Education Services at (605) 717-8920. Our billing team is available Monday - Thursday, 8:00 AM to 5:00 PM. We offer payment plans in any amount and are happy to work with you on a schedule that fits your needs. Please note that accounts with no payment activity or effort to resolve the balance within 90 days of the billing date may be subject to collections.",
-              bold: true
-            })
-          ],
-          spacing: { before: 200 }
-        }),
-        ...(index < allClients.length - 1 ? [new Paragraph({ children: [], pageBreakBefore: true })] : [])
-      ]
-    };
+             new TableCell({ children: [new Paragraph({ children: [blackText(row.claimOrServiceLine)] })] }),
+             new TableCell({ children: [new Paragraph({ children: [blackText(row.serviceDate)] })] }),
+             new TableCell({ children: [new Paragraph({ children: [whiteOut ? whiteText(row.procedure) : blackText(row.procedure)] })] }),
+             new TableCell({ children: [new Paragraph({ children: [whiteOut ? whiteText(row.units) : blackText(row.units)] })] }),
+             new TableCell({ children: [new Paragraph({ children: [whiteOut ? whiteText(row.unitRate) : blackText(row.unitRate)] })] }),
+             new TableCell({ children: [new Paragraph({ children: [blackText(row.totalCharge)] })] }),
+             new TableCell({ children: [new Paragraph({ children: [blackText(row.patientCharge)] })] }),
+             new TableCell({ children: [new Paragraph({ children: [blackText(row.totalPaid)] })] }),
+             new TableCell({ children: [new Paragraph({ children: [blackText(row.insurancePaid)] })] }),
+             new TableCell({ children: [new Paragraph({ children: [blackText(row.patientPaid)] })] }),
+             new TableCell({ children: [new Paragraph({ children: [blackText(row.adjustment)] })] }),
+             new TableCell({ children: [new Paragraph({ children: [blackText(row.totalBalance)] })] }),
+             new TableCell({ children: [new Paragraph({ children: [blackText(row.insuranceBalance)] })] }),
+             new TableCell({ children: [new Paragraph({ children: [blackText(row.balanceOwedRow)] })] }),
+          ]
+        });
+     });
+
+     // Total row
+     const totalRow = new TableRow({
+        children: [
+          new TableCell({
+             children: [new Paragraph({ text: "Total", bold: true })],
+             columnSpan: 13,
+             shading: { fill: "D3D3D3" }
+          }),
+          new TableCell({
+             children: [new Paragraph({ text: formatMoney(balanceOwed), bold: true })],
+             shading: { fill: "D3D3D3" }
+          })
+        ]
+     });
+
+     // PAY THIS AMOUNT table box
+     const payAmountBox = new Table({
+        alignment: AlignmentType.RIGHT,
+        width: { size: 50, type: WidthType.PERCENTAGE },
+        rows: [
+          new TableRow({
+             children: [
+                new TableCell({
+                  children: [
+                     new Paragraph({
+                        alignment: AlignmentType.CENTER,
+                        indent: { left: 750 },
+                        children: [
+                          new TextRun({
+                             text: `PAY THIS AMOUNT: ${formatMoney(balanceOwed)}`,
+                             alignment: AlignmentType.CENTER,
+                             bold: true,
+                             size: 28
+                          })
+                        ]
+                     })
+                  ],
+                  borders: {
+                     top: { style: BorderStyle.SINGLE, size: 4 },
+                     bottom: { style: BorderStyle.SINGLE, size: 4 },
+                     left: { style: BorderStyle.SINGLE, size: 4 },
+                     right: { style: BorderStyle.SINGLE, size: 4 }
+                  }
+                })
+             ]
+          })
+        ]
+     });
+
+     return {
+        properties: {
+          page: {
+             size: { width: 12240, height: 15840, orientation: PageOrientation.PORTRAIT },
+             margin: { top: 360, bottom: 360, left: 360, right: 360 }
+          }
+        },
+        children: [
+          new Paragraph({
+             alignment: AlignmentType.RIGHT,
+             children: [new TextRun({ text: `Statement Date: ${currentDate}`, bold: true, size: 24 })],
+             spacing: { after: 200 },
+             indent: { left: 750 }
+          }),
+          payAmountBox,
+          new Paragraph({ spacing: { after: 200 }, alignment: AlignmentType.CENTER, indent: { left: 750 } }),
+          new Paragraph({ text: "", spacing: { after: 800 } }),
+          // Client Info
+          new Paragraph({
+             children: [new TextRun({ text: clientName, bold: true, size: 24 })],
+             indent: { left: 1440 },
+             spacing: { after: 150 }
+          }),
+          ...addressLines.map(line =>
+             new Paragraph({
+                children: [new TextRun({ text: line, size: 24, bold: true })],
+                indent: { left: 1440 },
+                spacing: { after: 150 }
+             })
+          ),
+          new Paragraph({ spacing: { after: 750 } }),
+          new Table({
+             width: { size: 100, type: WidthType.PERCENTAGE },
+             rows: [headerRow, ...bodyRows, totalRow]
+          }),
+          new Paragraph({
+             children: [
+                new TextRun({
+                  text: "Disclaimer: The Adjustment column shows total reductions applied to your charges. These include write-offs and adjustments from your insurance provider, as well as any discounts you received through our South Dakota sliding fee scale program. These amounts are not owed and have already been deducted from your balance.",
+                  italics: true
+                })
+             ],
+             spacing: { before: 200 }
+          }),
+          new Paragraph({
+             children: [
+                new TextRun({
+                  text: "For any questions, concerns, or to make a payment over the phone, please call Family Health Education Services at (605) 717-8920. Our billing team is available Monday - Thursday, 8:00 AM to 5:00 PM. We offer payment plans in any amount and are happy to work with you on a schedule that fits your needs. Please note that accounts with no payment activity or effort to resolve the balance within 90 days of the billing date may be subject to collections.",
+                  bold: true
+                })
+             ],
+             spacing: { before: 200 }
+          }),
+          ...(index < allClients.length - 1 ? [new Paragraph({ children: [], pageBreakBefore: true })] : [])
+        ]
+     };
   });
 
   const doc = new Document({ sections });
 
   try {
-    const blob = await Packer.toBlob(doc);
-    const link = document.createElement("a");
-    link.href = URL.createObjectURL(blob);
-    link.download = `Invoices_${currentDate.replaceAll('/', '-')}.docx`;
-    link.click();
-    URL.revokeObjectURL(link.href);
+     const blob = await Packer.toBlob(doc);
+     const link = document.createElement("a");
+     link.href = URL.createObjectURL(blob);
+     link.download = `Invoices_${currentDate.replaceAll('/', '-')}.docx`;
+     link.click();
+     URL.revokeObjectURL(link.href);
   } catch (err) {
-    console.error("❌ Error generating Word doc:", err);
+     console.error("❌ Error generating Word doc:", err);
   }
 }
 
 /* =========================================================
-   BRIDGE HELPERS — unify both paths for preview/Word
+    BRIDGE HELPERS — unify both paths for preview/Word
 ========================================================= */
 // Build canonical client objects from AoA `sheets` (PDF path)
 function buildAllClientsFromSheets() {
   allClients = sheets.map((aoa, idx) => {
-    const headerIndex = aoa.findIndex(r =>
-      String(r?.[0] || '').toLowerCase().includes('claim number')
-    );
-    const header = aoa[headerIndex] || [
-      "Claim Number","Service Date","Procedure (and Codes)","Units","Unit Rate",
-      "Total Charge","Patient Charge","Total Paid","Insurance Paid","Patient Paid",
-      "Total Adjustment","Total Balance","Insurance Balance","Balance Owed"
-    ];
-    const rows = aoa.slice(headerIndex + 1).filter(r => r && r.length && r[0]);
+     const headerIndex = aoa.findIndex(r =>
+        String(r?.[0] || '').toLowerCase().includes('claim number')
+     );
+     const header = aoa[headerIndex] || [
+        "Claim Number","Service Date","Procedure (and Codes)","Units","Unit Rate",
+        "Total Charge","Patient Charge","Total Paid","Insurance Paid","Patient Paid",
+        "Total Adjustment","Total Balance","Insurance Balance","Balance Owed"
+     ];
+     const rows = aoa.slice(headerIndex + 1).filter(r => r && r.length && r[0]);
 
-    const objects = rows.map(r => ({
-      claimOrServiceLine: r[0], serviceDate: r[1], procedure: r[2], units: r[3], unitRate: r[4],
-      totalCharge: r[5], patientCharge: r[6], totalPaid: r[7], insurancePaid: r[8], patientPaid: r[9],
-      adjustment: r[10], totalBalance: r[11], insuranceBalance: r[12], balanceOwedRow: r[13]
-    }));
+     const objects = rows.map(r => ({
+        claimOrServiceLine: r[0], serviceDate: r[1], procedure: r[2], units: r[3], unitRate: r[4],
+        totalCharge: r[5], patientCharge: r[6], totalPaid: r[7], insurancePaid: r[8], patientPaid: r[9],
+        adjustment: r[10], totalBalance: r[11], insuranceBalance: r[12], balanceOwedRow: r[13]
+     }));
 
-    const totalBalance = rows.reduce((acc, r) => acc + currencyToNumber(r[13]), 0);
+     const totalBalance = rows.reduce((acc, r) => acc + currencyToNumber(r[13]), 0);
 
-    const info = clientInfo[idx] || { name: `[CLIENT ${idx + 1}]`, address: ["[ADDRESS LINE 1]", "[CITY, STATE ZIP]"] };
+     const info = clientInfo[idx] || { name: `[CLIENT ${idx + 1}]`, address: ["[ADDRESS LINE 1]", "[CITY, STATE ZIP]"] };
 
-    return {
-      clientName: info.name,
-      addressLines: info.address,
-      tableRows: objects,
-      header,
-      balanceOwed: totalBalance
-    };
+     return {
+        clientName: info.name,
+        addressLines: info.address,
+        tableRows: objects,
+        header,
+        balanceOwed: totalBalance
+     };
   });
 }
 
@@ -738,43 +740,43 @@ function buildAllClientsFromSheets() {
 function buildAllClientsFromWorkbook(workbook) {
   allClients = [];
   workbook.SheetNames.forEach((sheetName) => {
-    const sheet = workbook.Sheets[sheetName];
-    const jsonData = XLSX.utils.sheet_to_json(sheet, { header: 1 });
+     const sheet = workbook.Sheets[sheetName];
+     const jsonData = XLSX.utils.sheet_to_json(sheet, { header: 1 });
 
-    const headerIndex = jsonData.findIndex(row => String(row?.[0] || '').toLowerCase().includes('claim number'));
-    const topLines = jsonData.slice(0, headerIndex).map(r => r[0]);
+     const headerIndex = jsonData.findIndex(row => String(row?.[0] || '').toLowerCase().includes('claim number'));
+     const topLines = jsonData.slice(0, headerIndex).map(r => r[0]);
 
-    const nameLine = topLines.find(line => String(line || '').includes("Client Name(s):")) || "";
-    let name = nameLine.split("Client Name(s):")[1]?.split(" (")[0]?.trim() || "[CLIENT NAME]";
-    if (name.includes(",")) {
-      const [last, first] = name.split(",");
-      name = `${first.trim()} ${last.trim()}`;
-    }
-    const addressLines = [
-      jsonData[10]?.[0]?.trim() || "[ADDRESS LINE 1]",
-      jsonData[11]?.[0]?.trim() || "[CITY, STATE ZIP]"
-    ];
+     const nameLine = topLines.find(line => String(line || '').includes("Client Name(s):")) || "";
+     let name = nameLine.split("Client Name(s):")[1]?.split(" (")[0]?.trim() || "[CLIENT NAME]";
+     if (name.includes(",")) {
+        const [last, first] = name.split(",");
+        name = `${first.trim()} ${last.trim()}`;
+     }
+     const addressLines = [
+        jsonData[10]?.[0]?.trim() || "[ADDRESS LINE 1]",
+        jsonData[11]?.[0]?.trim() || "[CITY, STATE ZIP]"
+     ];
 
-    const tableRows = jsonData.slice(headerIndex + 1).filter(r => r[0]);
-    const cleanedRows = tableRows.map(r => ({
-      claimOrServiceLine: r[0], serviceDate: r[1], procedure: r[2], units: r[3], unitRate: r[4],
-      totalCharge: r[5], patientCharge: r[6], totalPaid: r[7], insurancePaid: r[8], patientPaid: r[9],
-      adjustment: r[10], totalBalance: r[11], insuranceBalance: r[12], balanceOwedRow: r[13]
-    }));
+     const tableRows = jsonData.slice(headerIndex + 1).filter(r => r[0]);
+     const cleanedRows = tableRows.map(r => ({
+        claimOrServiceLine: r[0], serviceDate: r[1], procedure: r[2], units: r[3], unitRate: r[4],
+        totalCharge: r[5], patientCharge: r[6], totalPaid: r[7], insurancePaid: r[8], patientPaid: r[9],
+        adjustment: r[10], totalBalance: r[11], insuranceBalance: r[12], balanceOwedRow: r[13]
+     }));
 
-    const totalOwed = tableRows.reduce((acc, r) => acc + currencyToNumber(r[13]), 0);
+     const totalOwed = tableRows.reduce((acc, r) => acc + currencyToNumber(r[13]), 0);
 
-    allClients.push({
-      clientName: name,
-      addressLines,
-      tableRows: cleanedRows,
-      header: [
-        "Claim Number", "Service Date", "Procedure (and Codes)", "Units", "Unit Rate",
-        "Total Charge", "Patient Charge", "Total Paid", "Insurance Paid", "Patient Paid",
-        "Total Adjustment", "Total Balance", "Insurance Balance", "Balance Owed"
-      ],
-      balanceOwed: totalOwed
-    });
+     allClients.push({
+        clientName: name,
+        addressLines,
+        tableRows: cleanedRows,
+        header: [
+          "Claim Number", "Service Date", "Procedure (and Codes)", "Units", "Unit Rate",
+          "Total Charge", "Patient Charge", "Total Paid", "Insurance Paid", "Patient Paid",
+          "Total Adjustment", "Total Balance", "Insurance Balance", "Balance Owed"
+        ],
+        balanceOwed: totalOwed
+     });
   });
 }
 
@@ -800,22 +802,24 @@ function renderFromClientObject(client){
 }
 
 /* =========================================================
-   EVENT WIRING — non-destructive (bind if elements exist)
+    EVENT WIRING — non-destructive (bind if elements exist)
 ========================================================= */
 (function wireUp() {
   const pdfInput = document.getElementById('fileInput');
   if (pdfInput && !pdfInput._wired) {
-    pdfInput.addEventListener('change', handleFile);
-    pdfInput._wired = true;
+     pdfInput.addEventListener('change', handleFile);
+     pdfInput._wired = true;
   }
   const exportBtn = document.getElementById('btnExportExcel');
   if (exportBtn && !exportBtn._wired) {
-    exportBtn.addEventListener('click', exportToExcel);
-    exportBtn._wired = true;
+     exportBtn.addEventListener('click', exportToExcel);
+     exportBtn._wired = true;
+  }
+  const wordBtn = document.getElementById('btnDownloadWord');
+  if (wordBtn && !wordBtn._wired) {
+     wordBtn.addEventListener('click', downloadWord);
+     wordBtn._wired = true;
   }
   // Excel flow keeps using your original "Process File" button that calls processFile()
 })();
-
 </script>
-</body>
-</html>
