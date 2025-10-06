@@ -433,32 +433,65 @@ function processFile() {
      const workbook = XLSX.read(data, { type: 'array' });
 
      // reset
-     allClients = [];
+      allClients = [];
 
-     // Build clients from workbook (re-using the same shape as PDF path)
-     buildAllClientsFromWorkbook(workbook);
+        workbook.SheetNames.forEach((sheetName, index) => {
+            const sheet = workbook.Sheets[sheetName];
+            const jsonData = XLSX.utils.sheet_to_json(sheet, { header: 1 });
 
-     // Display first client
-     if (allClients.length) {
-        const first = allClients[0];
-        clientName = first.clientName;
-        formattedAddressLines = first.addressLines;
-        sortedData = first.tableRows;
-        balanceOwed = first.balanceOwed;
+            // Extract top lines (before the header)
+            const headerIndex = jsonData.findIndex(row => row[0]?.toString().toLowerCase().includes('claim number'));
+            const topLines = jsonData.slice(0, headerIndex).map(r => r[0]);
 
-        const cn = document.getElementById('clientName');
-        if (cn) cn.innerText = clientName;
+            const nameLine = topLines.find(line => line?.includes("Client Name(s):")) || "";
+            let name = nameLine.split("Client Name(s):")[1]?.split(" (")[0]?.trim() || "[CLIENT NAME]";
+            if (name.includes(",")) {
+                const [last, first] = name.split(",");
+                name = `${first.trim()} ${last.trim()}`;
+            }
+            const addressLines = [
+                 jsonData[10]?.[0]?.trim() || "[ADDRESS LINE 1]",  // Row 11 (index 10)
+                 jsonData[11]?.[0]?.trim() || "[CITY, STATE ZIP]"  // Row 12 (index 11)
+];
+            const tableRows = jsonData.slice(headerIndex + 1).filter(r => r[0]);
+            const balanceIndex = 13; // "Balance Owed"
+            let totalBalance = 0;
+            const cleanedRows = tableRows.map((r, i) => {
+                const row = {
+                    claimOrServiceLine: r[0], serviceDate: r[1], procedure: r[2], units: r[3], unitRate: r[4],
+                    totalCharge: r[5], patientCharge: r[6], totalPaid: r[7], insurancePaid: r[8], patientPaid: r[9],
+                    adjustment: r[10], totalBalance: r[11], insuranceBalance: r[12], balanceOwedRow: r[13]
+                };
+                if (r[balanceIndex]) {
+                    const val = parseFloat(r[balanceIndex].replace(/[$,]/g, '')) || 0;
+                    totalBalance += val;
+                }
+                return row;
+            });
 
-        const ca = document.getElementById('clientAddress');
-        if (ca) {
-          ca.innerHTML = `<p>${formattedAddressLines[0] ?? ''}</p><p>${formattedAddressLines[1] ?? ''}</p>`;
-        }
+            allClients.push({
+                clientName: name,
+                addressLines,
+                tableRows: cleanedRows,
+                balanceOwed: totalBalance
+            });
 
-        extractData(sortedData);
-     }
-  };
+            // Display first client
+            if (index === 0) {
+                clientName = name;
+                formattedAddressLines = addressLines;
+                sortedData = cleanedRows;
+                balanceOwed = totalBalance;
+                document.getElementById('clientName').innerText = clientName;
+                document.getElementById('clientAddress').innerHTML = `
+                    <p>${formattedAddressLines[0]}</p>
+                    <p>${formattedAddressLines[1]}</p>`;
+                extractData(cleanedRows);
+            }
+        });
+    };
 
-  reader.readAsArrayBuffer(file);
+    reader.readAsArrayBuffer(file);
 }
 
 function extractData(rows) {
