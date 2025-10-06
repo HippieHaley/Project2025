@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/docx@7.5.0/build/index.js"></script>
+    <title>Excel Invoice Cleaner</title>
+    <style>
+        /* Basic Reset */
+        * {
+          margin: 0;
+          padding: 0;
+          box-sizing: border-box;
+        }
+      
+        /* General Body Style */
+        body {
+          font-family: Arial, sans-serif;
+          margin: 0 auto;
+          background-color: #acdbf9; /* Light blue */
+          color: #333;
+          padding-top: 50px;
+          padding-bottom: 50px;
+        }
+        h2 {
+            margin-top: 40px;
+        }
+        /* Table Styling */
+        table {
+          width: 100%;
+          border-collapse: collapse;
+          background-color: #acdbf9; /* Light blue */
+          border: 2px solid #333;
+          border-radius: 8px;
+          overflow: hidden;
+          margin-top: 20px;
+        }
+      
+        th,
+        td {
+          text-align: left;
+          padding: 15px;
+          background-color: #acdbf9;
+          color: #333;
+          white-space: nowrap;
+          border: 1px solid #333;
+        }
+      
+        th {
+          background-color: #f8c9f9; /* Soft pink */
+          font-weight: bold;
+          color: #000;
+        }
+      
+        th:first-child,
+        td:first-child {
+          background-color: #f8c9f9;
+        }
+      
+        /* Button Styling */
+        button {
+          display: inline-block;
+          padding: 12px 24px;
+          background-color: #f8c9f9;
+          color: #333;
+          font-size: 1rem;
+          font-weight: bold;
+          border: 1px solid #000;
+          border-radius: 30px;
+          text-align: center;
+          cursor: pointer;
+          margin-top: 20px;
+          transition: background-color 0.2s ease;
+        }
+      
+        button:hover {
+          background-color: #e8b3e8;
+        }
+      
+        button:disabled {
+          background-color: #f0d4f0;
+          color: #999;
+          border: 1px solid #999;
+          cursor: not-allowed;
+        }
+      
+        /* Optional: Back Home Button */
+        .back-home {
+          display: inline-block;
+          padding: 12px 24px;
+          background-color: #f8c9f9;
+          color: #333;
+          text-decoration: none;
+          font-size: 1rem;
+          font-weight: bold;
+          border-radius: 30px;
+          text-align: center;
+          border: 1px solid #000;
+          position: absolute;
+          top: 20px;
+          left: 20px;
+          z-index: 999;
+          transition: background-color 0.2s ease;
+        }
+      
+        .back-home:hover {
+          background-color: #e8b3e8;
+        }
+/* Style the file selector button inside the file input */
+input[type="file"]::file-selector-button {
+  font-size: 1rem;
+  padding: 10px 20px;
+  border: 1px solid #000;
+  border-radius: 30px;
+  background-color: #f8c9f9;
+  color: #333;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+input[type="file"]::file-selector-button:hover {
+  background-color: #e8b3e8;
+}
+
+      </style>
+      
+</head> 
+<body>
+    <a href="index.html" class="back-home">Back to Home</a>
+<h2>Upload Invoice File</h2>
+<input type="file" id="fileUpload" accept=".xlsx" />
+<button onclick="processFile()">Process File</button>
+<button onclick="downloadWord()">Download Word</button>
+    <h2 id="clientName"></h2>
+    <h3 id="clinicName"></h3>
+    <div id="clientAddress">
+    </div>
+    <table id="dataTable">
+        <thead>
+            <tr>
+                <th>Claim Number</th>
+                <th>Service Date</th>
+                <th>Procedure (and Codes)</th>
+                <th>Units</th>
+                <th>Unit Rate</th>
+                <th>Total Charge</th>
+                <th>Patient Charge</th>
+                <th>Total Paid</th>
+                <th>Insurance Paid</th>
+                <th>Patient Paid</th>
+                <th>Total Adjustment</th>
+                <th>Total Balance</th>
+                <th>Insurance Balance</th>
+                <th>Balance Owed</th>
+            </tr>
+        </thead>
+        <tbody></tbody>
+        </table>
+<script>
+    function styledCell(value) {
+    return `<td style="color: ${value ? 'black' : 'white'}">${value ?? ''}</td>`;
+}
+function isDate(str) {
+    return /^\d{2}\/\d{2}\/\d{4}$/.test(str.trim());
+}
+let sortedData = [];
+let clientName = "";
+let balanceOwed = 0; // ✅ Define globally
+let formattedAddressLines = []; // ✅ Global address storage
+let allClients = []; // Each entry = { clientName, addressLines, tableRows, balanceOwed }
+function processFile() {
+    const file = document.getElementById('fileUpload').files[0];
+    if (!file) {
+        alert("Please select a file first.");
+        return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = (e) => {
+        const data = new Uint8Array(e.target.result);
+        const workbook = XLSX.read(data, { type: 'array' });
+
+        allClients = [];
+
+        workbook.SheetNames.forEach((sheetName, index) => {
+            const sheet = workbook.Sheets[sheetName];
+            const jsonData = XLSX.utils.sheet_to_json(sheet, { header: 1 });
+
+            // Extract top lines (before the header)
+            const headerIndex = jsonData.findIndex(row => row[0]?.toString().toLowerCase().includes('claim number'));
+            const topLines = jsonData.slice(0, headerIndex).map(r => r[0]);
+
+            const nameLine = topLines.find(line => line?.includes("Client Name(s):")) || "";
+            let name = nameLine.split("Client Name(s):")[1]?.split(" (")[0]?.trim() || "[CLIENT NAME]";
+            if (name.includes(",")) {
+                const [last, first] = name.split(",");
+                name = `${first.trim()} ${last.trim()}`;
+            }
+            const addressLines = [
+  jsonData[10]?.[0]?.trim() || "[ADDRESS LINE 1]",  // Row 11 (index 10)
+  jsonData[11]?.[0]?.trim() || "[CITY, STATE ZIP]"  // Row 12 (index 11)
+];
+            const tableRows = jsonData.slice(headerIndex + 1).filter(r => r[0]);
+            const balanceIndex = 13; // "Balance Owed"
+            let totalBalance = 0;
+            const cleanedRows = tableRows.map((r, i) => {
+                const row = {
+                    claimOrServiceLine: r[0], serviceDate: r[1], procedure: r[2], units: r[3], unitRate: r[4],
+                    totalCharge: r[5], patientCharge: r[6], totalPaid: r[7], insurancePaid: r[8], patientPaid: r[9],
+                    adjustment: r[10], totalBalance: r[11], insuranceBalance: r[12], balanceOwedRow: r[13]
+                };
+                if (r[balanceIndex]) {
+                    const val = parseFloat(r[balanceIndex].replace(/[$,]/g, '')) || 0;
+                    totalBalance += val;
+                }
+                return row;
+            });
+
+            allClients.push({
+                clientName: name,
+                addressLines,
+                tableRows: cleanedRows,
+                balanceOwed: totalBalance
+            });
+
+            // Display first client
+            if (index === 0) {
+                clientName = name;
+                formattedAddressLines = addressLines;
+                sortedData = cleanedRows;
+                balanceOwed = totalBalance;
+                document.getElementById('clientName').innerText = clientName;
+                document.getElementById('clientAddress').innerHTML = `
+                    <p>${formattedAddressLines[0]}</p>
+                    <p>${formattedAddressLines[1]}</p>`;
+                extractData(cleanedRows);
+            }
+        });
+    };
+
+    reader.readAsArrayBuffer(file);
+}
+
+function extractData(rows) {
+    const tableBody = document.querySelector('#dataTable tbody');
+    tableBody.innerHTML = '';
+    balanceOwed = 0;
+
+    rows.forEach((row, index) => {
+        const {
+            claimOrServiceLine,
+            serviceDate,
+            procedure,
+            units,
+            unitRate,
+            totalCharge,
+            patientCharge,
+            totalPaid,
+            insurancePaid,
+            patientPaid,
+            adjustment,
+            totalBalance,
+            insuranceBalance,
+            balanceOwedRow
+        } = row;
+    });
+};
+async function downloadWord() {
+    const {
+        Document, Packer, Paragraph, Table, TableRow, TableCell,
+        WidthType, TextRun, AlignmentType, BorderStyle, PageOrientation
+    } = docx;
+
+    const currentDate = new Date().toLocaleDateString('en-US', {
+        year: 'numeric', month: '2-digit', day: '2-digit'
+    });
+
+    const sections = allClients.map((client, index) => {
+        const {
+            clientName,
+            addressLines,
+            tableRows,
+            balanceOwed
+        } = client;
+
+        // Filter out any tableRows that contain the disclaimer text.
+        const validRows = tableRows.filter(row => 
+            !row.claimOrServiceLine?.includes("Disclaimer: Charges/Adjustments made after statement date will appear on your next statement")
+        );
+
+        // Header row
+        const headerRow = new TableRow({
+            children: [
+                "Claim Number", "Service Date", "Procedure (and Codes)", "Units", "Unit Rate", "Total Charge",
+                "Patient Charge", "Total Paid", "Insurance Paid", "Patient Paid", "Total Adjustment",
+                "Total Balance", "Insurance Balance", "Balance Owed"
+            ].map(text =>
+                new TableCell({
+                    children: [new Paragraph({ text, bold: true })],
+                    shading: { fill: "D3D3D3" }
+                })
+            )
+        });
+
+        // Body rows built from validRows only
+        const bodyRows = validRows.map((row, index) => {
+            const isClaimRow = row.claimOrServiceLine?.includes("CL-");
+            const nextRow = validRows[index + 1];
+            const nextIsServiceLine = nextRow && nextRow.claimOrServiceLine?.includes("Service Line#");
+            const whiteOut = isClaimRow && nextIsServiceLine;
+
+            const blackText = (text) => new TextRun({ text: text ?? '', size: 22, color: '000000' });
+            const whiteText = (text) => new TextRun({ text: text ?? '', size: 22, color: 'FFFFFF' });
+
+            return new TableRow({
+                children: [
+                    new TableCell({ children: [new Paragraph({ children: [blackText(row.claimOrServiceLine)] })] }),
+                    new TableCell({ children: [new Paragraph({ children: [blackText(row.serviceDate)] })] }),
+                    new TableCell({ children: [new Paragraph({ children: [whiteOut ? whiteText(row.procedure) : blackText(row.procedure)] })] }),
+                    new TableCell({ children: [new Paragraph({ children: [whiteOut ? whiteText(row.units) : blackText(row.units)] })] }),
+                    new TableCell({ children: [new Paragraph({ children: [whiteOut ? whiteText(row.unitRate) : blackText(row.unitRate)] })] }),
+                    new TableCell({ children: [new Paragraph({ children: [blackText(row.totalCharge)] })] }),
+                    new TableCell({ children: [new Paragraph({ children: [blackText(row.patientCharge)] })] }),
+                    new TableCell({ children: [new Paragraph({ children: [blackText(row.totalPaid)] })] }),
+                    new TableCell({ children: [new Paragraph({ children: [blackText(row.insurancePaid)] })] }),
+                    new TableCell({ children: [new Paragraph({ children: [blackText(row.patientPaid)] })] }),
+                    new TableCell({ children: [new Paragraph({ children: [blackText(row.adjustment)] })] }),
+                    new TableCell({ children: [new Paragraph({ children: [blackText(row.totalBalance)] })] }),
+                    new TableCell({ children: [new Paragraph({ children: [blackText(row.insuranceBalance)] })] }),
+                    new TableCell({ children: [new Paragraph({ children: [blackText(row.balanceOwedRow)] })] }),
+                ]
+            });
+        });
+
+        // Total row
+        const totalRow = new TableRow({
+            children: [
+                new TableCell({
+                    children: [new Paragraph({ text: "Total", bold: true })],
+                    columnSpan: 13,
+                    shading: { fill: "D3D3D3" }
+                }),
+                new TableCell({
+                    children: [new Paragraph({ text: `$${balanceOwed.toFixed(2)}`, bold: true })],
+                    shading: { fill: "D3D3D3" }
+                })
+            ]
+        });
+
+        // PAY THIS AMOUNT table box
+        const payAmountBox = new Table({
+            alignment: AlignmentType.RIGHT,
+            width: { size: 50, type: WidthType.PERCENTAGE },
+            rows: [
+                new TableRow({
+                    children: [
+                        new TableCell({
+                            children: [
+                                new Paragraph({
+                                    alignment: AlignmentType.CENTER,
+                                    indent: { left: 750 },
+                                    children: [
+                                        new TextRun({
+                                            text: `PAY THIS AMOUNT: $${balanceOwed.toFixed(2)}`,
+                                            alignment: AlignmentType.CENTER,
+                                            bold: true,
+                                            size: 28
+                                        })
+                                    ]
+                                })
+                            ],
+                            borders: {
+                                top: { style: BorderStyle.SINGLE, size: 4 },
+                                bottom: { style: BorderStyle.SINGLE, size: 4 },
+                                left: { style: BorderStyle.SINGLE, size: 4 },
+                                right: { style: BorderStyle.SINGLE, size: 4 }
+                            }
+                        })
+                    ]
+                })
+            ]
+        });
+
+        return {
+            properties: {
+                page: {
+                    size: { width: 12240, height: 15840, orientation: PageOrientation.PORTRAIT },
+                    margin: { top: 360, bottom: 360, left: 360, right: 360 }
+                }
+            },
+            children: [
+                new Paragraph({
+                    alignment: AlignmentType.RIGHT,
+                    children: [new TextRun({ text: `Statement Date: ${currentDate}`, bold: true, size: 24 })],
+                    spacing: { after: 200 },
+                    indent: { left: 750 }
+                }),
+                payAmountBox,
+                new Paragraph({ spacing: { after: 200 }, alignment: AlignmentType.CENTER, indent: { left: 750 } }),
+                new Paragraph({ text: "", spacing: { after: 800 } }),
+                // Client Info
+                new Paragraph({
+    children: [new TextRun({ text: clientName, bold: true, size: 24 })],
+    indent: { left: 1440 },
+    spacing: { after: 150 }
+}),
+...addressLines.map(line =>
+    new Paragraph({
+        children: [new TextRun({ text: line, size: 24, bold: true })],
+        indent: { left: 1440 },
+        spacing: { after: 150 }
+    })
+),
+new Paragraph({
+    spacing: { after: 750 } // Retained spacing after the paragraph
+}),
+                new Table({
+                    width: { size: 100, type: WidthType.PERCENTAGE },
+                    rows: [headerRow, ...bodyRows, totalRow]
+                }),
+                new Paragraph({
+    children: [
+        new TextRun({
+            text: "Disclaimer: The Adjustment column shows total reductions applied to your charges. These include write-offs and adjustments from your insurance provider, as well as any discounts you received through our South Dakota sliding fee scale program. These amounts are not owed and have already been deducted from your balance.",
+            italics: true
+        })
+    ],
+    spacing: { before: 200 } // Optional: adjust spacing as needed
+}),
+new Paragraph({
+    children: [
+        new TextRun({
+            text: "For any questions, concerns, or to make a payment over the phone, please call Family Health Education Services at (605) 717-8920. Our billing team is available Monday - Thursday, 8:00 AM to 5:00 PM. We offer payment plans in any amount and are happy to work with you on a schedule that fits your needs. Please note that accounts with no payment activity or effort to resolve the balance within 90 days of the billing date may be subject to collections.",
+             bold: true
+        })
+    ],
+    spacing: { before: 200 } // Optional spacing adjustments
+}),
+                // Page break after each section (except last)
+                ...(index < allClients.length - 1 ? [new Paragraph({ children: [], pageBreakBefore: true })] : [])
+            ]
+        };
+    });
+
+    const doc = new Document({ sections });
+
+    try {
+        const blob = await Packer.toBlob(doc);
+        const link = document.createElement("a");
+        link.href = URL.createObjectURL(blob);
+        link.download = `Invoices_${currentDate.replaceAll('/', '-')}.docx`;
+        link.click();
+        URL.revokeObjectURL(link.href);
+    } catch (err) {
+        console.error("❌ Error generating Word doc:", err);
+    }
+}
+</script>
+</body> 
+</html>
