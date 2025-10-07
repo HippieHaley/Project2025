@@ -71,8 +71,25 @@
   <div id="output"></div>
 
   <script>
-    let sheets = []; // Array of arrays of lines, per statement
-    let previewText = ""; // Preview for output div
+     const HEADERS = [
+      "Claim Number",
+      "Service Date(s)",
+      "Procedure",
+      "Units",
+      "Unit Rate",
+      "Total Charge",
+      "Patient Charge",
+      "Total Paid",
+      "Ins. Paid",
+      "Patient Paid",
+      "Total Adj.",
+      "Total Balance",
+      "Ins. Balance",
+      "Patient Balance"
+    ];
+
+    let sheets = []; // Array of arrays of parsed rows, per statement
+    let previewHTML = ""; // HTML preview for output div
 
     // Utility: Clean unwanted lines from text
     function cleanLine(line) {
@@ -85,18 +102,77 @@
       if (
         !cleaned ||
         /State\s+of\s+South\s+Dakota\s+Department\s+of\s+Health/i.test(line) ||
+        /Disclaimer: Charges\/Adjustments made after statement date will appear on your next statement. Questions: Please call \(605\)773-6031/i.test(line) ||
         /600\s+E\s+Capitol\s+Ave/i.test(line) ||
         /Pierre,\s+SD\s+57501/i.test(line)
       ) return "";
       return cleaned;
     }
-
-    // Show notification
-    function showNotification(msg) {
+function showNotification(msg) {
       const n = document.getElementById("notification");
       n.textContent = msg;
       n.style.display = "block";
       setTimeout(() => { n.style.display = "none"; }, 3000);
+    }
+
+    // Parse one statement's chunk into table rows
+    function parseStatementRows(lines) {
+      // Find the header line by matching all header names
+      const headerIdx = lines.findIndex(line =>
+        HEADERS.every(h =>
+          line.toLowerCase().includes(h.toLowerCase().split(" ")[0]) // match by first word
+        )
+      );
+      // If header not found, guess it's the first row
+      let dataLines = headerIdx !== -1 ? lines.slice(headerIdx + 1) : lines;
+      // Remove summary/blank lines
+      dataLines = dataLines.filter(l => l.trim() && !l.toLowerCase().includes("disclaimer"));
+
+      // Parse each data line into columns
+      const tableRows = [];
+      dataLines.forEach(line => {
+        // Attempt to split by whitespace, but preserve procedure (may contain spaces)
+        // Assume: Claim Number (no spaces), then Service Date(s) (date format), then Procedure (may have spaces), then numbers
+        const tokens = line.trim().split(/\s+/);
+        if (tokens.length < 8) return; // skip short lines
+
+        // Find the index of the service date (MM/DD/YYYY or MM/DD/YY)
+        let dateIdx = tokens.findIndex(tok => /^\d{1,2}\/\d{1,2}\/\d{2,4}$/.test(tok));
+        if (dateIdx === -1) return; // skip if no date
+
+        // Assume claim number is before date, procedure is after date and before units (first number after date)
+        const claimNumber = tokens.slice(0, dateIdx).join(' ');
+        const serviceDate = tokens[dateIdx];
+        // Find first number after date for units
+        let unitsIdx = dateIdx + 1;
+        while (unitsIdx < tokens.length && isNaN(tokens[unitsIdx].replace(/[^0-9.]/g, ''))) {
+          unitsIdx++;
+        }
+        const procedure = tokens.slice(dateIdx + 1, unitsIdx).join(' ');
+        const units = tokens[unitsIdx] || '';
+        // The rest of the columns, map by order
+        const rest = tokens.slice(unitsIdx + 1);
+
+        // Map columns (fill blanks if missing)
+        const row = [
+          claimNumber,
+          serviceDate,
+          procedure,
+          units,
+          rest[0] || '', // Unit Rate
+          rest[1] || '', // Total Charge
+          rest[2] || '', // Patient Charge
+          rest[3] || '', // Total Paid
+          rest[4] || '', // Ins. Paid
+          rest[5] || '', // Patient Paid
+          rest[6] || '', // Total Adj.
+          rest[7] || '', // Total Balance
+          rest[8] || '', // Ins. Balance
+          rest[9] || ''  // Patient Balance
+        ];
+        tableRows.push(row);
+      });
+      return tableRows;
     }
 
     // PDF file handler
@@ -104,7 +180,7 @@
       const file = event.target.files[0];
       if (!file) return;
       sheets = [];
-      previewText = "";
+      previewHTML = "";
       document.getElementById('output').textContent = "Extracting PDF...";
       document.getElementById('exportExcelBtn').disabled = true;
 
@@ -114,8 +190,8 @@
         pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.10.377/pdf.worker.min.js';
         const pdf = await pdfjsLib.getDocument({ data: pdfData }).promise;
 
-        // We treat each "statement date:" as a new sheet (per your workflow)
-        let currentSheetLines = [];
+        // We treat each "statement date:" as a new sheet
+        let currentLines = [];
         for (let i = 1; i <= pdf.numPages; i++) {
           const page = await pdf.getPage(i);
           const textContent = await page.getTextContent();
@@ -131,34 +207,51 @@
             );
             if (statementIdx === -1) {
               // No statement marker, add all remaining lines to current sheet
-              currentSheetLines.push(...tempLines);
+              currentLines.push(...tempLines);
               tempLines = [];
             } else {
               // Found a statement date, start a new sheet
               // Drop everything before and including statement date
               tempLines = tempLines.slice(statementIdx + 1);
-              if (currentSheetLines.length > 0) {
-                sheets.push([...currentSheetLines]);
-                currentSheetLines = [];
+              if (currentLines.length > 0) {
+                sheets.push([...currentLines]);
+                currentLines = [];
               }
             }
           }
         }
         // Last sheet if it has content
-        if (currentSheetLines.length > 0) sheets.push([...currentSheetLines]);
+        if (currentLines.length > 0) sheets.push([...currentLines]);
 
-        // Build preview
-        if (sheets.length === 0) {
-          previewText = "No valid statement data found.";
+        // Now parse each sheet into table rows
+        const parsedSheets = sheets.map(sheetLines => {
+          const tableRows = parseStatementRows(sheetLines);
+          return tableRows;
+        });
+
+        // Build preview HTML table
+        if (parsedSheets.length === 0 || parsedSheets.every(s => s.length === 0)) {
+          previewHTML = "No valid statement data found.";
           document.getElementById('exportExcelBtn').disabled = true;
         } else {
-          previewText = sheets.map(
-            (sheet, idx) => `--- Statement ${idx + 1} ---\n${sheet.join('\n')}\n`
-          ).join('\n');
+          previewHTML = parsedSheets.map((sheet, idx) => {
+            if (!sheet.length) return `--- Statement ${idx + 1}: No rows found ---`;
+            return `<b>Statement ${idx + 1}</b><table><tr>` +
+              HEADERS.map(h => `<th>${h}</th>`).join('') +
+              '</tr>' +
+              sheet.map(row =>
+                '<tr>' +
+                row.map(cell => `<td>${cell}</td>`).join('') +
+                '</tr>'
+              ).join('') +
+              '</table>';
+          }).join('<br>');
           document.getElementById('exportExcelBtn').disabled = false;
-          showNotification("PDF data extracted for " + sheets.length + " statement(s)!");
+          showNotification("PDF data extracted for " + parsedSheets.length + " statement(s)!");
         }
-        document.getElementById('output').textContent = previewText;
+        document.getElementById('output').innerHTML = previewHTML;
+        // Store parsed for export
+        sheets = parsedSheets;
 
       } catch (e) {
         document.getElementById('output').textContent = "Error reading PDF!";
@@ -170,9 +263,9 @@
     document.getElementById('exportExcelBtn').onclick = function() {
       if (!sheets.length) return;
       const wb = XLSX.utils.book_new();
-      sheets.forEach((sheetLines, idx) => {
-        // Each line as a row, single column for simplicity
-        const wsData = sheetLines.map(line => [line]);
+      sheets.forEach((tableRows, idx) => {
+        // Add header row
+        const wsData = [HEADERS, ...tableRows];
         const ws = XLSX.utils.aoa_to_sheet(wsData);
         XLSX.utils.book_append_sheet(wb, ws, `Statement ${idx + 1}`);
       });
