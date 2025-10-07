@@ -75,12 +75,14 @@
   </style>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.10.377/pdf.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/docx@8.5.0/build/index.min.js"></script>
 </head>
 <body>
   <a href="index.html" class="back-home">Back to Home</a>
   <h1>PDF Invoice/Statement Toolkit</h1>
   <input type="file" id="fileInput" accept="application/pdf" />
   <button id="exportExcelBtn" disabled>Export to Excel</button>
+  <button id="exportWordBtn" disabled>Export to Word</button>
   <div id="notification"></div>
   <div id="output"></div>
 
@@ -105,19 +107,19 @@
     let sheets = []; // Array of objects: {infoLines, tableRows}
 
     function cleanLine(line) {
-  return line
-    .replace(/State\s+of\s+South\s+Dakota\s+Department\s+of\s+Health/gi, '')
-    .replace(/South Dakota Department of Health/gi, '')
-    .replace(/600\s+E\s+Capitol\s+Ave/gi, '')
-    .replace(/Pierre,\s+SD\s+57501/gi, '')
-    .replace(/Payment Type:.*$/i, '')
-    .replace(/Card Type:.*$/i, '')
-    .replace(/Name on Card:.*$/i, '')
-    .replace(/Card Number:.*$/i, '')
-    .replace(/Expiration Date:.*$/i, '')
-    .replace(/Amount Enclosed:.*$/i, '')
-    .trim();
-}
+      return line
+        .replace(/State\s+of\s+South\s+Dakota\s+Department\s+of\s+Health/gi, '')
+        .replace(/South Dakota Department of Health/gi, '')
+        .replace(/600\s+E\s+Capitol\s+Ave/gi, '')
+        .replace(/Pierre,\s+SD\s+57501/gi, '')
+        .replace(/Payment Type:.*$/i, '')
+        .replace(/Card Type:.*$/i, '')
+        .replace(/Name on Card:.*$/i, '')
+        .replace(/Card Number:.*$/i, '')
+        .replace(/Expiration Date:.*$/i, '')
+        .replace(/Amount Enclosed:.*$/i, '')
+        .trim();
+    }
 
     function showNotification(msg) {
       const n = document.getElementById("notification");
@@ -214,6 +216,7 @@
       sheets = [];
       document.getElementById('output').textContent = "Extracting PDF...";
       document.getElementById('exportExcelBtn').disabled = true;
+      document.getElementById('exportWordBtn').disabled = true;
 
       try {
         const arrayBuffer = await file.arrayBuffer();
@@ -266,6 +269,7 @@
         if (sheets.length === 0 || sheets.every(s => s.tableRows.length === 0)) {
           document.getElementById('output').textContent = "No valid statement data found.";
           document.getElementById('exportExcelBtn').disabled = true;
+          document.getElementById('exportWordBtn').disabled = true;
         } else {
           let previewHTML = sheets.map((sheet, idx) => {
             let infoBlock = sheet.infoLines.map(l => `<div>${l}</div>`).join('');
@@ -278,10 +282,13 @@
           }).join('<br>');
           document.getElementById('output').innerHTML = previewHTML;
           document.getElementById('exportExcelBtn').disabled = false;
+          document.getElementById('exportWordBtn').disabled = false;
           showNotification("PDF data extracted for " + sheets.length + " statement(s)!");
         }
       } catch (e) {
         document.getElementById('output').textContent = "Error reading PDF!";
+        document.getElementById('exportExcelBtn').disabled = true;
+        document.getElementById('exportWordBtn').disabled = true;
         showNotification("Error: Could not extract PDF data.");
       }
     });
@@ -301,6 +308,67 @@
       });
       XLSX.writeFile(wb, "Statements.xlsx");
     };
+
+    document.getElementById('exportWordBtn').onclick = function() {
+      exportToWord(sheets, HEADERS);
+    };
+
+    // Export to Word using docx.js
+   function exportToWord(sheets, headers) {
+  const { Document, Packer, Paragraph, Table, TableRow, TableCell, WidthType } = window.docx;
+
+  const children = [];
+  sheets.forEach((sheet, idx) => {
+    // Add info lines
+    sheet.infoLines.forEach(line => {
+      children.push(new Paragraph({ text: line, spacing: { after: 200 } }));
+    });
+    children.push(new Paragraph({ text: "" }));
+
+    // Add table header
+    const headerRow = new TableRow({
+      children: headers.map(h => new TableCell({
+        children: [new Paragraph(h)],
+        width: { size: 100 / headers.length, type: WidthType.PERCENTAGE }
+      }))
+    });
+
+    // Add table rows
+    const dataRows = sheet.tableRows.map(row =>
+      new TableRow({
+        children: row.map(cell => new TableCell({
+          children: [new Paragraph(cell)],
+          width: { size: 100 / headers.length, type: WidthType.PERCENTAGE }
+        }))
+      })
+    );
+
+    children.push(new Table({
+      rows: [headerRow, ...dataRows],
+      width: { size: 100, type: WidthType.PERCENTAGE }
+    }));
+
+    children.push(new Paragraph({ text: "" }));
+  });
+
+  // Build the document
+  const doc = new Document({
+    sections: [{ children }]
+  });
+
+  window.docx.Packer.toBlob(doc).then(blob => {
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = "Statements.docx";
+    document.body.appendChild(a);
+    a.click();
+    setTimeout(() => {
+      URL.revokeObjectURL(url);
+      document.body.removeChild(a);
+    }, 100);
+  });
+}
   </script>
 </body>
 </html>
