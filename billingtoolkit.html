@@ -2,8 +2,8 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>PDF Invoice/Statement Toolkit</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -75,36 +75,22 @@
   </style>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.10.377/pdf.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/docx@8.5.0/build/index.min.js"></script>
 </head>
 <body>
   <a href="index.html" class="back-home">Back to Home</a>
   <h1>PDF Invoice/Statement Toolkit</h1>
   <input type="file" id="fileInput" accept="application/pdf" />
   <button id="exportExcelBtn" disabled>Export to Excel</button>
-  <button id="exportWordBtn" disabled>Export to Word</button>
   <div id="notification"></div>
   <div id="output"></div>
-
   <script>
     const HEADERS = [
-      "Claim Number",
-      "Service Date(s)",
-      "Procedure",
-      "Units",
-      "Unit Rate",
-      "Total Charge",
-      "Patient Charge",
-      "Total Paid",
-      "Ins. Paid",
-      "Patient Paid",
-      "Total Adj.",
-      "Total Balance",
-      "Ins. Balance",
-      "Patient Balance"
+      "Claim Number", "Service Date(s)", "Procedure", "Units", "Unit Rate",
+      "Total Charge", "Patient Charge", "Total Paid", "Ins. Paid",
+      "Patient Paid", "Total Adj.", "Total Balance", "Ins. Balance", "Patient Balance"
     ];
 
-    let sheets = []; // Array of objects: {infoLines, tableRows}
+    let sheets = [];
 
     function cleanLine(line) {
       return line
@@ -131,83 +117,45 @@
     function parseTableRow(line) {
       const tokens = line.trim().split(/\s+/);
       if (tokens.length < 5) return Array(HEADERS.length).fill('');
-
-      // Find date index
       let dateIdx = tokens.findIndex(tok => /^\d{1,2}\/\d{1,2}\/\d{2,4}$/.test(tok));
       if (dateIdx === -1) return Array(HEADERS.length).fill('');
-
       const claimNumber = tokens.slice(0, dateIdx).join(' ');
       const serviceDate = tokens[dateIdx];
-
-      // Procedure: everything after date until we hit a token that's a number
       let i = dateIdx + 1;
       let procedureTokens = [];
-      while (
-        i < tokens.length &&
-        !/^\d+$/.test(tokens[i])
-      ) {
+      while (i < tokens.length && !/^\d+$/.test(tokens[i])) {
         procedureTokens.push(tokens[i]);
         i++;
       }
       const procedure = procedureTokens.join(' ');
-
-      // Units: next token (should be a number)
       const units = tokens[i] || '';
       i++;
-
-      // Unit Rate: next token (should look like $xx.xx)
       const unitRate = tokens[i] || '';
       i++;
-
-      // The rest of the fields
       let rest = [];
-      while (i < tokens.length) {
-        rest.push(tokens[i]);
-        i++;
-      }
+      while (i < tokens.length) { rest.push(tokens[i]); i++; }
       while (rest.length < 9) rest.push('');
-
       return [
-        claimNumber,
-        serviceDate,
-        procedure,
-        units,
-        unitRate,
-        rest[0],
-        rest[1],
-        rest[2],
-        rest[3],
-        rest[4],
-        rest[5],
-        rest[6],
-        rest[7],
-        rest[8]
+        claimNumber, serviceDate, procedure, units, unitRate,
+        rest[0], rest[1], rest[2], rest[3], rest[4], rest[5], rest[6], rest[7], rest[8]
       ];
     }
 
-    // Parse statement info and table
     function processExtractedSheet(flattened) {
       let infoLines = [];
       let headerIdx = flattened.findIndex(l => l.toLowerCase().startsWith("claim number"));
-      if (headerIdx > 0) {
-        infoLines = flattened.slice(0, headerIdx);
-      }
-      // Find table rows (stop at Totals/Balances)
+      if (headerIdx > 0) infoLines = flattened.slice(0, headerIdx);
       let tableLines = [];
       if (headerIdx !== -1) {
         for (let i = headerIdx + 1; i < flattened.length; i++) {
           let line = flattened[i];
-          if (
-            /^totals?/i.test(line) ||
-            /^balances?/i.test(line) ||
-            /^patient'?s unapplied balance/i.test(line) ||
-            /disclaimer/i.test(line)
-          ) break;
+          if (/^totals?/i.test(line) || /^balances?/i.test(line) ||
+              /^patient'?s unapplied balance/i.test(line) || /disclaimer/i.test(line)) break;
           if (line.trim()) tableLines.push(line);
         }
       }
       const tableRows = tableLines.map(parseTableRow);
-      sheets.push({infoLines, tableRows});
+      sheets.push({ infoLines, tableRows });
     }
 
     document.getElementById('fileInput').addEventListener('change', async function(event) {
@@ -216,22 +164,16 @@
       sheets = [];
       document.getElementById('output').textContent = "Extracting PDF...";
       document.getElementById('exportExcelBtn').disabled = true;
-      document.getElementById('exportWordBtn').disabled = true;
-
       try {
         const arrayBuffer = await file.arrayBuffer();
         const pdfData = new Uint8Array(arrayBuffer);
         pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.10.377/pdf.worker.min.js';
         const pdf = await pdfjsLib.getDocument({ data: pdfData }).promise;
-
         let currentSheetData = [];
         for (let i = 1; i <= pdf.numPages; i++) {
           const page = await pdf.getPage(i);
           const textContent = await page.getTextContent();
-
-          let line = '';
-          let lastY = null;
-
+          let line = '', lastY = null;
           textContent.items.forEach(item => {
             if (lastY !== null && Math.abs(item.transform[5] - lastY) > 10) {
               line = cleanLine(line);
@@ -248,7 +190,6 @@
             line += item.str + ' ';
             lastY = item.transform[5];
           });
-
           if (line.trim()) {
             line = cleanLine(line);
             if (line.includes("Disclaimer: Charges/Adjustments made after statement date")) {
@@ -264,12 +205,9 @@
         if (currentSheetData.length > 0) {
           processExtractedSheet(currentSheetData.map(r => r.trim()).filter(Boolean));
         }
-
-        // Build preview HTML
         if (sheets.length === 0 || sheets.every(s => s.tableRows.length === 0)) {
           document.getElementById('output').textContent = "No valid statement data found.";
           document.getElementById('exportExcelBtn').disabled = true;
-          document.getElementById('exportWordBtn').disabled = true;
         } else {
           let previewHTML = sheets.map((sheet, idx) => {
             let infoBlock = sheet.infoLines.map(l => `<div>${l}</div>`).join('');
@@ -282,93 +220,92 @@
           }).join('<br>');
           document.getElementById('output').innerHTML = previewHTML;
           document.getElementById('exportExcelBtn').disabled = false;
-          document.getElementById('exportWordBtn').disabled = false;
           showNotification("PDF data extracted for " + sheets.length + " statement(s)!");
         }
       } catch (e) {
         document.getElementById('output').textContent = "Error reading PDF!";
         document.getElementById('exportExcelBtn').disabled = true;
-        document.getElementById('exportWordBtn').disabled = true;
         showNotification("Error: Could not extract PDF data.");
       }
     });
+
+    // Helper to get max string width for each column
+    function getColWidths(wsData) {
+      let maxCol = 0;
+      wsData.forEach(row => { if (row.length > maxCol) maxCol = row.length; });
+      let colWidths = Array(maxCol).fill(10); // Default min width
+      wsData.forEach(row => {
+        row.forEach((cell, i) => {
+          let len = cell ? cell.toString().length : 0;
+          if (len > colWidths[i]) colWidths[i] = len;
+        });
+      });
+      return colWidths.map(w => ({ wch: w + 2 }));
+    }
 
     document.getElementById('exportExcelBtn').onclick = function() {
       if (!sheets.length) return;
       const wb = XLSX.utils.book_new();
       sheets.forEach((sheet, idx) => {
-        let wsData = [
-          ...sheet.infoLines.map(l=>[l]),
-          [],
-          HEADERS,
-          ...sheet.tableRows
-        ];
+        let wsData = [];
+
+        // Row 1: Statement Date, Client Name(s), (columns M or N) Pay Amount
+        let statementDate = ""; // parse from infoLines if available!
+        let clientName = "";
+        let payAmount = "";
+        sheet.infoLines.forEach(l => {
+          if (/statement date/i.test(l)) statementDate = l;
+          if (/client name/i.test(l)) clientName = l;
+          if (/pay.*amount/i.test(l)) payAmount = l;
+        });
+        // Place payAmount at column M (index 12)
+        let row1 = Array(13).fill("");
+        row1[0] = statementDate;
+        row1[1] = clientName;
+        row1[12] = payAmount;
+        wsData.push(row1);
+
+        // Row 2: blank
+        wsData.push(Array(13).fill(""));
+
+        // Row 3: blank (top margin)
+        wsData.push(Array(13).fill(""));
+
+        // Address block: rows 4-6, column A only
+        let addressLines = [];
+        sheet.infoLines.forEach(l => {
+          if (/(anderson|wall st|apt|lead, sd|[0-9]{5})/i.test(l)) addressLines.push(l);
+        });
+        wsData.push([addressLines[0] || "", ...Array(12).fill("")]);
+        wsData.push([addressLines[1] || "", ...Array(12).fill("")]);
+        wsData.push([addressLines[2] || "", ...Array(12).fill("")]);
+
+        // Row 7: blank
+        wsData.push(Array(13).fill(""));
+
+        // Row 8: Client ID and Client Name
+        let clientIdLine = sheet.infoLines.find(l => /client id/i.test(l)) || "";
+        wsData.push([clientIdLine, ...Array(12).fill("")]);
+
+        // Row 9: blank
+        wsData.push(Array(13).fill(""));
+
+        // Row 10: Table headers
+        wsData.push([...HEADERS]);
+
+        // Table data, starting at row 11
+        sheet.tableRows.forEach(row => wsData.push(row));
+
         const ws = XLSX.utils.aoa_to_sheet(wsData);
+
+        // Auto-fit columns
+        ws['!cols'] = getColWidths(wsData);
+
         XLSX.utils.book_append_sheet(wb, ws, `Statement ${idx + 1}`);
       });
+
       XLSX.writeFile(wb, "Statements.xlsx");
     };
-
-    document.getElementById('exportWordBtn').onclick = function() {
-      exportToWord(sheets, HEADERS);
-    };
-
-    // Export to Word using docx.js
-   function exportToWord(sheets, headers) {
-  const { Document, Packer, Paragraph, Table, TableRow, TableCell, WidthType } = window.docx;
-
-  const children = [];
-  sheets.forEach((sheet, idx) => {
-    // Add info lines
-    sheet.infoLines.forEach(line => {
-      children.push(new Paragraph({ text: line, spacing: { after: 200 } }));
-    });
-    children.push(new Paragraph({ text: "" }));
-
-    // Add table header
-    const headerRow = new TableRow({
-      children: headers.map(h => new TableCell({
-        children: [new Paragraph(h)],
-        width: { size: 100 / headers.length, type: WidthType.PERCENTAGE }
-      }))
-    });
-
-    // Add table rows
-    const dataRows = sheet.tableRows.map(row =>
-      new TableRow({
-        children: row.map(cell => new TableCell({
-          children: [new Paragraph(cell)],
-          width: { size: 100 / headers.length, type: WidthType.PERCENTAGE }
-        }))
-      })
-    );
-
-    children.push(new Table({
-      rows: [headerRow, ...dataRows],
-      width: { size: 100, type: WidthType.PERCENTAGE }
-    }));
-
-    children.push(new Paragraph({ text: "" }));
-  });
-
-  // Build the document
-  const doc = new Document({
-    sections: [{ children }]
-  });
-
-  window.docx.Packer.toBlob(doc).then(blob => {
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = "Statements.docx";
-    document.body.appendChild(a);
-    a.click();
-    setTimeout(() => {
-      URL.revokeObjectURL(url);
-      document.body.removeChild(a);
-    }, 100);
-  });
-}
   </script>
 </body>
 </html>
