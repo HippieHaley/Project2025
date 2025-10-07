@@ -1,96 +1,346 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <title>PDF Invoice/Statement Toolkit</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      max-width: 900px;
-      margin: 0 auto;
-      background: #acdbf9;
-      color: #333;
-      padding: 2em;
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-    }
-    input[type="file"], button {
-      margin: 1em 0;
-      padding: 0.8em 1.5em;
-      border-radius: 30px;
-      border: 1px solid #000;
-      font-size: 1em;
-      background: #f8c9f9;
-      transition: background-color 0.2s;
-    }
-    button:disabled { background: #f0d4f0; color: #999; border: 1px solid #999; cursor: not-allowed; }
-    button:hover:not(:disabled), input[type="file"]:hover { background: #e8b3e8; }
-    #output { white-space: pre-wrap; background: #fff; padding: 1em; border-radius: 6px; margin-top: 1em; width: 100%; min-height: 200px; box-sizing: border-box;}
-    .back-home {
-      display: inline-block;
-      padding: 12px 24px;
-      background-color: #f8c9f9;
-      color: #333;
-      text-decoration: none;
-      font-size: 1rem;
-      font-weight: bold;
-      border-radius: 30px;
-      text-align: center;
-      border: 1px solid #000;
-      position: absolute;
-      top: 20px;
-      left: 20px;
-      z-index: 999;
-      transition: background-color 0.2s ease;
-    }
-    .back-home:hover { background: #e8b3e8; }
-    #notification {
-      position: fixed;
-      top: 10px;
-      right: 10px;
-      background: #f8c9f9;
-      color: #333;
-      padding: 10px 20px;
-      border-radius: 5px;
-      display: none;
-      z-index: 1000;
-    }
-    table {
-      border-collapse: collapse;
-      margin: 1em 0;
-      width: 100%;
-    }
-    th, td {
-      border: 1px solid #aaa;
-      padding: 6px 10px;
-      text-align: left;
-      font-size: 0.95em;
-    }
-    th {
-      background: #f8c9f9;
-    }
-  </style>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.10.377/pdf.min.js"></script>
+ <!DOCTYPE html>
+  <html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Billing Toolkit</title>
+    <style>
+      :root {
+        --blue: #acdbf9;
+        --pink: #f8c9f9;
+        --pink-dark: #e8b3e8;
+        --ink: #333;
+        --border: #000;
+        --table-border: #333;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: Arial, sans-serif;
+        background-color: var(--blue);
+        color: var(--ink);
+        margin: 0;
+        padding: 80px 20px 40px;
+      }
+
+      .back-home {
+        position: fixed;
+        top: 20px;
+        left: 20px;
+        display: inline-block;
+        padding: 12px 24px;
+        background-color: var(--pink);
+        color: var(--ink);
+        text-decoration: none;
+        font-size: 1rem;
+        font-weight: bold;
+        border-radius: 30px;
+        border: 1px solid var(--border);
+        transition: background-color 0.2s ease;
+        z-index: 999;
+      }
+
+      .back-home:hover {
+        background-color: var(--pink-dark);
+      }
+
+      .container {
+        max-width: 1100px;
+        margin: 0 auto;
+        display: flex;
+        flex-direction: column;
+        gap: 24px;
+      }
+
+      h1 {
+        text-align: center;
+        margin: 0;
+        font-size: 2.1rem;
+        letter-spacing: 0.02em;
+      }
+
+      .workflow {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 20px;
+      }
+
+      .card {
+        background-color: #ffffff;
+        border: 2px solid var(--border);
+        border-radius: 16px;
+        padding: 24px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+      }
+
+      .card h2 {
+        margin: 0;
+        text-align: center;
+        border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+        padding-bottom: 12px;
+      }
+
+      .help-text {
+        margin: 0;
+        font-size: 0.95rem;
+        line-height: 1.4;
+        text-align: center;
+      }
+
+      input[type="file"] {
+        padding: 12px 24px;
+        border: 1px solid var(--border);
+        border-radius: 30px;
+        background-color: var(--pink);
+        color: var(--ink);
+        cursor: pointer;
+        font-size: 1rem;
+        font-weight: bold;
+        align-self: center;
+        transition: background-color 0.2s ease;
+      }
+
+      input[type="file"]:hover {
+        background-color: var(--pink-dark);
+      }
+
+      input[type="file"]::file-selector-button {
+        font-size: 1rem;
+        padding: 10px 20px;
+        border: 1px solid var(--border);
+        border-radius: 30px;
+        background-color: var(--pink);
+        color: var(--ink);
+        font-weight: bold;
+        cursor: pointer;
+        transition: background-color 0.2s ease;
+      }
+
+      input[type="file"]::file-selector-button:hover {
+        background-color: var(--pink-dark);
+      }
+
+      button {
+        display: inline-block;
+        padding: 12px 24px;
+        background-color: var(--pink);
+        color: var(--ink);
+        font-size: 1rem;
+        font-weight: bold;
+        border: 1px solid var(--border);
+        border-radius: 30px;
+        text-align: center;
+        cursor: pointer;
+        transition: background-color 0.2s ease;
+      }
+
+      button:hover {
+        background-color: var(--pink-dark);
+      }
+
+      button:disabled {
+        background-color: #f0d4f0;
+        color: #999;
+        border: 1px solid #999;
+        cursor: not-allowed;
+      }
+
+      .actions {
+        display: flex;
+        justify-content: center;
+        gap: 12px;
+        flex-wrap: wrap;
+      }
+
+      .summary-list {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+        font-size: 0.95rem;
+      }
+
+      .summary-list li {
+        padding: 8px 12px;
+        background: rgba(172, 219, 249, 0.35);
+        border-radius: 8px;
+        border: 1px solid rgba(0, 0, 0, 0.12);
+      }
+
+      .client-picker {
+        display: flex;
+        gap: 10px;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .client-picker select {
+        padding: 8px 12px;
+        border-radius: 12px;
+        border: 1px solid var(--border);
+        background: #fff;
+        font-size: 1rem;
+      }
+
+      #preview-card h2 {
+        border-bottom: none;
+        text-align: left;
+        margin-bottom: -4px;
+      }
+
+      #previewStatus {
+        margin: 0;
+        font-size: 0.95rem;
+        color: rgba(51, 51, 51, 0.75);
+      }
+
+      .client-info h3 {
+        margin: 8px 0 4px;
+        font-size: 1.3rem;
+      }
+
+      .client-info p {
+        margin: 0;
+        line-height: 1.35;
+      }
+
+      .table-wrap {
+        overflow-x: auto;
+        border: 2px solid var(--table-border);
+        border-radius: 12px;
+        background: var(--blue);
+      }
+
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        min-width: 900px;
+      }
+
+      th,
+      td {
+        border: 1px solid var(--table-border);
+        padding: 10px;
+        white-space: nowrap;
+        background-color: var(--blue);
+        color: var(--ink);
+        font-size: 0.92rem;
+      }
+
+      th {
+        background-color: var(--pink);
+        font-weight: bold;
+      }
+
+      td.numeric {
+        text-align: right;
+      }
+
+      #balanceSummary {
+        margin: 10px 0 0;
+        font-weight: 600;
+        text-align: right;
+      }
+
+      .notification {
+        position: fixed;
+        top: 16px;
+        right: 16px;
+        padding: 10px 18px;
+        background-color: var(--pink);
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        font-weight: 600;
+        display: none;
+        z-index: 1000;
+      }
+
+      @media (max-width: 640px) {
+        body {
+          padding-top: 120px;
+        }
+
+        .back-home {
+          position: static;
+          margin: 10px auto 0;
+          display: block;
+          text-align: center;
+        }
+
+        .card {
+          padding: 20px;
+        }
+
+        .workflow {
+          grid-template-columns: 1fr;
+        }
+      }
+    </style>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.10.377/pdf.min.js" crossorigin="anonymous"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-</head>
-<body>
-  <a href="index.html" class="back-home">Back to Home</a>
-  <h1>PDF Invoice/Statement Toolkit</h1>
-  <input type="file" id="fileInput" accept="application/pdf" />
-  <button id="exportExcelBtn" disabled>Export to Excel</button>
-  <div id="notification"></div>
-  <div id="output"></div>
-  <script>
+  <script src="https://cdn.jsdelivr.net/npm/docx@7.5.0/build/index.js"></script>
+  </head>
+  <body>
+    <a href="index.html" class="back-home">Back to Home</a>
+    <div class="container">
+      <h1>Billing Toolkit</h1>
+
+      <div class="workflow">
+        <section class="card" id="pdf-section">
+          <h2>Step 1. Extract From PDF</h2>
+          <p class="help-text">
+            Upload a PDF statement to identify invoice tables and export them into an Excel workbook.
+          </p>
+          <input type="file" id="pdfInput" accept="application/pdf" />
+          <div class="actions">
+            <button id="exportExcelBtn" disabled>Export Extracted Excel</button>
+          </div>
+          <ul id="pdfSummary" class="summary-list"></ul>
+        </section>
+
+        <section class="card" id="excel-section">
+          <h2>Step 2. Clean Excel & Generate Word</h2>
+          <p class="help-text">
+            Load the Excel file (from Step&nbsp;1 or another source) to normalize the data and build client
+  statements.
+          </p>
+          <input type="file" id="excelInput" accept=".xlsx" />
+          <div class="actions">
+            <button id="processExcelBtn">Process Excel</button>
+            <button id="downloadWordBtn" disabled>Download Word Statements</button>
+          </div>
+          
+    <div id="notification" class="notification"></div>
+
+    <script>
+  pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.10.377/pdf.worker.min.js';
+
     const HEADERS = [
-      "Claim Number", "Service Date(s)", "Procedure", "Units", "Unit Rate",
-      "Total Charge", "Patient Charge", "Total Paid", "Ins. Paid",
-      "Patient Paid", "Total Adj.", "Total Balance", "Ins. Balance", "Patient Balance"
+      "Claim Number",
+      "Service Date(s)",
+      "Procedure",
+      "Units",
+      "Unit Rate",
+      "Total Charge",
+      "Patient Charge",
+      "Total Paid",
+      "Ins. Paid",
+      "Patient Paid",
+      "Total Adj.",
+      "Total Balance",
+      "Ins. Balance",
+      "Patient Balance"
     ];
 
-    let sheets = [];
+    let sheets = []; // Array of objects: {infoLines, tableRows}
 
     function cleanLine(line) {
       return line
@@ -117,45 +367,83 @@
     function parseTableRow(line) {
       const tokens = line.trim().split(/\s+/);
       if (tokens.length < 5) return Array(HEADERS.length).fill('');
+
+      // Find date index
       let dateIdx = tokens.findIndex(tok => /^\d{1,2}\/\d{1,2}\/\d{2,4}$/.test(tok));
       if (dateIdx === -1) return Array(HEADERS.length).fill('');
+
       const claimNumber = tokens.slice(0, dateIdx).join(' ');
       const serviceDate = tokens[dateIdx];
+
+      // Procedure: everything after date until we hit a token that's a number
       let i = dateIdx + 1;
       let procedureTokens = [];
-      while (i < tokens.length && !/^\d+$/.test(tokens[i])) {
+      while (
+        i < tokens.length &&
+        !/^\d+$/.test(tokens[i])
+      ) {
         procedureTokens.push(tokens[i]);
         i++;
       }
       const procedure = procedureTokens.join(' ');
+
+      // Units: next token (should be a number)
       const units = tokens[i] || '';
       i++;
+
+      // Unit Rate: next token (should look like $xx.xx)
       const unitRate = tokens[i] || '';
       i++;
+
+      // The rest of the fields
       let rest = [];
-      while (i < tokens.length) { rest.push(tokens[i]); i++; }
+      while (i < tokens.length) {
+        rest.push(tokens[i]);
+        i++;
+      }
       while (rest.length < 9) rest.push('');
+
       return [
-        claimNumber, serviceDate, procedure, units, unitRate,
-        rest[0], rest[1], rest[2], rest[3], rest[4], rest[5], rest[6], rest[7], rest[8]
+        claimNumber,
+        serviceDate,
+        procedure,
+        units,
+        unitRate,
+        rest[0],
+        rest[1],
+        rest[2],
+        rest[3],
+        rest[4],
+        rest[5],
+        rest[6],
+        rest[7],
+        rest[8]
       ];
     }
 
+    // Parse statement info and table
     function processExtractedSheet(flattened) {
       let infoLines = [];
       let headerIdx = flattened.findIndex(l => l.toLowerCase().startsWith("claim number"));
-      if (headerIdx > 0) infoLines = flattened.slice(0, headerIdx);
+      if (headerIdx > 0) {
+        infoLines = flattened.slice(0, headerIdx);
+      }
+      // Find table rows (stop at Totals/Balances)
       let tableLines = [];
       if (headerIdx !== -1) {
         for (let i = headerIdx + 1; i < flattened.length; i++) {
           let line = flattened[i];
-          if (/^totals?/i.test(line) || /^balances?/i.test(line) ||
-              /^patient'?s unapplied balance/i.test(line) || /disclaimer/i.test(line)) break;
+          if (
+            /^totals?/i.test(line) ||
+            /^balances?/i.test(line) ||
+            /^patient'?s unapplied balance/i.test(line) ||
+            /disclaimer/i.test(line)
+          ) break;
           if (line.trim()) tableLines.push(line);
         }
       }
       const tableRows = tableLines.map(parseTableRow);
-      sheets.push({ infoLines, tableRows });
+      sheets.push({infoLines, tableRows});
     }
 
     document.getElementById('fileInput').addEventListener('change', async function(event) {
@@ -164,16 +452,22 @@
       sheets = [];
       document.getElementById('output').textContent = "Extracting PDF...";
       document.getElementById('exportExcelBtn').disabled = true;
+      document.getElementById('exportWordBtn').disabled = true;
+
       try {
         const arrayBuffer = await file.arrayBuffer();
         const pdfData = new Uint8Array(arrayBuffer);
         pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.10.377/pdf.worker.min.js';
         const pdf = await pdfjsLib.getDocument({ data: pdfData }).promise;
+
         let currentSheetData = [];
         for (let i = 1; i <= pdf.numPages; i++) {
           const page = await pdf.getPage(i);
           const textContent = await page.getTextContent();
-          let line = '', lastY = null;
+
+          let line = '';
+          let lastY = null;
+
           textContent.items.forEach(item => {
             if (lastY !== null && Math.abs(item.transform[5] - lastY) > 10) {
               line = cleanLine(line);
@@ -190,6 +484,7 @@
             line += item.str + ' ';
             lastY = item.transform[5];
           });
+
           if (line.trim()) {
             line = cleanLine(line);
             if (line.includes("Disclaimer: Charges/Adjustments made after statement date")) {
@@ -205,9 +500,12 @@
         if (currentSheetData.length > 0) {
           processExtractedSheet(currentSheetData.map(r => r.trim()).filter(Boolean));
         }
+
+        // Build preview HTML
         if (sheets.length === 0 || sheets.every(s => s.tableRows.length === 0)) {
           document.getElementById('output').textContent = "No valid statement data found.";
           document.getElementById('exportExcelBtn').disabled = true;
+          document.getElementById('exportWordBtn').disabled = true;
         } else {
           let previewHTML = sheets.map((sheet, idx) => {
             let infoBlock = sheet.infoLines.map(l => `<div>${l}</div>`).join('');
@@ -220,92 +518,93 @@
           }).join('<br>');
           document.getElementById('output').innerHTML = previewHTML;
           document.getElementById('exportExcelBtn').disabled = false;
+          document.getElementById('exportWordBtn').disabled = false;
           showNotification("PDF data extracted for " + sheets.length + " statement(s)!");
         }
       } catch (e) {
         document.getElementById('output').textContent = "Error reading PDF!";
         document.getElementById('exportExcelBtn').disabled = true;
+        document.getElementById('exportWordBtn').disabled = true;
         showNotification("Error: Could not extract PDF data.");
       }
     });
-
-    // Helper to get max string width for each column
-    function getColWidths(wsData) {
-      let maxCol = 0;
-      wsData.forEach(row => { if (row.length > maxCol) maxCol = row.length; });
-      let colWidths = Array(maxCol).fill(10); // Default min width
-      wsData.forEach(row => {
-        row.forEach((cell, i) => {
-          let len = cell ? cell.toString().length : 0;
-          if (len > colWidths[i]) colWidths[i] = len;
-        });
-      });
-      return colWidths.map(w => ({ wch: w + 2 }));
-    }
 
     document.getElementById('exportExcelBtn').onclick = function() {
       if (!sheets.length) return;
       const wb = XLSX.utils.book_new();
       sheets.forEach((sheet, idx) => {
-        let wsData = [];
-
-        // Row 1: Statement Date, Client Name(s), (columns M or N) Pay Amount
-        let statementDate = ""; // parse from infoLines if available!
-        let clientName = "";
-        let payAmount = "";
-        sheet.infoLines.forEach(l => {
-          if (/statement date/i.test(l)) statementDate = l;
-          if (/client name/i.test(l)) clientName = l;
-          if (/pay.*amount/i.test(l)) payAmount = l;
-        });
-        // Place payAmount at column M (index 12)
-        let row1 = Array(13).fill("");
-        row1[0] = statementDate;
-        row1[1] = clientName;
-        row1[12] = payAmount;
-        wsData.push(row1);
-
-        // Row 2: blank
-        wsData.push(Array(13).fill(""));
-
-        // Row 3: blank (top margin)
-        wsData.push(Array(13).fill(""));
-
-        // Address block: rows 4-6, column A only
-        let addressLines = [];
-        sheet.infoLines.forEach(l => {
-          if (/(anderson|wall st|apt|lead, sd|[0-9]{5})/i.test(l)) addressLines.push(l);
-        });
-        wsData.push([addressLines[0] || "", ...Array(12).fill("")]);
-        wsData.push([addressLines[1] || "", ...Array(12).fill("")]);
-        wsData.push([addressLines[2] || "", ...Array(12).fill("")]);
-
-        // Row 7: blank
-        wsData.push(Array(13).fill(""));
-
-        // Row 8: Client ID and Client Name
-        let clientIdLine = sheet.infoLines.find(l => /client id/i.test(l)) || "";
-        wsData.push([clientIdLine, ...Array(12).fill("")]);
-
-        // Row 9: blank
-        wsData.push(Array(13).fill(""));
-
-        // Row 10: Table headers
-        wsData.push([...HEADERS]);
-
-        // Table data, starting at row 11
-        sheet.tableRows.forEach(row => wsData.push(row));
-
+        let wsData = [
+          ...sheet.infoLines.map(l=>[l]),
+          [],
+          HEADERS,
+          ...sheet.tableRows
+        ];
         const ws = XLSX.utils.aoa_to_sheet(wsData);
-
-        // Auto-fit columns
-        ws['!cols'] = getColWidths(wsData);
-
         XLSX.utils.book_append_sheet(wb, ws, `Statement ${idx + 1}`);
       });
-
       XLSX.writeFile(wb, "Statements.xlsx");
     };
+
+    document.getElementById('exportWordBtn').onclick = function() {
+      exportToWord(sheets, HEADERS);
+    };
+
+    // Export to Word using docx.js
+   function exportToWord(sheets, headers) {
+  const { Document, Packer, Paragraph, Table, TableRow, TableCell, WidthType } = window.docx;
+
+  const children = [];
+  sheets.forEach((sheet, idx) => {
+    // Add info lines
+    sheet.infoLines.forEach(line => {
+      children.push(new Paragraph({ text: line, spacing: { after: 200 } }));
+    });
+    children.push(new Paragraph({ text: "" }));
+
+    // Add table header
+    const headerRow = new TableRow({
+      children: headers.map(h => new TableCell({
+        children: [new Paragraph(h)],
+        width: { size: 100 / headers.length, type: WidthType.PERCENTAGE }
+      }))
+    });
+
+    // Add table rows
+    const dataRows = sheet.tableRows.map(row =>
+      new TableRow({
+        children: row.map(cell => new TableCell({
+          children: [new Paragraph(cell)],
+          width: { size: 100 / headers.length, type: WidthType.PERCENTAGE }
+        }))
+      })
+    );
+
+    children.push(new Table({
+      rows: [headerRow, ...dataRows],
+      width: { size: 100, type: WidthType.PERCENTAGE }
+    }));
+
+    children.push(new Paragraph({ text: "" }));
+  });
+
+  // Build the document
+  const doc = new Document({
+    sections: [{ children }]
+  });
+
+  window.docx.Packer.toBlob(doc).then(blob => {
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = "Statements.docx";
+    document.body.appendChild(a);
+    a.click();
+    setTimeout(() => {
+      URL.revokeObjectURL(url);
+      document.body.removeChild(a);
+    }, 100);
+  });
+}
   </script>
 </body>
 </html>
