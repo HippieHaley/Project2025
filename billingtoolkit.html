@@ -7,7 +7,7 @@
   <style>
     body {
       font-family: Arial, sans-serif;
-      max-width: 800px;
+      max-width: 900px;
       margin: 0 auto;
       background: #acdbf9;
       color: #333;
@@ -58,6 +58,20 @@
       display: none;
       z-index: 1000;
     }
+    table {
+      border-collapse: collapse;
+      margin: 1em 0;
+      width: 100%;
+    }
+    th, td {
+      border: 1px solid #aaa;
+      padding: 6px 10px;
+      text-align: left;
+      font-size: 0.95em;
+    }
+    th {
+      background: #f8c9f9;
+    }
   </style>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.10.377/pdf.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
@@ -71,7 +85,7 @@
   <div id="output"></div>
 
   <script>
-     const HEADERS = [
+    const HEADERS = [
       "Claim Number",
       "Service Date(s)",
       "Procedure",
@@ -88,99 +102,116 @@
       "Patient Balance"
     ];
 
-    let sheets = []; // Array of arrays of parsed rows, per statement
-    let previewHTML = ""; // HTML preview for output div
+    let sheets = []; // Array of objects: {infoLines, tableRows}
 
-    // Utility: Clean unwanted lines from text
     function cleanLine(line) {
-      let cleaned = line
-        .replace(/State\s+of\s+South\s+Dakota\s+Department\s+of\s+Health/gi, "")
-        .replace(/600\s+E\s+Capitol\s+Ave/gi, "")
-        .replace(/Pierre,\s+SD\s+57501/gi, "")
-        .trim();
-      // Remove lines that are now empty after cleaning
-      if (
-        !cleaned ||
-        /State\s+of\s+South\s+Dakota\s+Department\s+of\s+Health/i.test(line) ||
-        /Disclaimer: Charges\/Adjustments made after statement date will appear on your next statement. Questions: Please call \(605\)773-6031/i.test(line) ||
-        /600\s+E\s+Capitol\s+Ave/i.test(line) ||
-        /Pierre,\s+SD\s+57501/i.test(line)
-      ) return "";
-      return cleaned;
-    }
-function showNotification(msg) {
+  return line
+    .replace(/State\s+of\s+South\s+Dakota\s+Department\s+of\s+Health/gi, '')
+    .replace(/South Dakota Department of Health/gi, '')
+    .replace(/600\s+E\s+Capitol\s+Ave/gi, '')
+    .replace(/Pierre,\s+SD\s+57501/gi, '')
+    .replace(/Payment Type:.*$/i, '')
+    .replace(/Card Type:.*$/i, '')
+    .replace(/Name on Card:.*$/i, '')
+    .replace(/Card Number:.*$/i, '')
+    .replace(/Expiration Date:.*$/i, '')
+    .replace(/Amount Enclosed:.*$/i, '')
+    .trim();
+}
+
+    function showNotification(msg) {
       const n = document.getElementById("notification");
       n.textContent = msg;
       n.style.display = "block";
       setTimeout(() => { n.style.display = "none"; }, 3000);
     }
 
-    // Parse one statement's chunk into table rows
-    function parseStatementRows(lines) {
-      // Find the header line by matching all header names
-      const headerIdx = lines.findIndex(line =>
-        HEADERS.every(h =>
-          line.toLowerCase().includes(h.toLowerCase().split(" ")[0]) // match by first word
-        )
-      );
-      // If header not found, guess it's the first row
-      let dataLines = headerIdx !== -1 ? lines.slice(headerIdx + 1) : lines;
-      // Remove summary/blank lines
-      dataLines = dataLines.filter(l => l.trim() && !l.toLowerCase().includes("disclaimer"));
+    function parseTableRow(line) {
+      const tokens = line.trim().split(/\s+/);
+      if (tokens.length < 5) return Array(HEADERS.length).fill('');
 
-      // Parse each data line into columns
-      const tableRows = [];
-      dataLines.forEach(line => {
-        // Attempt to split by whitespace, but preserve procedure (may contain spaces)
-        // Assume: Claim Number (no spaces), then Service Date(s) (date format), then Procedure (may have spaces), then numbers
-        const tokens = line.trim().split(/\s+/);
-        if (tokens.length < 8) return; // skip short lines
+      // Find date index
+      let dateIdx = tokens.findIndex(tok => /^\d{1,2}\/\d{1,2}\/\d{2,4}$/.test(tok));
+      if (dateIdx === -1) return Array(HEADERS.length).fill('');
 
-        // Find the index of the service date (MM/DD/YYYY or MM/DD/YY)
-        let dateIdx = tokens.findIndex(tok => /^\d{1,2}\/\d{1,2}\/\d{2,4}$/.test(tok));
-        if (dateIdx === -1) return; // skip if no date
+      const claimNumber = tokens.slice(0, dateIdx).join(' ');
+      const serviceDate = tokens[dateIdx];
 
-        // Assume claim number is before date, procedure is after date and before units (first number after date)
-        const claimNumber = tokens.slice(0, dateIdx).join(' ');
-        const serviceDate = tokens[dateIdx];
-        // Find first number after date for units
-        let unitsIdx = dateIdx + 1;
-        while (unitsIdx < tokens.length && isNaN(tokens[unitsIdx].replace(/[^0-9.]/g, ''))) {
-          unitsIdx++;
-        }
-        const procedure = tokens.slice(dateIdx + 1, unitsIdx).join(' ');
-        const units = tokens[unitsIdx] || '';
-        // The rest of the columns, map by order
-        const rest = tokens.slice(unitsIdx + 1);
+      // Procedure: everything after date until we hit a token that's a number
+      let i = dateIdx + 1;
+      let procedureTokens = [];
+      while (
+        i < tokens.length &&
+        !/^\d+$/.test(tokens[i])
+      ) {
+        procedureTokens.push(tokens[i]);
+        i++;
+      }
+      const procedure = procedureTokens.join(' ');
 
-        // Map columns (fill blanks if missing)
-        const row = [
-          claimNumber,
-          serviceDate,
-          procedure,
-          units,
-          rest[0] || '', // Unit Rate
-          rest[1] || '', // Total Charge
-          rest[2] || '', // Patient Charge
-          rest[3] || '', // Total Paid
-          rest[4] || '', // Ins. Paid
-          rest[5] || '', // Patient Paid
-          rest[6] || '', // Total Adj.
-          rest[7] || '', // Total Balance
-          rest[8] || '', // Ins. Balance
-          rest[9] || ''  // Patient Balance
-        ];
-        tableRows.push(row);
-      });
-      return tableRows;
+      // Units: next token (should be a number)
+      const units = tokens[i] || '';
+      i++;
+
+      // Unit Rate: next token (should look like $xx.xx)
+      const unitRate = tokens[i] || '';
+      i++;
+
+      // The rest of the fields
+      let rest = [];
+      while (i < tokens.length) {
+        rest.push(tokens[i]);
+        i++;
+      }
+      while (rest.length < 9) rest.push('');
+
+      return [
+        claimNumber,
+        serviceDate,
+        procedure,
+        units,
+        unitRate,
+        rest[0],
+        rest[1],
+        rest[2],
+        rest[3],
+        rest[4],
+        rest[5],
+        rest[6],
+        rest[7],
+        rest[8]
+      ];
     }
 
-    // PDF file handler
-    document.getElementById("fileInput").addEventListener("change", async function(event) {
+    // Parse statement info and table
+    function processExtractedSheet(flattened) {
+      let infoLines = [];
+      let headerIdx = flattened.findIndex(l => l.toLowerCase().startsWith("claim number"));
+      if (headerIdx > 0) {
+        infoLines = flattened.slice(0, headerIdx);
+      }
+      // Find table rows (stop at Totals/Balances)
+      let tableLines = [];
+      if (headerIdx !== -1) {
+        for (let i = headerIdx + 1; i < flattened.length; i++) {
+          let line = flattened[i];
+          if (
+            /^totals?/i.test(line) ||
+            /^balances?/i.test(line) ||
+            /^patient'?s unapplied balance/i.test(line) ||
+            /disclaimer/i.test(line)
+          ) break;
+          if (line.trim()) tableLines.push(line);
+        }
+      }
+      const tableRows = tableLines.map(parseTableRow);
+      sheets.push({infoLines, tableRows});
+    }
+
+    document.getElementById('fileInput').addEventListener('change', async function(event) {
       const file = event.target.files[0];
       if (!file) return;
       sheets = [];
-      previewHTML = "";
       document.getElementById('output').textContent = "Extracting PDF...";
       document.getElementById('exportExcelBtn').disabled = true;
 
@@ -190,82 +221,81 @@ function showNotification(msg) {
         pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.10.377/pdf.worker.min.js';
         const pdf = await pdfjsLib.getDocument({ data: pdfData }).promise;
 
-        // We treat each "statement date:" as a new sheet
-        let currentLines = [];
+        let currentSheetData = [];
         for (let i = 1; i <= pdf.numPages; i++) {
           const page = await pdf.getPage(i);
           const textContent = await page.getTextContent();
-          let tempLines = textContent.items.map(item => item.str.trim()).filter(Boolean);
 
-          // Clean all lines
-          tempLines = tempLines.map(cleanLine).filter(Boolean);
+          let line = '';
+          let lastY = null;
 
-          // Chunk out statements by "statement date:"
-          while (tempLines.length > 0) {
-            const statementIdx = tempLines.findIndex(
-              line => line.toLowerCase().includes("statement date:")
-            );
-            if (statementIdx === -1) {
-              // No statement marker, add all remaining lines to current sheet
-              currentLines.push(...tempLines);
-              tempLines = [];
-            } else {
-              // Found a statement date, start a new sheet
-              // Drop everything before and including statement date
-              tempLines = tempLines.slice(statementIdx + 1);
-              if (currentLines.length > 0) {
-                sheets.push([...currentLines]);
-                currentLines = [];
+          textContent.items.forEach(item => {
+            if (lastY !== null && Math.abs(item.transform[5] - lastY) > 10) {
+              line = cleanLine(line);
+              if (line.includes("Disclaimer: Charges/Adjustments made after statement date")) {
+                if (currentSheetData.length > 0) {
+                  processExtractedSheet(currentSheetData.map(r => r.trim()).filter(Boolean));
+                  currentSheetData = [];
+                }
+              } else {
+                currentSheetData.push(line.trim());
               }
+              line = '';
+            }
+            line += item.str + ' ';
+            lastY = item.transform[5];
+          });
+
+          if (line.trim()) {
+            line = cleanLine(line);
+            if (line.includes("Disclaimer: Charges/Adjustments made after statement date")) {
+              if (currentSheetData.length > 0) {
+                processExtractedSheet(currentSheetData.map(r => r.trim()).filter(Boolean));
+                currentSheetData = [];
+              }
+            } else {
+              currentSheetData.push(line.trim());
             }
           }
         }
-        // Last sheet if it has content
-        if (currentLines.length > 0) sheets.push([...currentLines]);
+        if (currentSheetData.length > 0) {
+          processExtractedSheet(currentSheetData.map(r => r.trim()).filter(Boolean));
+        }
 
-        // Now parse each sheet into table rows
-        const parsedSheets = sheets.map(sheetLines => {
-          const tableRows = parseStatementRows(sheetLines);
-          return tableRows;
-        });
-
-        // Build preview HTML table
-        if (parsedSheets.length === 0 || parsedSheets.every(s => s.length === 0)) {
-          previewHTML = "No valid statement data found.";
+        // Build preview HTML
+        if (sheets.length === 0 || sheets.every(s => s.tableRows.length === 0)) {
+          document.getElementById('output').textContent = "No valid statement data found.";
           document.getElementById('exportExcelBtn').disabled = true;
         } else {
-          previewHTML = parsedSheets.map((sheet, idx) => {
-            if (!sheet.length) return `--- Statement ${idx + 1}: No rows found ---`;
-            return `<b>Statement ${idx + 1}</b><table><tr>` +
-              HEADERS.map(h => `<th>${h}</th>`).join('') +
-              '</tr>' +
-              sheet.map(row =>
-                '<tr>' +
-                row.map(cell => `<td>${cell}</td>`).join('') +
-                '</tr>'
+          let previewHTML = sheets.map((sheet, idx) => {
+            let infoBlock = sheet.infoLines.map(l => `<div>${l}</div>`).join('');
+            let tableBlock = `<table><tr>${HEADERS.map(h => `<th>${h}</th>`).join('')}</tr>` +
+              sheet.tableRows.map(row =>
+                '<tr>' + row.map(cell => `<td>${cell}</td>`).join('') + '</tr>'
               ).join('') +
-              '</table>';
+              `</table>`;
+            return `<b>Statement ${idx + 1}</b><br>${infoBlock}<br>${tableBlock}`;
           }).join('<br>');
+          document.getElementById('output').innerHTML = previewHTML;
           document.getElementById('exportExcelBtn').disabled = false;
-          showNotification("PDF data extracted for " + parsedSheets.length + " statement(s)!");
+          showNotification("PDF data extracted for " + sheets.length + " statement(s)!");
         }
-        document.getElementById('output').innerHTML = previewHTML;
-        // Store parsed for export
-        sheets = parsedSheets;
-
       } catch (e) {
         document.getElementById('output').textContent = "Error reading PDF!";
         showNotification("Error: Could not extract PDF data.");
       }
     });
 
-    // Export to Excel handler
     document.getElementById('exportExcelBtn').onclick = function() {
       if (!sheets.length) return;
       const wb = XLSX.utils.book_new();
-      sheets.forEach((tableRows, idx) => {
-        // Add header row
-        const wsData = [HEADERS, ...tableRows];
+      sheets.forEach((sheet, idx) => {
+        let wsData = [
+          ...sheet.infoLines.map(l=>[l]),
+          [],
+          HEADERS,
+          ...sheet.tableRows
+        ];
         const ws = XLSX.utils.aoa_to_sheet(wsData);
         XLSX.utils.book_append_sheet(wb, ws, `Statement ${idx + 1}`);
       });
