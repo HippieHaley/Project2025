@@ -3,342 +3,181 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Invoice/Statement Generator</title>
+  <title>PDF Invoice/Statement Toolkit</title>
   <style>
-     body {
-    font-family: Arial, sans-serif;
-    max-width: 1000px;
-    margin: 0 auto;
-    background-color: #acdbf9; /* Light blue background */
-    color: #333;
-    padding-top: 50px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    min-height: 100vh;
-  }
-  button {
-    display: inline-block;
-    padding: 12px 24px;
-    background-color: #f8c9f9; /* Soft pink */
-    color: #333;
-    font-size: 1rem;
-    font-weight: bold;
-    border: 1px solid #000;
-    border-radius: 30px;
-    text-align: center;
-    cursor: pointer;
-    transition: background-color 0.2s ease;
-    margin: 10px;
-  }
-
-  button:hover {
-    background-color: #e8b3e8; /* Slightly darker pink */
-  }
-
-  button:disabled {
-    background-color: #f0d4f0; /* Dimmed pink */
-    color: #999;
-    cursor: not-allowed;
-    border: 1px solid #999;
-  }
-
-  /* File Input Styling */
-  input[type="file"] {
-    padding: 12px 24px;
-    font-size: 1rem;
-    border: 1px solid #000;
-    border-radius: 30px;
-    background-color: #f8c9f9;
-    color: #333;
-    cursor: pointer;
-    transition: background-color 0.2s ease;
-    margin: 10px;
-  }
-
-  input[type="file"]:hover {
-    background-color: #e8b3e8;
-  }
-
-  input[type="file"]::file-selector-button {
-    background-color: #f8c9f9;
-    color: #333;
-    border: 1px solid #000;
-    padding: 10px 20px;
-    border-radius: 30px;
-    cursor: pointer;
-    font-weight: bold;
-    transition: background-color 0.2s ease;
-  }
-
-  input[type="file"]::file-selector-button:hover {
-    background-color: #e8b3e8;
-  }
-
-  /* Back Home Button */
-  .back-home {
-    display: inline-block;
-    padding: 12px 24px;
-    background-color: #f8c9f9;
-    color: #333;
-    text-decoration: none;
-    font-size: 1rem;
-    font-weight: bold;
-    border-radius: 30px;
-    text-align: center;
-    border: 1px solid #000;
-    position: absolute;
-    top: 20px;
-    left: 20px;
-    z-index: 999;
-    transition: background-color 0.2s ease;
-  }
-
-  .back-home:hover {
-    background-color: #e8b3e8;
-  }
-</style>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.10.377/pdf.min.js" crossorigin="anonymous"></script>
+    body {
+      font-family: Arial, sans-serif;
+      max-width: 800px;
+      margin: 0 auto;
+      background: #acdbf9;
+      color: #333;
+      padding: 2em;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    input[type="file"], button {
+      margin: 1em 0;
+      padding: 0.8em 1.5em;
+      border-radius: 30px;
+      border: 1px solid #000;
+      font-size: 1em;
+      background: #f8c9f9;
+      transition: background-color 0.2s;
+    }
+    button:disabled { background: #f0d4f0; color: #999; border: 1px solid #999; cursor: not-allowed; }
+    button:hover:not(:disabled), input[type="file"]:hover { background: #e8b3e8; }
+    #output { white-space: pre-wrap; background: #fff; padding: 1em; border-radius: 6px; margin-top: 1em; width: 100%; min-height: 200px; box-sizing: border-box;}
+    .back-home {
+      display: inline-block;
+      padding: 12px 24px;
+      background-color: #f8c9f9;
+      color: #333;
+      text-decoration: none;
+      font-size: 1rem;
+      font-weight: bold;
+      border-radius: 30px;
+      text-align: center;
+      border: 1px solid #000;
+      position: absolute;
+      top: 20px;
+      left: 20px;
+      z-index: 999;
+      transition: background-color 0.2s ease;
+    }
+    .back-home:hover { background: #e8b3e8; }
+    #notification {
+      position: fixed;
+      top: 10px;
+      right: 10px;
+      background: #f8c9f9;
+      color: #333;
+      padding: 10px 20px;
+      border-radius: 5px;
+      display: none;
+      z-index: 1000;
+    }
+  </style>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.10.377/pdf.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 </head>
 <body>
   <a href="index.html" class="back-home">Back to Home</a>
+  <h1>PDF Invoice/Statement Toolkit</h1>
   <input type="file" id="fileInput" accept="application/pdf" />
-  <button id="exportExcelBtn" onclick="exportToExcel()" disabled>Export to Excel</button>
-  <div id="notification" style="position: fixed; top: 10px; right: 10px; background-color: #f8c9f9; color: #333; padding: 10px 20px; border-radius: 5px; display: none; z-index: 1000;"></div>
+  <button id="exportExcelBtn" disabled>Export to Excel</button>
+  <div id="notification"></div>
+  <div id="output"></div>
+
   <script>
-    let sheets = [];
-    let clientInfo = [];
-  
-    // Attach listener to file input
-    document.getElementById('fileInput').addEventListener('change', handleFile);
-  
-    async function handleFile(event) {
-  const file = event.target.files[0];
-  if (!file) return;
+    let sheets = []; // Array of arrays of lines, per statement
+    let previewText = ""; // Preview for output div
 
-  try {
-    const arrayBuffer = await file.arrayBuffer();
-    const pdfData = new Uint8Array(arrayBuffer);
+    // Utility: Clean unwanted lines from text
+    function cleanLine(line) {
+      let cleaned = line
+        .replace(/State\s+of\s+South\s+Dakota\s+Department\s+of\s+Health/gi, "")
+        .replace(/600\s+E\s+Capitol\s+Ave/gi, "")
+        .replace(/Pierre,\s+SD\s+57501/gi, "")
+        .trim();
+      // Remove lines that are now empty after cleaning
+      if (
+        !cleaned ||
+        /State\s+of\s+South\s+Dakota\s+Department\s+of\s+Health/i.test(line) ||
+        /600\s+E\s+Capitol\s+Ave/i.test(line) ||
+        /Pierre,\s+SD\s+57501/i.test(line)
+      ) return "";
+      return cleaned;
+    }
 
-    pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.10.377/pdf.worker.min.js';
+    // Show notification
+    function showNotification(msg) {
+      const n = document.getElementById("notification");
+      n.textContent = msg;
+      n.style.display = "block";
+      setTimeout(() => { n.style.display = "none"; }, 3000);
+    }
 
-    const pdf = await pdfjsLib.getDocument({ data: pdfData }).promise;
+    // PDF file handler
+    document.getElementById("fileInput").addEventListener("change", async function(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+      sheets = [];
+      previewText = "";
+      document.getElementById('output').textContent = "Extracting PDF...";
+      document.getElementById('exportExcelBtn').disabled = true;
 
-    sheets = [];
-    clientInfo = [];
+      try {
+        const arrayBuffer = await file.arrayBuffer();
+        const pdfData = new Uint8Array(arrayBuffer);
+        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.10.377/pdf.worker.min.js';
+        const pdf = await pdfjsLib.getDocument({ data: pdfData }).promise;
 
-    let currentSheetData = [];
+        // We treat each "statement date:" as a new sheet (per your workflow)
+        let currentSheetLines = [];
+        for (let i = 1; i <= pdf.numPages; i++) {
+          const page = await pdf.getPage(i);
+          const textContent = await page.getTextContent();
+          let tempLines = textContent.items.map(item => item.str.trim()).filter(Boolean);
 
-    for (let i = 1; i <= pdf.numPages; i++) {
-      const page = await pdf.getPage(i);
-      const textContent = await page.getTextContent();
+          // Clean all lines
+          tempLines = tempLines.map(cleanLine).filter(Boolean);
 
-      let line = '';
-      let lastY = null;
-
-      textContent.items.forEach(item => {
-        if (lastY !== null && Math.abs(item.transform[5] - lastY) > 10) {
-          line = cleanText(line);
-
-          if (line.includes("Disclaimer: Charges/Adjustments made after statement date")) {
-            if (currentSheetData.length > 0) {
-              processExtractedSheet(currentSheetData);
-              currentSheetData = [];
+          // Chunk out statements by "statement date:"
+          while (tempLines.length > 0) {
+            const statementIdx = tempLines.findIndex(
+              line => line.toLowerCase().includes("statement date:")
+            );
+            if (statementIdx === -1) {
+              // No statement marker, add all remaining lines to current sheet
+              currentSheetLines.push(...tempLines);
+              tempLines = [];
+            } else {
+              // Found a statement date, start a new sheet
+              // Drop everything before and including statement date
+              tempLines = tempLines.slice(statementIdx + 1);
+              if (currentSheetLines.length > 0) {
+                sheets.push([...currentSheetLines]);
+                currentSheetLines = [];
+              }
             }
-          } else {
-            currentSheetData.push([line.trim()]);
           }
-
-          line = '';
         }
+        // Last sheet if it has content
+        if (currentSheetLines.length > 0) sheets.push([...currentSheetLines]);
 
-        line += item.str + ' ';
-        lastY = item.transform[5];
-      });
-
-      // Capture last dangling line from the page
-      if (line.trim()) {
-        line = cleanText(line);
-        if (line.includes("Disclaimer: Charges/Adjustments made after statement date")) {
-          if (currentSheetData.length > 0) {
-            processExtractedSheet(currentSheetData);
-            currentSheetData = [];
-          }
+        // Build preview
+        if (sheets.length === 0) {
+          previewText = "No valid statement data found.";
+          document.getElementById('exportExcelBtn').disabled = true;
         } else {
-          currentSheetData.push([line.trim()]);
+          previewText = sheets.map(
+            (sheet, idx) => `--- Statement ${idx + 1} ---\n${sheet.join('\n')}\n`
+          ).join('\n');
+          document.getElementById('exportExcelBtn').disabled = false;
+          showNotification("PDF data extracted for " + sheets.length + " statement(s)!");
         }
+        document.getElementById('output').textContent = previewText;
+
+      } catch (e) {
+        document.getElementById('output').textContent = "Error reading PDF!";
+        showNotification("Error: Could not extract PDF data.");
       }
-    }
+    });
 
-    // Final sheet after last page
-    if (currentSheetData.length > 0) {
-      processExtractedSheet(currentSheetData);
-    }
-    console.log("✅ Extracted sheets:", sheets);
-    if (sheets.length > 0) {
-      showNotification('PDF data extracted successfully!');
-    } else {
-      alert('No readable text extracted.');
-    }
-  } catch (error) {
-    console.error('Error extracting PDF data:', error);
-    alert('Failed to extract data. Check the console for details.');
-  }
-}
-function cleanText(text) {
-  return text
-    .replace(/State\s+of\s+South\s+Dakota\s+Department\s+of\s+Health/gi, '')
-    .replace(/600\s+E\s+Capitol\s+Ave/gi, '')
-    .replace(/Pierre,\s+SD\s+57501/gi, '')
-    .trim();
-}
-function processExtractedSheet(rawLines) {
-  const flattened = rawLines.map(r => r[0]?.trim()).filter(Boolean);
-  const name = extractClientName(flattened);
-  const address = extractClientAddress(flattened);
-  clientInfo.push({ name, address });
-
-  const headerIndex = flattened.findIndex(line =>
-  line.toLowerCase().includes("claim number")
-);
-  const rawTop = flattened.slice(0, headerIndex).map(line => [line]);
-
-  const tableRows = extractTableRows(flattened, headerIndex);
-  const structured = buildStructuredTable(tableRows);
-
-  const wsData = [
-    ...rawTop,
-    [],
-    ...structured
-  ];
-
-  sheets.push(wsData);
-}
-function extractClientName(lines) {
-  const nameLine = lines.find(line => line.includes("Client Name(s):"));
-  if (!nameLine) return "[CLIENT NAME]";
-
-  let name = nameLine.split("Client Name(s):")[1].trim().split(" (")[0];
-
-  if (name.includes(",")) {
-    const [last, first] = name.split(",");
-    name = `${first.trim()} ${last.trim()}`;
-  }
-
-  return name;
-}
-function extractClientAddress(lines) {
-  const index = lines.findIndex(line => line.includes(","));
-  if (index === -1) return ["[ADDRESS LINE 1]", "[CITY, STATE ZIP]"];
-
-  const raw = lines.slice(index + 1, index + 4)
-    .map(line => line.trim())
-    .filter(line => line.length > 0);
-
-  return [
-    raw[0] || "[ADDRESS LINE 1]",
-    raw.find(line => /\d{5}/.test(line)) || "[CITY, STATE ZIP]"
-  ];
-}
-function extractTableRows(lines, headerIndex) {
-  if (headerIndex === -1) return [];
-
-  return lines
-    .slice(headerIndex + 1)
-    .filter(line =>
-      line.includes("CL-") || line.includes("Service Line#")
-    );
-}
-function buildStructuredTable(rows) {
-  const headers = [
-    "Claim Number", "Service Date", "Procedure (and Codes)", "Units", "Unit Rate",
-    "Total Charge", "Patient Charge", "Total Paid", "Insurance Paid", "Patient Paid",
-    "Total Adjustment", "Total Balance", "Insurance Balance", "Balance Owed"
-  ];
-
-  const body = [];
-
-  rows.forEach((line, rowIndex) => {
-    const parts = line.trim().split(/\s+/); // basic split, then we slice cleanly
-    const dateIndex = parts.findIndex(part => /^\d{1,2}\/\d{1,2}\/\d{4}$/.test(part));
-
-    const claimOrServiceLine = parts.slice(0, dateIndex).join(' ');
-    const serviceDate = parts[dateIndex];
-
-    // Find the first numeric value after the date (typically units)
-    let unitsIndex = dateIndex + 1;
-    while (unitsIndex < parts.length && isNaN(parts[unitsIndex].replace(/[$,]/g, ''))) {
-      unitsIndex++;
-    }
-
-    const procedure = parts.slice(dateIndex + 1, unitsIndex).join(' ');
-    const units = parts[unitsIndex] || '';
-    const unitRate = parts[unitsIndex + 1] || '';
-    const totalCharge = parts[unitsIndex + 2] || '';
-    const patientCharge = parts[unitsIndex + 3] || '';
-    const totalPaid = parts[unitsIndex + 4] || '';
-    const insurancePaid = parts[unitsIndex + 5] || '';
-    const patientPaid = parts[unitsIndex + 6] || '';
-    const adjustment = parts[unitsIndex + 7] || '';
-    const totalBalance = parts[unitsIndex + 8] || '';
-    const insuranceBalance = parts[unitsIndex + 9] || '';
-    const balanceOwedRow = parts[unitsIndex + 10] || '';
-
-    body.push([
-      claimOrServiceLine,
-      serviceDate,
-      procedure,
-      units,
-      unitRate,
-      totalCharge,
-      patientCharge,
-      totalPaid,
-      insurancePaid,
-      patientPaid,
-      adjustment,
-      totalBalance,
-      insuranceBalance,
-      balanceOwedRow
-    ]);
-  });
-
-  return [headers, ...body];
-}
-function exportToExcel() {
-  if (sheets.length === 0) {
-    alert("No sheets were generated from the PDF. Please check the file and try again.");
-    return;
-  }
-
-  const wb = XLSX.utils.book_new();
-
-  sheets.forEach((sheetData, index) => {
-    const ws = XLSX.utils.aoa_to_sheet(sheetData);
-
-    ws['!cols'] = [
-      { wch: 20 }, { wch: 15 }, { wch: 40 }, { wch: 8 }, { wch: 12 },
-      { wch: 14 }, { wch: 14 }, { wch: 12 }, { wch: 14 }, { wch: 12 },
-      { wch: 16 }, { wch: 14 }, { wch: 18 }, { wch: 14 }
-    ];
-
-    XLSX.utils.book_append_sheet(wb, ws, `Invoice ${index + 1}`);
-  });
-
-  XLSX.writeFile(wb, "Invoice_Statement.xlsx");
-}
-    function showNotification(message) {
-      const notification = document.getElementById('notification');
-      notification.textContent = message;
-      notification.style.display = 'block';   
-      document.getElementById('exportExcelBtn').disabled = false;
-      setTimeout(() => {
-        notification.style.display = 'none';
-      }, 3000); // Hide after 3 seconds
-    }
- 
-
+    // Export to Excel handler
+    document.getElementById('exportExcelBtn').onclick = function() {
+      if (!sheets.length) return;
+      const wb = XLSX.utils.book_new();
+      sheets.forEach((sheetLines, idx) => {
+        // Each line as a row, single column for simplicity
+        const wsData = sheetLines.map(line => [line]);
+        const ws = XLSX.utils.aoa_to_sheet(wsData);
+        XLSX.utils.book_append_sheet(wb, ws, `Statement ${idx + 1}`);
+      });
+      XLSX.writeFile(wb, "Statements.xlsx");
+    };
   </script>
 </body>
 </html>
