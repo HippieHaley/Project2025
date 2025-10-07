@@ -266,58 +266,53 @@
       exportToWord(sheets, HEADERS);
     };
 
+    // Export extracted statements to Word (.docx)
     function exportToWord(sheets, headers) {
       const { Document, Packer, Paragraph, Table, TableRow, TableCell, WidthType } = window.docx;
       const children = [];
-      let first = true;
       sheets.forEach((sheet, idx) => {
-        if (!first) {
-          children.push(new window.docx.Paragraph({ children: [], pageBreakBefore: true }));
-        }
-        first = false;
-        sheet.infoLines.forEach(line => {
-          children.push(new Paragraph({ text: line, spacing: { after: 200 } }));
-        });
-        children.push(new Paragraph({ text: "" }));
-        const headerRow = new TableRow({
-          children: headers.map(h => new TableCell({ children: [new Paragraph(h)], width: { size: 100 / headers.length, type: WidthType.PERCENTAGE } }))
-        });
-        const dataRows = sheet.tableRows.map(row =>
-          new TableRow({
-        children: row.map(cell => new TableCell({ children: [new Paragraph(cell)], width: { size: 100 / headers.length, type: WidthType.PERCENTAGE } }))
-          })
-        );
-        children.push(new Table({ rows: [headerRow, ...dataRows], width: { size: 100, type: WidthType.PERCENTAGE } }));
-        children.push(new Paragraph({ text: "" }));
+      if (idx > 0) {
+        children.push(new Paragraph({ children: [], pageBreakBefore: true }));
+      }
+      // Info lines
+      sheet.infoLines.forEach(line => {
+        children.push(new Paragraph({ text: line, spacing: { after: 200 } }));
       });
-      sheets.forEach((sheet, idx) => {
-        sheet.infoLines.forEach(line => {
-          children.push(new Paragraph({ text: line, spacing: { after: 200 } }));
-        });
-        children.push(new Paragraph({ text: "" }));
-        const headerRow = new TableRow({
-          children: headers.map(h => new TableCell({ children: [new Paragraph(h)], width: { size: 100 / headers.length, type: WidthType.PERCENTAGE } }))
-        });
-        const dataRows = sheet.tableRows.map(row =>
-          new TableRow({
-            children: row.map(cell => new TableCell({ children: [new Paragraph(cell)], width: { size: 100 / headers.length, type: WidthType.PERCENTAGE } }))
-          })
-        );
-        children.push(new Table({ rows: [headerRow, ...dataRows], width: { size: 100, type: WidthType.PERCENTAGE } }));
-        children.push(new Paragraph({ text: "" }));
+      children.push(new Paragraph({ text: "" }));
+      // Table header
+      const headerRow = new TableRow({
+        children: headers.map(h => new TableCell({
+        children: [new Paragraph({ text: h, bold: true })],
+        width: { size: 100 / headers.length, type: WidthType.PERCENTAGE }
+        }))
+      });
+      // Table data
+      const dataRows = sheet.tableRows.map(row =>
+        new TableRow({
+        children: row.map(cell => new TableCell({
+          children: [new Paragraph(cell)],
+          width: { size: 100 / headers.length, type: WidthType.PERCENTAGE }
+        }))
+        })
+      );
+      children.push(new Table({
+        rows: [headerRow, ...dataRows],
+        width: { size: 100, type: WidthType.PERCENTAGE }
+      }));
+      children.push(new Paragraph({ text: "" }));
       });
       const doc = new Document({ sections: [{ children }] });
-      window.docx.Packer.toBlob(doc).then(blob => {
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = "Statements.docx";
-        document.body.appendChild(a);
-        a.click();
-        setTimeout(() => {
-          URL.revokeObjectURL(url);
-          document.body.removeChild(a);
-        }, 100);
+      Packer.toBlob(doc).then(blob => {
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = "Statements.docx";
+      document.body.appendChild(a);
+      a.click();
+      setTimeout(() => {
+        URL.revokeObjectURL(url);
+        document.body.removeChild(a);
+      }, 100);
       });
     }
   </script>
