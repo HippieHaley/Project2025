@@ -1,12 +1,30 @@
 const downloadWordBtn = document.getElementById('downloadWordBtn');
+const wordInput = document.getElementById('wordInput');
 
+let uploadedWordFile = null;
+
+// Listen for file upload
+wordInput.addEventListener('change', (event) => {
+    if (event.target.files && event.target.files[0]) {
+        uploadedWordFile = event.target.files[0];
+        downloadWordBtn.disabled = false;
+    } else {
+        uploadedWordFile = null;
+        downloadWordBtn.disabled = true;
+    }
+});
+
+// Download the uploaded file when button is clicked
 downloadWordBtn.addEventListener('click', () => {
-    // Example: Download a Word file from a URL
-    const wordFileUrl = '/path/to/your/file.docx';
+    if (!uploadedWordFile) return;
+    const url = URL.createObjectURL(uploadedWordFile);
     const link = document.createElement('a');
-    link.href = wordFileUrl;
-    link.download = 'BillingDetails.docx';
+    link.href = url;
+    link.download = uploadedWordFile.name || 'BillingDetails.docx';
     document.body.appendChild(link);
     link.click();
-    document.body.removeChild(link);
+    setTimeout(() => {
+        URL.revokeObjectURL(url);
+        document.body.removeChild(link);
+    }, 100);
 });
