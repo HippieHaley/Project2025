@@ -238,18 +238,22 @@
       }
 
       .table-wrap {
-        overflow-x: auto;
-        border: 2px solid var(--table-border);
-        border-radius: 12px;
-        background:  #ffffff;
-      }
+  display: flex;
+  justify-content: center; /* center horizontally */
+  align-items: flex-start;  /* top align (can be center for vertical too) */
+  width: 100%;
+  overflow-x: auto;
+  border: 2px solid var(--table-border);
+  border-radius: 12px;
+  background: #ffffff;
+  margin: 0 auto; /* extra insurance for centering */
+}
 
-      table {
-        width: 100%;
-        border-collapse: collapse;
-        min-width: 900px;
-      }
-
+table {
+  margin: 0 auto; /* center table inside table-wrap */
+  width: auto;    /* don't fill 100%, let content size */
+  min-width: 900px;
+}
       th,
       td {
         border: 1px solid var(--table-border);
