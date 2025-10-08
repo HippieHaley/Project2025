@@ -101,6 +101,7 @@ function cleanLine(line) {
     .replace(/Card Number:.*$/i, '')
     .replace(/Expiration Date:.*$/i, '')
     .replace(/Amount Enclosed:.*$/i, '')
+    .replace(/Clients Name(s):.*$/i, '')
     .trim();
 }
 
@@ -297,25 +298,24 @@ function exportToWord(sheets, headers) {
         addressLines[1] = line.trim();
       }
     }
-    // fallback: get lines 1 and 2 if not found by above
-    if (addressLines[0] === "[ADDRESS LINE 1]" && sheet.infoLines[1]) addressLines[0] = sheet.infoLines[1];
-    if (addressLines[1] === "[CITY, STATE ZIP]" && sheet.infoLines[2]) addressLines[1] = sheet.infoLines[2];
+    // fallback: always use infoLines[5] and infoLines[6] for address if available
+    if (sheet.infoLines[4]) addressLines[0] = sheet.infoLines[4];
+    if (sheet.infoLines[5]) addressLines[1] = sheet.infoLines[5];
 
     // --- Calculate total balance owed ---
     let balanceOwed = 0;
     let balanceColIdx = headers.findIndex(h => /balance owed|patient balance/i.test(h));
-    sheet.tableRows.forEach(row => {
-      let val = row[balanceColIdx];
-      if (typeof val === 'string') {
-        val = parseFloat(val.replace(/[$,]/g, ''));
-        if (!isNaN(val)) balanceOwed += val;
-      }
-    });
-
-    // --- Filter out disclaimer rows ---
-    const validRows = sheet.tableRows.filter(row =>
-      !(row[0] && row[0].toString().includes("Disclaimer: Charges/Adjustments made after statement date"))
-    );
+sheet.tableRows.forEach(row => {
+  let val = row[balanceColIdx];
+  if (typeof val === 'string') {
+    val = parseFloat(val.replace(/[$,]/g, ''));
+    if (!isNaN(val)) balanceOwed += val;
+  }
+});
+// --- Filter out disclaimer rows ---
+const validRows = sheet.tableRows.filter(row =>
+  !(row[0] && row[0].toString().includes("Disclaimer: Charges/Adjustments made after statement date"))
+);
 
     // --- Table rows ---
     const headerRow = new TableRow({
