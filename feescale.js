@@ -333,7 +333,7 @@ function copyIncomeInfo() {
   infoToCopy +=
     `Yearly Income: $${yearlyIncome}\n` +
     `Client Pay: ${coverageLevel}\n` +
-    `AWC! qualification: ${awcQualification} -If Applicable\n` +
+    `AWC! and WCN qualification: ${awcQualification} -If Applicable\n` +
     `Insurance:\n` +
     `${new Date().toLocaleString([], { hour:'2-digit', minute:'2-digit', year:'numeric', month:'2-digit', day:'2-digit' })}\n` +
     `Staff: H\n`;
