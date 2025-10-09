@@ -327,11 +327,6 @@ button:hover {
       });
       document.body.appendChild(container);
     }
-
-  function clearSmsSuggestions() {
-    const existing = document.getElementById('smsSuggestionContainer');
-    if (existing) existing.remove();
-  }
   function updateInputVisibility(row) {
   const templateSelector = row.querySelector('.template-selector');
   const selectedTemplate = templateSelector ? templateSelector.value : 'default';
@@ -390,44 +385,36 @@ addRow = function () {
         alert("You must have at least one row.");
       }
     }
-function getEmailRowData(row) {
-  const inputs = row.getElementsByTagName('input');
-  const email = inputs[0].value;
-  const date = inputs[1].value;
-  const time = inputs[2].value;
-
-  const templateSelector = row.querySelector('.template-selector');
-  const selectedTemplate = templateSelector ? templateSelector.value : 'default';
-
-  const templates = {
-    default: `Please send YES to confirm your appt on ${date} @ ${time}.\nCall to cancel, reschedule, or if you have questions.\n605-717-8920. Thank you.`,
-    reschedule: `We need to reschedule your appt originally set for ${date} @ ${time}.\nPlease call us at 605-717-8920. Thank you.`,
-    CallClinic: `We called you on ${new Date().toLocaleDateString()}.\nIt's important you get in touch with the clinic.\nPlease call us at 605-717-8920. Thank you.`,
-    AEDue: `Its about that time! Your annual exam is due ${date}.\nPlease call us at 605-717-8920 to schedule your appointment. Thank you.`,
-    MissedAppt: `We missed you at your appointment on ${date} @ ${time}.\nPlease call us at 605-717-8920 to reschedule. Thank you.`,
-    IncomeDocReminder: `Please bring some sort of income documentation for your appointment on ${date}. This could be w-2s or a month of paystubs. Thank you.`,
-  };
-
-  const subject = 'SECUREMAIL From Monument Health FHES.';
-  const body = templates[selectedTemplate] || templates.default;
-
-  return { email, subject, body };
+function formatTime12H(time) {
+  if (!time) return '';
+  let [hour, minute] = time.split(":");
+  hour = parseInt(hour, 10);
+  const ampm = hour >= 12 ? "PM" : "AM";
+  hour = hour % 12;
+  if (hour === 0) hour = 12;
+  return `${hour}:${minute} ${ampm}`;
 }
+
+// Then in getEmailRowData:
+const formattedTime = formatTime12H(time);
+// use formattedTime instead of time in your templates
+
 function getEmailRowData(row) {
   const inputs = row.getElementsByTagName('input');
   const email = inputs[0].value;
   const date = inputs[1].value;
   const time = inputs[2].value;
+  const formattedTime = formatTime12H(time);
 
   const templateSelector = row.querySelector('.template-selector');
   const selectedTemplate = templateSelector ? templateSelector.value : 'default';
 
   const templates = {
-    default: `Please send YES to confirm your appt on ${date} @ ${time}.\nCall to cancel, reschedule, or if you have questions.\n605-717-8920. Thank you.`,
-    reschedule: `We need to reschedule your appt originally set for ${date} @ ${time}.\nPlease call us at 605-717-8920. Thank you.`,
+    default: `Please send YES to confirm your appt on ${date} @ ${formattedTime}.\nCall to cancel, reschedule, or if you have questions.\n605-717-8920. Thank you.`,
+    reschedule: `We need to reschedule your appt originally set for ${date} @ ${formattedTime}.\nPlease call us at 605-717-8920. Thank you.`,
     CallClinic: `We called you on ${new Date().toLocaleDateString()}.\nIt's important you get in touch with the clinic.\nPlease call us at 605-717-8920. Thank you.`,
     AEDue: `Its about that time! Your annual exam is due ${date}.\nPlease call us at 605-717-8920 to schedule your appointment. Thank you.`,
-    MissedAppt: `We missed you at your appointment on ${date} @ ${time}.\nPlease call us at 605-717-8920 to reschedule. Thank you.`,
+    MissedAppt: `We missed you at your appointment on ${date} @ ${formattedTime}.\nPlease call us at 605-717-8920 to reschedule. Thank you.`,
     IncomeDocReminder: `Please bring some sort of income documentation for your appointment on ${date}. This could be w-2s or a month of paystubs. Thank you.`,
   };
 
