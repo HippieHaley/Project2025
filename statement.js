@@ -1,12 +1,12 @@
 // statement.js
-// Requires docx.js and papaparse.min.js loaded in your HTML!
+// Requires mammoth.browser.min.js and papaparse.min.js loaded in your HTML!
 
 document.addEventListener('DOMContentLoaded', function () {
   const wordInput = document.getElementById('wordInput');
   const downloadBtn = document.getElementById('downloadWordBtn');
   let cleanedTable = null;
 
-  wordInput.addEventListener('change', async function () {
+  wordInput.addEventListener('change', function () {
     if (!wordInput.files.length) {
       downloadBtn.disabled = true;
       return;
@@ -20,22 +20,12 @@ document.addEventListener('DOMContentLoaded', function () {
       return;
     }
 
-    const rows = await extractDocxTable(file);
-    if (!rows.length) {
-      alert('No tables found in the document.');
-      downloadBtn.disabled = true;
-      return;
-    }
-
-    cleanedTable = cleanBillingTable(rows);
-    downloadBtn.disabled = false;
-    showOutput(cleanedTable);
+    extractWithMammoth(file);
   });
 
   downloadBtn.addEventListener('click', function () {
     if (!cleanedTable) return;
 
-    // Use PapaParse for CSV conversion
     if (typeof Papa === "undefined") {
       alert("PapaParse library (papaparse.min.js) is required.");
       return;
@@ -53,54 +43,69 @@ document.addEventListener('DOMContentLoaded', function () {
     URL.revokeObjectURL(url);
   });
 
-  // Helper: Extracts table data from DOCX using docx.js
-  async function extractDocxTable(file) {
-    return new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.onload = async (e) => {
-        try {
-          const arrayBuffer = e.target.result;
-          const doc = await window.docx.Document.load(arrayBuffer);
-          const tables = doc.getTables();
-          if (!tables.length) return resolve([]);
-          // Use the first table, or merge all tables if needed
-          const rows = [];
-          tables.forEach(table => {
-            const tableRows = table.getRows();
-            tableRows.forEach(row => {
-              const cells = row.getCells().map(cell => cell.getText().trim());
-              rows.push(cells);
-            });
-          });
-          // Convert array of arrays to array of objects using headers
-          const headers = rows[0];
-          const dataRows = rows.slice(1);
-          const objects = dataRows.map(cells => {
-            let obj = {};
-            headers.forEach((header, i) => {
-              obj[header] = cells[i] || "";
-            });
-            return obj;
-          });
-          resolve(objects);
-        } catch (err) {
-          console.error('DOCX parsing error:', err);
-          resolve([]);
+  // Extract tables and paragraphs using Mammoth.js
+  function extractWithMammoth(file) {
+    const reader = new FileReader();
+    reader.onload = function(e) {
+      mammoth.convertToHtml({arrayBuffer: e.target.result}).then(result => {
+        const div = document.createElement('div');
+        div.innerHTML = result.value;
+
+        // Extract all tables
+        const tables = Array.from(div.querySelectorAll('table'));
+        if (tables.length === 0) {
+          alert("No tables found in the document.");
+          downloadBtn.disabled = true;
+          document.getElementById('output').innerHTML = result.value; // Show everything else
+          return;
         }
-      };
-      reader.readAsArrayBuffer(file);
-    });
+
+        // Only process first table for CSV, but preview all tables
+        let tableArrays = tables.map(table => {
+          return Array.from(table.rows).map(row =>
+            Array.from(row.cells).map(cell => cell.textContent.trim())
+          );
+        });
+
+        // Clean first table for download
+        let cleaned = cleanBillingTable(tableArrays[0]);
+        cleanedTable = cleaned;
+        downloadBtn.disabled = false;
+
+        // Output preview: show all tables and all other content
+        let html = "";
+        tables.forEach((table, idx) => {
+          html += `<h4>Table ${idx + 1}</h4>`;
+          html += table.outerHTML;
+        });
+        // Show paragraphs and lists etc
+        let nonTable = div.cloneNode(true);
+        nonTable.querySelectorAll('table').forEach(t => t.remove());
+        html += "<div>" + nonTable.innerHTML + "</div>";
+
+        document.getElementById('output').innerHTML = html;
+      });
+    };
+    reader.readAsArrayBuffer(file);
   }
 
-  // Helper: Cleans and merges table data according to your rules
-  function cleanBillingTable(rows) {
+  // Cleans and merges table data according to your rules
+  function cleanBillingTable(tableRows) {
+    if (!tableRows || !tableRows.length) return [];
     const targetColumns = [
       "Claim Number", "Service Date", "Procedure (and Codes)", "Units",
       "Unit Rate", "Total Charge", "Patient Charge", "Insurance Paid",
       "Patient Paid", "Total Adjustment", "Balance Owed"
     ];
 
-    return rows.map(row => {
+    const headers = tableRows[0];
+    const dataRows = tableRows.slice(1);
+    return dataRows.map(cells => {
+      let row = {};
+      headers.forEach((header, i) => {
+        row[header] = cells[i] || "";
+      });
+
       // Merge all insurance columns into one
       let insurancePaid = 0;
       Object.keys(row).forEach(key => {
@@ -129,25 +134,5 @@ document.addEventListener('DOMContentLoaded', function () {
         "Balance Owed": balanceOwed
       };
     });
-  }
-
-  // Helper: Display output preview
-  function showOutput(table) {
-    const output = document.getElementById('output');
-    if (!output) return;
-    let html = "<table><thead><tr>";
-    Object.keys(table[0] || {}).forEach(col => {
-      html += `<th>${col}</th>`;
-    });
-    html += "</tr></thead><tbody>";
-    table.forEach(row => {
-      html += "<tr>";
-      Object.values(row).forEach(val => {
-        html += `<td>${val}</td>`;
-      });
-      html += "</tr>";
-    });
-    html += "</tbody></table>";
-    output.innerHTML = html;
   }
 });
