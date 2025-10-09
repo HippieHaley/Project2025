@@ -90,7 +90,7 @@ const procedures = [
     cpt: "99385",
     hcpcs: "",
     icd10: "",
-    fullprice: 267,
+    fullprice: 296,
     category: "visits",
     visitType: "preventive",
     keywords: ["preventive new", "99385", "18–39"]
@@ -100,7 +100,7 @@ const procedures = [
     cpt: "99386",
     hcpcs: "",
     icd10: "",
-    fullprice: 285,
+    fullprice: 431,
     category: "visits",
     visitType: "preventive",
     keywords: ["preventive new", "99386", "40–64"]
@@ -110,7 +110,7 @@ const procedures = [
     cpt: "99394",
     hcpcs: "",
     icd10: "",
-    fullprice: 262,
+    fullprice: 245,
     category: "visits",
     visitType: "preventive",
     keywords: ["preventive established", "99394", "12–17"]
@@ -120,7 +120,7 @@ const procedures = [
     cpt: "99395",
     hcpcs: "",
     icd10: "",
-    fullprice: 267,
+    fullprice: 245,
     category: "visits",
     visitType: "preventive",
     keywords: ["preventive established", "99395", "18–39"]
@@ -130,7 +130,7 @@ const procedures = [
     cpt: "99396",
     hcpcs: "",
     icd10: "",
-    fullprice: 285,
+    fullprice: 431,
     category: "visits",
     visitType: "preventive",
     keywords: ["preventive established", "99396", "40–64"]
@@ -144,7 +144,7 @@ const procedures = [
     cpt: "11981",
     hcpcs: "J7307",
     icd10: "Z30.017",
-    fullprice: 316,
+    fullprice: 318,
     category: "procedures",
     keywords: ["implant insert", "nexplanon", "insertion"]
   },
@@ -304,7 +304,7 @@ const procedures = [
     cpt: "88164",
     hcpcs: "",
     icd10: "Z12.4",
-    fullprice: 23,
+    fullprice: 20,
     category: "labs",
     keywords: ["pap", "conventional pap"]
   },
@@ -313,7 +313,7 @@ const procedures = [
   cpt: "87254",
   hcpcs: "",
   icd10: "A60.9",
-  fullprice: 39,
+  fullprice: 35,
   category: "labs",
   keywords: ["herpes", "viral culture", "87254"]
 },
@@ -322,7 +322,7 @@ const procedures = [
   cpt: "86593",
   hcpcs: "",
   icd10: "A51.9",
-  fullprice: 35,
+  fullprice: 30,
   category: "labs",
   keywords: ["syphilis", "TPPA", "86593"]
 },
@@ -416,7 +416,7 @@ const procedures = [
     cpt: "",
     hcpcs: "J7303",
     icd10: "Z30.011",
-    fullprice: 8,
+    fullprice: 75,
     category: "meds",
     keywords: ["nuvaring", "ring", "birth control"]
   },
@@ -434,7 +434,7 @@ const procedures = [
   cpt: "",
   hcpcs: "J7297",
   icd10: "Z30.430",
-  fullprice: 113,
+  fullprice: 130,
   category: "meds",
   keywords: ["Liletta", "IUD", "J7297"]
 },
@@ -443,7 +443,7 @@ const procedures = [
   cpt: "",
   hcpcs: "J7300",
   icd10: "Z30.430",
-  fullprice: 276,
+  fullprice: 315,
   category: "meds",
   keywords: ["Paragard", "IUD", "J7300"]
 },
@@ -452,7 +452,7 @@ const procedures = [
   cpt: "",
   hcpcs: "J7302",
   icd10: "Z30.430",
-  fullprice: 942,
+  fullprice: 310,
   category: "meds",
   keywords: ["Mirena", "IUD", "J7302"]
 },
@@ -587,11 +587,20 @@ const procedures = [
     keywords: ["apri", "oc", "pill", "s4993"]
   },
   {
+    name: "Aubra",
+    cpt: "",
+    hcpcs: "S4993",
+    icd10: "Z30.011",
+    fullprice: 6,
+    category: "oral contraceptives",
+    keywords: ["Aubra", "oc", "pill", "S4993"]
+  },
+  {
     name: "Aviane",
     cpt: "",
     hcpcs: "S4993",
     icd10: "Z30.011",
-    fullprice: 5,
+    fullprice: 4,
     category: "oral contraceptives",
     keywords: ["aviane", "oc", "pill", "s4993"]
   },
@@ -600,7 +609,7 @@ const procedures = [
     cpt: "",
     hcpcs: "S4993",
     icd10: "Z30.011",
-    fullprice: 28,
+    fullprice: 7,
     category: "oral contraceptives",
     keywords: ["camila", "oc", "pop", "progestin"]
   },
@@ -612,6 +621,33 @@ const procedures = [
     fullprice: 5,
     category: "oral contraceptives",
     keywords: ["cryselle", "oc", "pill"]
+  },
+  {
+    name: "Doxycycline 100mg",
+    cpt: "",
+    hcpcs: "",
+    icd10: "",
+    fullprice: 1,
+    category: "oral contraceptives",
+    keywords: ["doxycycline", "oral", "pill"]
+  },
+  {
+    name: "Enpresse",
+    cpt: "",
+    hcpcs: "S4993",
+    icd10: "Z30.011",
+    fullprice: 6,
+    category: "oral contraceptives",
+    keywords: ["Enpresse", "oc", "pill", "S4993"]
+  },
+  {
+    name: "Heather",
+    cpt: "",
+    hcpcs: "S4993",
+    icd10: "",
+    fullprice: 6,
+    category: "oral contraceptives",
+    keywords: ["Heather", "oc", "pill", "S4993"]
   },
   {
     name: "Levora",
@@ -645,7 +681,7 @@ const procedures = [
     cpt: "",
     hcpcs: "S4993",
     icd10: "Z30.011",
-    fullprice: 14,
+    fullprice: 2,
     category: "oral contraceptives",
     keywords: ["tri-lo marzia", "oc", "pill"]
   },
@@ -659,15 +695,6 @@ const procedures = [
     keywords: ["trivora", "oc", "pill"]
   },
   {
-  name: "Aubra",
-  cpt: "",
-  hcpcs: "S4993",
-  icd10: "Z30.011",
-  fullprice: 6,
-  category: "oral contraceptives",
-  keywords: ["Aubra", "oc", "pill", "S4993"]
-},
-{
   name: "Chateal",
   cpt: "",
   hcpcs: "S4993",
@@ -684,15 +711,6 @@ const procedures = [
   fullprice: 4,
   category: "oral contraceptives",
   keywords: ["Cyred", "oc", "pill", "S4993"]
-},
-{
-  name: "Enpresse",
-  cpt: "",
-  hcpcs: "S4993",
-  icd10: "Z30.011",
-  fullprice: 6,
-  category: "oral contraceptives",
-  keywords: ["Enpresse", "oc", "pill", "S4993"]
 },
 {
   name: "Jolivette",
@@ -753,7 +771,7 @@ const procedures = [
   cpt: "",
   hcpcs: "S4993",
   icd10: "Z30.011",
-  fullprice: 5,
+  fullprice: 6,
   category: "oral contraceptives",
   keywords: ["Nortrel 777", "oc", "pill", "S4993"]
 },
@@ -783,6 +801,15 @@ const procedures = [
   fullprice: 11,
   category: "oral contraceptives",
   keywords: ["Reclipsen", "oc", "pill", "S4993"]
+},
+{
+  name: "Simpresse",
+  cpt: "",
+  hcpcs: "S4993",
+  icd10: "",
+  fullprice: 5,
+  category: "oral contraceptives",
+  keywords: ["Simpresse", "oc", "pill", "S4993"]
 },
 {
   name: "Sronyx",
@@ -828,8 +855,35 @@ const procedures = [
   fullprice: 5,
   category: "oral contraceptives",
   keywords: ["Vilbra", "oc", "pill", "S4993"]
+},
+{
+  name: "My Way Emergency Contraception",
+  cpt: "",
+  hcpcs: "",
+  icd10: "",
+  fullprice: 12,
+  category: "oral contraceptives",
+  keywords: ["My Way", "emergency contraception", "pill"]
+},
+{
+  name: "Norgestimate/Ethinyl Estradiol",
+  cpt: "",
+  hcpcs: "",
+  icd10: "",
+  fullprice: 2,
+  category: "oral contraceptives",
+  keywords: ["Norgestimate", "Ethinyl Estradiol", "pill"]
+},
+{
+  name: "Zafemy",
+  cpt: "",
+  hcpcs: "",
+  icd10: "",
+  fullprice: 85,
+  category: "oral contraceptives",
+  keywords: ["Zafemy", "patch", "contraceptive"]
 }
 ];
 
-export default procedures;
 
+export default procedures;
