@@ -1,153 +1,134 @@
-// statement.js
-// Requires docx.js and papaparse.min.js loaded in your HTML!
+function exportWordBtn() {
+  const headersMapping = {
+    "Claim Number": "Claim Number",
+    "Service Date": "Service Date",
+    "Procedure (and Codes)": "Procedure (and Codes)",
+    "Units": "Units",
+    "Unit Rate": "Unit Rate",
+    "Total Charge": "Total Charge",
+    "Patient Charge": "Patient Charge",
+    "Total Paid": "Total Paid",
+    "Insurance Paid": "Insurance Paid",
+    "Patient Paid": "Patient Paid",
+    "Total Adjustment": "Total Adjustment",
+    "Total Balance": "Total Balance",
+    "Insurance Balance": "Insurance Balance",
+    "Balance Owed": "Balance Owed"
+    // Add more mappings as needed
+  };
+function extractData(rows) {
+    const tableBody = document.querySelector('#dataTable tbody');
+    tableBody.innerHTML = '';
+    balanceOwed = 0;
 
-document.addEventListener('DOMContentLoaded', function () {
-  const wordInput = document.getElementById('wordInput');
-  const downloadBtn = document.getElementById('downloadWordBtn');
-  let cleanedTable = null;
+    rows.forEach((row, index) => {
+        const {
+            claimOrServiceLine,
+            serviceDate,
+            procedure,
+            units,
+            unitRate,
+            totalCharge,
+            patientCharge,
+            totalPaid,
+            insurancePaid,
+            patientPaid,
+            adjustment,
+            totalBalance,
+            insuranceBalance,
+            balanceOwedRow
+        } = row;
+    });
+  // Example: Generate table rows for Word export using docx.js style objects
+  // This is a placeholder for integrating with docx.js or similar libraries
+  // Assuming validRows and balanceOwed are available in your scope
 
-  wordInput.addEventListener('change', async function () {
-    if (!wordInput.files.length) {
-      downloadBtn.disabled = true;
-      return;
-    }
-    const file = wordInput.files[0];
-    const ext = file.name.split('.').pop().toLowerCase();
+  // Helper functions for text styling
+  const blackText = (text) => ({ text: text ?? '', size: 22, color: '000000' });
+  const whiteText = (text) => ({ text: text ?? '', size: 22, color: 'FFFFFF' });
 
-    if (ext !== 'docx') {
-      alert('Please upload a DOCX file.');
-      downloadBtn.disabled = true;
-      return;
-    }
+    const isClaimRow = row.claimOrServiceLine?.includes("CL-");
+    const nextRow = validRows[index + 1];
+    const nextIsServiceLine = nextRow && nextRow.claimOrServiceLine?.includes("Service Line#");
+    const whiteOut = isClaimRow && nextIsServiceLine;
 
-    const rows = await extractDocxTable(file);
-    if (!rows.length) {
-      alert('No tables found in the document.');
-      downloadBtn.disabled = true;
-      return;
-    }
+    return {
+      cells: [
+        { children: [blackText(row.claimOrServiceLine)] },
+        { children: [blackText(row.serviceDate)] },
+        { children: [whiteOut ? whiteText(row.procedure) : blackText(row.procedure)] },
+        { children: [whiteOut ? whiteText(row.units) : blackText(row.units)] },
+        { children: [whiteOut ? whiteText(row.unitRate) : blackText(row.unitRate)] },
+        { children: [blackText(row.totalCharge)] },
+        { children: [blackText(row.patientCharge)] },
+        { children: [blackText(row.totalPaid)] },
+        { children: [blackText(row.insurancePaid)] },
+        { children: [blackText(row.patientPaid)] },
+        { children: [blackText(row.adjustment)] },
+        { children: [blackText(row.totalBalance)] },
+        { children: [blackText(row.insuranceBalance)] },
+        { children: [blackText(row.balanceOwedRow)] },
+      ]
+    };
+  }
+  // Total row
+  const totalRow = {
+    cells: [
+      {
+        children: [{ text: "Total", bold: true }],
+        columnSpan: 13,
+        shading: { fill: "D3D3D3" }
+      },
+      {
+        children: [{ text: `$${balanceOwed.toFixed(2)}`, bold: true }],
+        shading: { fill: "D3D3D3" }
+      }
+    ]
+  };
+  // Find all tables in the export-content element
+  const exportContent = document.getElementById('export-content');
+  if (exportContent) {
+    const tables = exportContent.querySelectorAll('table');
+    tables.forEach(table => {
+      const headerRow = table.querySelector('tr');
+      if (headerRow) {
+        headerRow.querySelectorAll('th').forEach(th => {
+          const originalHeader = th.textContent.trim();
+          if (headersMapping[originalHeader]) {
+            th.textContent = headersMapping[originalHeader];
+          }
+        });
+      }
+    });
+  }
+  // Add click event to export content as a Word document
+  btn.addEventListener('click', () => {
+    // Get the content you want to export
+    const content = document.getElementById('export-content');
+    if (!content) return;
 
-    cleanedTable = cleanBillingTable(rows);
-    downloadBtn.disabled = false;
-    showOutput(cleanedTable);
-  });
+    // Create a Blob with Word MIME type
+    const blob = new Blob(
+      [
+        `<html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'>
+        <head><meta charset='utf-8'></head><body>${content.innerHTML}</body></html>`
+      ],
+      { type: 'application/msword' }
+    );
 
-  downloadBtn.addEventListener('click', function () {
-    if (!cleanedTable) return;
-
-    // Use PapaParse for CSV conversion
-    if (typeof Papa === "undefined") {
-      alert("PapaParse library (papaparse.min.js) is required.");
-      return;
-    }
-    const csv = Papa.unparse(cleanedTable);
-    const blob = new Blob([csv], { type: 'text/csv' });
+    // Create a download link
     const url = URL.createObjectURL(blob);
-
     const a = document.createElement('a');
     a.href = url;
-    a.download = 'simplified_statement.csv';
+    a.download = 'document.doc';
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
   });
 
-  // Helper: Extracts table data from DOCX using docx.js
-  async function extractDocxTable(file) {
-    return new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.onload = async (e) => {
-        try {
-          const arrayBuffer = e.target.result;
-          const doc = await window.docx.Document.load(arrayBuffer);
-          const tables = doc.getTables();
-          if (!tables.length) return resolve([]);
-          // Use the first table, or merge all tables if needed
-          const rows = [];
-          tables.forEach(table => {
-            const tableRows = table.getRows();
-            tableRows.forEach(row => {
-              const cells = row.getCells().map(cell => cell.getText().trim());
-              rows.push(cells);
-            });
-          });
-          // Convert array of arrays to array of objects using headers
-          const headers = rows[0];
-          const dataRows = rows.slice(1);
-          const objects = dataRows.map(cells => {
-            let obj = {};
-            headers.forEach((header, i) => {
-              obj[header] = cells[i] || "";
-            });
-            return obj;
-          });
-          resolve(objects);
-        } catch (err) {
-          console.error('DOCX parsing error:', err);
-          resolve([]);
-        }
-      };
-      reader.readAsArrayBuffer(file);
-    });
-  }
+  // Append the button to the DOM
+  document.body.appendChild(btn);
+}
 
-  // Helper: Cleans and merges table data according to your rules
-  function cleanBillingTable(rows) {
-    const targetColumns = [
-      "Claim Number", "Service Date", "Procedure (and Codes)", "Units",
-      "Unit Rate", "Total Charge", "Patient Charge", "Insurance Paid",
-      "Patient Paid", "Total Adjustment", "Balance Owed"
-    ];
-
-    return rows.map(row => {
-      // Merge all insurance columns into one
-      let insurancePaid = 0;
-      Object.keys(row).forEach(key => {
-        if (/insurance/i.test(key) || /ins\./i.test(key)) {
-          insurancePaid += parseFloat(row[key].replace(/[^0-9.-]/g, '')) || 0;
-        }
-      });
-
-      // Balance Owed fallback
-      const balanceOwed = row["Balance Owed"] && row["Balance Owed"].trim()
-        ? row["Balance Owed"]
-        : (row["Patient Charge"] || "");
-
-      // Build cleaned row
-      return {
-        "Claim Number": row["Claim Number"] || "",
-        "Service Date": row["Service Date"] || "",
-        "Procedure (and Codes)": row["Procedure"] || row["Procedure (and Codes)"] || "",
-        "Units": row["Units"] || "",
-        "Unit Rate": row["Unit Rate"] || "",
-        "Total Charge": row["Total Charge"] || "",
-        "Patient Charge": row["Patient Charge"] || "",
-        "Insurance Paid": insurancePaid ? insurancePaid.toFixed(2) : "",
-        "Patient Paid": row["Patient Paid"] || "",
-        "Total Adjustment": row["Total Adjustment"] || "",
-        "Balance Owed": balanceOwed
-      };
-    });
-  }
-
-  // Helper: Display output preview
-  function showOutput(table) {
-    const output = document.getElementById('output');
-    if (!output) return;
-    let html = "<table><thead><tr>";
-    Object.keys(table[0] || {}).forEach(col => {
-      html += `<th>${col}</th>`;
-    });
-    html += "</tr></thead><tbody>";
-    table.forEach(row => {
-      html += "<tr>";
-      Object.values(row).forEach(val => {
-        html += `<td>${val}</td>`;
-      });
-      html += "</tr>";
-    });
-    html += "</tbody></table>";
-    output.innerHTML = html;
-  }
-});
+export { exportWordBtn };
