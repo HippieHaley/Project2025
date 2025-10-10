@@ -42,7 +42,30 @@ function showNotification(msg) {
   n.style.display = "block";
   setTimeout(() => { n.style.display = "none"; }, 3000);
 }
+function extractTableRows(lines, headerIndex) {
+  if (headerIndex === -1) return [];
 
+  return lines
+    .slice(headerIndex + 1)
+    .filter(line =>
+      line.includes("CL-") || line.includes("Service Line#")
+    );
+}
+function buildStructuredTable(rows) {
+  const headers = [
+    "Claim Number", "Service Date", "Procedure (and Codes)", "Units", "Unit Rate",
+    "Total Charge", "Patient Charge", "Total Paid", "Insurance Paid", "Patient Paid",
+    "Total Adjustment", "Total Balance", "Insurance Balance", "Balance Owed"
+  ];
+  return rows.map(row => {
+    const cells = row.split(/\s{2,}/).map(cell => cell.trim());
+    let obj = {};
+    headers.forEach((header, idx) => {
+      obj[header] = cells[idx] || "";
+    });
+    return obj;
+  });
+}
 function parseTableRow(line) {
   const tokens = line.trim().split(/\s+/);
   if (tokens.length < 5) return Array(HEADERS.length).fill('');
