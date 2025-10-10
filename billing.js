@@ -258,18 +258,34 @@ const validRows = sheet.tableRows.filter(row =>
       )
     });
 
-    const bodyRows = validRows.map((row, i) =>
-      new TableRow({
-        children: row.map((cell, colIdx) =>
-          new TableCell({
-            children: [new Paragraph({
-              children: [new TextRun({ text: cell ?? '', size: 22, color: '000000' })]
-            })]
-          })
-        )
-      })
-    );
+    const bodyRows = validRows.map((row, index) => {
+            const isClaimRow = row.claimOrServiceLine?.includes("CL-");
+            const nextRow = validRows[index + 1];
+            const nextIsServiceLine = nextRow && nextRow.claimOrServiceLine?.includes("Service Line#");
+            const whiteOut = isClaimRow && nextIsServiceLine;
 
+            const blackText = (text) => new TextRun({ text: text ?? '', size: 22, color: '000000' });
+            const whiteText = (text) => new TextRun({ text: text ?? '', size: 22, color: 'FFFFFF' });
+
+            return new TableRow({
+                children: [
+                    new TableCell({ children: [new Paragraph({ children: [blackText(row.claimOrServiceLine)] })] }),
+                    new TableCell({ children: [new Paragraph({ children: [blackText(row.serviceDate)] })] }),
+                    new TableCell({ children: [new Paragraph({ children: [whiteOut ? whiteText(row.procedure) : blackText(row.procedure)] })] }),
+                    new TableCell({ children: [new Paragraph({ children: [whiteOut ? whiteText(row.units) : blackText(row.units)] })] }),
+                    new TableCell({ children: [new Paragraph({ children: [whiteOut ? whiteText(row.unitRate) : blackText(row.unitRate)] })] }),
+                    new TableCell({ children: [new Paragraph({ children: [blackText(row.totalCharge)] })] }),
+                    new TableCell({ children: [new Paragraph({ children: [blackText(row.patientCharge)] })] }),
+                    new TableCell({ children: [new Paragraph({ children: [blackText(row.totalPaid)] })] }),
+                    new TableCell({ children: [new Paragraph({ children: [blackText(row.insurancePaid)] })] }),
+                    new TableCell({ children: [new Paragraph({ children: [blackText(row.patientPaid)] })] }),
+                    new TableCell({ children: [new Paragraph({ children: [blackText(row.adjustment)] })] }),
+                    new TableCell({ children: [new Paragraph({ children: [blackText(row.totalBalance)] })] }),
+                    new TableCell({ children: [new Paragraph({ children: [blackText(row.insuranceBalance)] })] }),
+                    new TableCell({ children: [new Paragraph({ children: [blackText(row.balanceOwedRow)] })] }),
+                ]
+            });
+        });
     const totalRow = new TableRow({
       children: [
         new TableCell({
