@@ -414,66 +414,67 @@ async function exportToWord(sheets, headers) {
       width: { size: 100, type: WidthType.PERCENTAGE },
       alignment: AlignmentType.CENTER,
       rows: [
-        new TableRow({
+      new TableRow({
+        children: [
+        // Left column: Logo centered, address block
+        new TableCell({
+          width: { size: 50, type: WidthType.PERCENTAGE },
+          borders: { top: { size: 0 }, bottom: { size: 0 }, left: { size: 0 }, right: { size: 0 } },
           children: [
-            // Left column: Logo centered, address block
-            new TableCell({
-              width: { size: 50, type: WidthType.PERCENTAGE },
-              children: [
-                new Paragraph({
-                  alignment: AlignmentType.CENTER,
-                  children: [
-                    new ImageRun({
-                      data: logoBuffer,
-                      transformation: { width: 200, height: 160 }
-                    })
-                  ],
-                  spacing: { after: 150 }
-                }),
-                new Paragraph({ text: "", spacing: { after: 50 } }),
-                new Paragraph({
-                  children: [new TextRun({ text: clientName, bold: true, size: 24 })],
-                  alignment: AlignmentType.CENTER,
-                  spacing: { after: 150 }
-                }),
-                ...addressLines.map(line =>
-                  new Paragraph({
-                    children: [new TextRun({ text: line, size: 24, bold: true })],
-                    alignment: AlignmentType.CENTER,
-                    spacing: { after: 150 }
-                  })
-                )
-              ]
-            }),
-            // Right column: Statement date, pay amount box, payment info image, etc.
-            new TableCell({
-              width: { size: 50, type: WidthType.PERCENTAGE },
-              children: [
-                new Paragraph({
-                  alignment: AlignmentType.RIGHT,
-                  children: [new TextRun({ text: `Statement Date: ${currentDate}`, bold: true, size: 24 })],
-                  spacing: { after: 100 }
-                }),
-                payAmountBox,
-                new Paragraph({ text: "", spacing: { after: 50 } }),
-                new Paragraph({
-                  alignment: AlignmentType.RIGHT,
-                  children: [
-                    new ImageRun({
-                      data: paymentBuffer,
-                      transformation: { width: 400, height: 200 }
-                    })
-                  ],
-                  spacing: { after: 100 }
-                }),
-                // You can add more payment info paragraphs here if needed
-              ]
+          new Paragraph({
+            alignment: AlignmentType.CENTER,
+            children: [
+            new ImageRun({
+              data: logoBuffer,
+              transformation: { width: 200, height: 160 }
             })
+            ],
+            spacing: { after: 150 }
+          }),
+          new Paragraph({ text: "", spacing: { after: 50 } }),
+          new Paragraph({
+            children: [new TextRun({ text: clientName, bold: true, size: 24 })],
+            alignment: AlignmentType.CENTER,
+            spacing: { after: 150 }
+          }),
+          ...addressLines.map(line =>
+            new Paragraph({
+            children: [new TextRun({ text: line, size: 24, bold: true })],
+            alignment: AlignmentType.CENTER,
+            spacing: { after: 150 }
+            })
+          )
+          ]
+        }),
+        // Right column: Statement date, pay amount box, payment info image, etc.
+        new TableCell({
+          width: { size: 50, type: WidthType.PERCENTAGE },
+          borders: { top: { size: 0 }, bottom: { size: 0 }, left: { size: 0 }, right: { size: 0 } },
+          children: [
+          new Paragraph({
+            alignment: AlignmentType.RIGHT,
+            children: [new TextRun({ text: `Statement Date: ${currentDate}`, bold: true, size: 24 })],
+            spacing: { after: 100 }
+          }),
+          payAmountBox,
+          new Paragraph({ text: "", spacing: { after: 50 } }),
+          new Paragraph({
+            alignment: AlignmentType.RIGHT,
+            children: [
+            new ImageRun({
+              data: paymentBuffer,
+              transformation: { width: 400, height: 200 }
+            })
+            ],
+            spacing: { after: 100 }
+          }),
           ]
         })
-      ]
-    });
-
+        ]
+      })
+      ],
+      borders: { top: { size: 0 }, bottom: { size: 0 }, left: { size: 0 }, right: { size: 0 } }
+    });    // You can add more payment info paragraphs here if needed
     return {
       properties: {
         page: {
