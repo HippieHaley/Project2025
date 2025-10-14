@@ -429,7 +429,7 @@ async function exportToWord(sheets, headers) {
               transformation: { width: 200, height: 160 }
             })
             ],
-            spacing: { after: 150 }
+            spacing: { after: 50 }
           }),
           new Paragraph({ text: "", spacing: { after: 50 } }),
           new Paragraph({
