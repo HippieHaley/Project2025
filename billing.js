@@ -438,10 +438,12 @@ async function exportToWord(sheets, headers) {
         new ImageRun({
           data: logoBuffer,
           transformation: { width: 100, height: 80 },
+          indent: { left: 1440 },
           floating: {
           horizontalPosition: { relative: 'page', align: 'left' },
           verticalPosition: { relative: 'paragraph', align: 'top' },
           wrap: { type: 'tight' }
+          
           }
         })
         ],
@@ -472,17 +474,17 @@ async function exportToWord(sheets, headers) {
       new Paragraph({ spacing: { after: 200 }, alignment: AlignmentType.RIGHT }),
       new Paragraph({ text: "", spacing: { after: 800 } }),
       new Paragraph({
-        children: [new TextRun({ text: clientName, bold: true, size: 24 })],
-        spacing: { after: 150 },
-        alignment: AlignmentType.LEFT
-      }),
-      ...addressLines.map(line =>
-        new Paragraph({
-        children: [new TextRun({ text: line, size: 24, bold: true })],
-        spacing: { after: 150 },
-        alignment: AlignmentType.LEFT
-        })
-      ),
+          children: [new TextRun({ text: clientName, bold: true, size: 24 })],
+          indent: { left: 1440 },
+          spacing: { after: 150 }
+        }),
+        ...addressLines.map(line =>
+          new Paragraph({
+            children: [new TextRun({ text: line, size: 24, bold: true })],
+            indent: { left: 1440 },
+            spacing: { after: 150 }
+          })
+        ),
       new Paragraph({ spacing: { after: 750 } }),
       new Table({
         width: { size: 100, type: WidthType.PERCENTAGE },
