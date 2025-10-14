@@ -503,7 +503,7 @@ async function exportToWord(sheets, headers) {
         new Paragraph({
           children: [
             new TextRun({
-              text: "For any questions, concerns, or to make a payment over the phone, please call Family Health Education Services at (605) 717-8920. Our billing team is available Monday - Thursday, 8:00 AM to 5:00 PM. We offer payment plans in any amount and are happy to work with you on a schedule that fits your needs. Please note that accounts with no payment activity or effort to resolve the balance within 90 days of the billing date may be subject to collections.",
+              text: "For any questions, concerns, or to make a payment over the phone, please call Family Health Education Services at (605) 717-8920. Our billing team is available Monday - Thursday, 8:00 AM to 5:00 PM. We offer payment plans in any amount and are happy to work with you on a schedule that meets your needs. Please note that accounts with no payment activity or effort to resolve the balance within 90 days of the billing date may be subject to collections.",
               bold: true
             }),
           ],
