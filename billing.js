@@ -272,17 +272,20 @@ function exportToWord(sheets, headers) {
       }
     }
 
-    // --- Build header row ---
+    // --- Build filteredHeaders and move Balance Owed to last ---
     let filteredHeaders = headers.filter((h, i) =>
       i !== insurancePaidColIdx &&
       i !== insuranceBalanceColIdx &&
       i !== adjustmentColIdx &&
       i !== totalPaidColIdx &&
       (!removePatientCharge || i !== patientChargeColIdx) &&
-      (!removeTotalBalance || i !== totalBalanceColIdx)
+      (!removeTotalBalance || i !== totalBalanceColIdx) &&
+      i !== balanceOwedColIdx // We'll add this later
     );
     // Add "Ins. Covered" where "Insurance Paid" used to be
     filteredHeaders.splice(insurancePaidColIdx, 0, "Ins. Covered");
+    // Add Balance Owed last
+    filteredHeaders.push(headers[balanceOwedColIdx]);
 
     const headerRow = new TableRow({
       children: filteredHeaders.map(text =>
@@ -303,14 +306,15 @@ function exportToWord(sheets, headers) {
       const blackText = (text) => new TextRun({ text: text ?? '', size: 22, color: '000000' });
       const whiteText = (text) => new TextRun({ text: text ?? '', size: 22, color: 'FFFFFF' });
 
-      // Remove appropriate columns
+      // Remove all the columns except balance owed (we'll add it last)
       let filteredRow = row.filter((cell, i) =>
         i !== insurancePaidColIdx &&
         i !== insuranceBalanceColIdx &&
         i !== adjustmentColIdx &&
         i !== totalPaidColIdx &&
         (!removePatientCharge || i !== patientChargeColIdx) &&
-        (!removeTotalBalance || i !== totalBalanceColIdx)
+        (!removeTotalBalance || i !== totalBalanceColIdx) &&
+        i !== balanceOwedColIdx
       );
 
       // Only add Ins. Covered value for CL rows
@@ -323,10 +327,12 @@ function exportToWord(sheets, headers) {
       }
       filteredRow.splice(insurancePaidColIdx, 0, insCoveredValue);
 
+      // Add Balance Owed last
+      filteredRow.push(row[balanceOwedColIdx]);
+
       return new TableRow({
         children: filteredRow.map((cell, colIdx) => {
           // Map to correct column index in original headers
-          // For whiteOut logic, need to figure out the original column index in headers
           let originalIndices = headers
             .map((h, i) => i)
             .filter(i =>
@@ -335,9 +341,11 @@ function exportToWord(sheets, headers) {
               i !== adjustmentColIdx &&
               i !== totalPaidColIdx &&
               (!removePatientCharge || i !== patientChargeColIdx) &&
-              (!removeTotalBalance || i !== totalBalanceColIdx)
+              (!removeTotalBalance || i !== totalBalanceColIdx) &&
+              i !== balanceOwedColIdx
             );
           originalIndices.splice(insurancePaidColIdx, 0, insurancePaidColIdx); // for Ins. Covered col
+          originalIndices.push(balanceOwedColIdx); // for Balance Owed at end
           const originalColIdx = originalIndices[colIdx];
 
           // Procedure (2), Units (3), Unit Rate (4) are white out columns
@@ -441,7 +449,16 @@ function exportToWord(sheets, headers) {
         new Paragraph({
           children: [
             new TextRun({
-              text: "For any questions, concerns, or to make a payment over the phone, please call Family Health Education Services at (605) 717-8920. Our billing team is available Monday - Thursday, 8:00 AM to 5:00 PM. We offer payment plans in any amount and are happy to work with you on a schedule that meets your needs. Please note that accounts with no payment activity or effort to resolve the balance within 90 days of the billing date may be subject to collections.",
+              text: "Disclaimer: The Adjustment column shows total reductions applied to your charges. These include write-offs and adjustments from your insurance provider, as well as any discounts you received through our South Dakota sliding fee scale program. These amounts are not owed and have already been deducted from your balance.",
+              italics: true
+            })
+          ],
+          spacing: { before: 200 }
+        }),
+        new Paragraph({
+          children: [
+            new TextRun({
+              text: "For any questions, concerns, or to make a payment over the phone, please call Family Health Education Services at (605) 717-8920. Our billing team is available Monday - Thursday, 8:00 AM to 5:00 PM. We offer payment plans in any amount and are happy to work with you on a schedule that fits your needs. Please note that accounts with no payment activity or effort to resolve the balance within 90 days of the billing date may be subject to collections.",
               bold: true
             })
           ],
