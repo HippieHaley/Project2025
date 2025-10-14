@@ -480,7 +480,7 @@ async function exportToWord(sheets, headers) {
         new Paragraph({
         children: [new TextRun({ text: line, size: 24, bold: true })],
         spacing: { after: 150 },
-        alignment: AlignmentType.RIGHT
+        alignment: AlignmentType.LEFT
         })
       ),
       new Paragraph({ spacing: { after: 750 } }),
