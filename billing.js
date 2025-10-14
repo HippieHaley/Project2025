@@ -465,9 +465,8 @@ async function exportToWord(sheets, headers) {
               data: paymentBuffer,
               transformation: { width: 400, height: 200 }
             })
-            ],
-            spacing: { after: 100 }
-          }),
+            ]
+          })
           ]
         })
         ]
@@ -483,11 +482,22 @@ async function exportToWord(sheets, headers) {
         }
       },
       children: [
-        layoutTable,
-        new Paragraph({ spacing: { after: 750 } }),
+  layoutTable,
+  new Paragraph({ spacing: { after: 150 } }),
+  new Paragraph({
+    border: {
+      bottom: {
+        color: "auto",
+        space: 1,
+        style: "dotted",
+        size: 12
+      }
+    },
+    spacing: { after: 150 }
+  }),
         new Table({
           width: { size: 100, type: WidthType.PERCENTAGE },
-          alignment: AlignmentType.RIGHT,
+          alignment: AlignmentType.LEFT,
           rows: [headerRow, ...bodyRows, totalRow]
         }),
         new Paragraph({
