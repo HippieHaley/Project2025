@@ -310,7 +310,6 @@ table {
     <a href="index.html" class="back-home">Back to Home</a>
          <h1>Billing Toolkit</h1>
     <div class="workflow">
-
       <!-- Step 1: PDF Extraction -->
       <section class="card" id="pdf-section">
         <h2>Extract From PDF</h2>
@@ -322,17 +321,10 @@ table {
           <button id="exportExcelBtn" disabled>Export Extracted Excel</button>
           <button id="exportWordBtn" disabled>Export Extracted Word</button>
         </div>
-        <section class="card" id="word-section">
-          <h2>Generate Statements</h2>
-          <p class="help-text">
-            Add finishing touches
-          </p>
-          <div class="actions">
-            <input type="file" id="wordInput" accept=".doc,.docx" />
-            <button id="downloadWordBtn" disabled>Download Processed Word</button>
-          </div>
-          </div>  
-           <div class="container">
+        </section>
+      </div>
+
+        <div id="pdfPreview" class="container">
                   <div id="output"></div>
         <ul id="pdfSummary" class="summary-list"></ul>
     <div id="notification" class="notification"></div>
