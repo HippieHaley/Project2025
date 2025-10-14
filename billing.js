@@ -434,29 +434,32 @@ async function exportToWord(sheets, headers) {
       // Logo at top right corner
       new Paragraph({
         alignment: AlignmentType.LEFT,
-        children: [        
+        children: [
           new ImageRun({
-          data: logoBuffer,
-          transformation: { width: 200, height: 160 },
-          floating: {
-          horizontalPosition: { relative: 'page', offset: 1440 }, // 1440 twips = 1 inch
+        data: logoBuffer,
+        transformation: { width: 200, height: 160 },
+        floating: {
+          horizontalPosition: {
+            relative: 'page',
+            align: 'left', // align to left edge of page
+            offset: 1440,      // no offset, flush with edge
+          },
           verticalPosition: { relative: 'paragraph', align: 'top' },
           wrap: { type: 'tight' }
-          }
-        })
+        }
+          })
         ],
         spacing: { after: 50 }
-      })
-      ,
+      }),
       new Paragraph({
         alignment: AlignmentType.RIGHT,
         children: [new TextRun({ text: `Statement Date: ${currentDate}`, bold: true, size: 24 })],
         spacing: { after: 200 }
       }),
       payAmountBox,
-      // Payment image right under PAY THIS AMOUNT box, aligned right
+      // Payment image right under PAY THIS AMOUNT box, aligned center
       new Paragraph({
-        alignment: AlignmentType.RIGHT,
+        alignment: AlignmentType.CENTER,
         children: [
         new ImageRun({
           data: paymentBuffer,
