@@ -42,30 +42,7 @@ function showNotification(msg) {
   n.style.display = "block";
   setTimeout(() => { n.style.display = "none"; }, 3000);
 }
-function extractTableRows(lines, headerIndex) {
-  if (headerIndex === -1) return [];
 
-  return lines
-    .slice(headerIndex + 1)
-    .filter(line =>
-      line.includes("CL-") || line.includes("Service Line#")
-    );
-}
-function buildStructuredTable(rows) {
-  const headers = [
-    "Claim Number", "Service Date", "Procedure (and Codes)", "Units", "Unit Rate",
-    "Total Charge", "Patient Charge", "Total Paid", "Insurance Paid", "Patient Paid",
-    "Total Adjustment", "Total Balance", "Insurance Balance", "Balance Owed"
-  ];
-  return rows.map(row => {
-    const cells = row.split(/\s{2,}/).map(cell => cell.trim());
-    let obj = {};
-    headers.forEach((header, idx) => {
-      obj[header] = cells[idx] || "";
-    });
-    return obj;
-  });
-}
 function parseTableRow(line) {
   const tokens = line.trim().split(/\s+/);
   if (tokens.length < 5) return Array(HEADERS.length).fill('');
@@ -281,34 +258,18 @@ const validRows = sheet.tableRows.filter(row =>
       )
     });
 
-    const bodyRows = validRows.map((row, index) => {
-            const isClaimRow = row.claimOrServiceLine?.includes("CL-");
-            const nextRow = validRows[index + 1];
-            const nextIsServiceLine = nextRow && nextRow.claimOrServiceLine?.includes("Service Line#");
-            const whiteOut = isClaimRow && nextIsServiceLine;
+    const bodyRows = validRows.map((row, i) =>
+      new TableRow({
+        children: row.map((cell, colIdx) =>
+          new TableCell({
+            children: [new Paragraph({
+              children: [new TextRun({ text: cell ?? '', size: 22, color: '000000' })]
+            })]
+          })
+        )
+      })
+    );
 
-            const blackText = (text) => new TextRun({ text: text ?? '', size: 22, color: '000000' });
-            const whiteText = (text) => new TextRun({ text: text ?? '', size: 22, color: 'FFFFFF' });
-
-            return new TableRow({
-                children: [
-                    new TableCell({ children: [new Paragraph({ children: [blackText(row.claimOrServiceLine)] })] }),
-                    new TableCell({ children: [new Paragraph({ children: [blackText(row.serviceDate)] })] }),
-                    new TableCell({ children: [new Paragraph({ children: [whiteOut ? whiteText(row.procedure) : blackText(row.procedure)] })] }),
-                    new TableCell({ children: [new Paragraph({ children: [whiteOut ? whiteText(row.units) : blackText(row.units)] })] }),
-                    new TableCell({ children: [new Paragraph({ children: [whiteOut ? whiteText(row.unitRate) : blackText(row.unitRate)] })] }),
-                    new TableCell({ children: [new Paragraph({ children: [blackText(row.totalCharge)] })] }),
-                    new TableCell({ children: [new Paragraph({ children: [blackText(row.patientCharge)] })] }),
-                    new TableCell({ children: [new Paragraph({ children: [blackText(row.totalPaid)] })] }),
-                    new TableCell({ children: [new Paragraph({ children: [blackText(row.insurancePaid)] })] }),
-                    new TableCell({ children: [new Paragraph({ children: [blackText(row.patientPaid)] })] }),
-                    new TableCell({ children: [new Paragraph({ children: [blackText(row.adjustment)] })] }),
-                    new TableCell({ children: [new Paragraph({ children: [blackText(row.totalBalance)] })] }),
-                    new TableCell({ children: [new Paragraph({ children: [blackText(row.insuranceBalance)] })] }),
-                    new TableCell({ children: [new Paragraph({ children: [blackText(row.balanceOwedRow)] })] }),
-                ]
-            });
-        });
     const totalRow = new TableRow({
       children: [
         new TableCell({
