@@ -434,8 +434,8 @@ async function exportToWord(sheets, headers) {
       // Logo at top right corner
       new Paragraph({
         alignment: AlignmentType.LEFT,
-        children: [
-        new ImageRun({
+        children: [        
+          new ImageRun({
           data: logoBuffer,
           transformation: { width: 200, height: 160 },
           floating: {
@@ -446,7 +446,8 @@ async function exportToWord(sheets, headers) {
         })
         ],
         spacing: { after: 50 }
-      }),
+      })
+      ,
       new Paragraph({
         alignment: AlignmentType.RIGHT,
         children: [new TextRun({ text: `Statement Date: ${currentDate}`, bold: true, size: 24 })],
