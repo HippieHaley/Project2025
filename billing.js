@@ -431,16 +431,17 @@ async function exportToWord(sheets, headers) {
         }
       },
       children: [
-        // Logo at top left corner
+        // Logo at top left corner with tight text wrap
         new Paragraph({
           alignment: AlignmentType.LEFT,
           children: [
             new ImageRun({
               data: logoBuffer,
-              transformation: {
-          width: 100,
-          height: 80,
-          wrap: 'tight'
+              transformation: { width: 100, height: 80 },
+              floating: {
+          horizontalPosition: { relative: 'column', offset: 0 },
+          verticalPosition: { relative: 'paragraph', offset: 0 },
+          wrap: { type: 'tight' }
               }
             })
           ],
@@ -459,12 +460,11 @@ async function exportToWord(sheets, headers) {
           children: [
             new ImageRun({
               data: paymentBuffer,
+              data: paymentBuffer,
               transformation: {
                 width: 400,
-                height: 200,
-                wrap: 'tight'
+                height: 200
               }
-            })
           ],
           spacing: { after: 100 },
           indent: { left: 750 }
