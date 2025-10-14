@@ -229,36 +229,6 @@ const procedures = [
   category: "procedures",
   keywords: ["vasectomy", "male sterilization", "55250"]
 },
-  // ======================
-  // COMMON MEDS
-  // ======================
-  {
-    name: "Doxycycline",
-    cpt: "",
-    hcpcs: "",
-    icd10: "A56.01",
-    fullprice: 1,
-    category: "meds",
-    keywords: ["doxycycline", "sti treatment", "antibiotic"]
-  },
-  {
-    name: "Rocephin (Ceftriaxone inj)",
-    cpt: "",
-    hcpcs: "J0696",
-    icd10: "A54.01",
-    fullprice: 20,
-    category: "meds",
-    keywords: ["rocephin", "ceftriaxone", "sti treatment"]
-  },
-  {
-    name: "Bicillin L-A",
-    cpt: "",
-    hcpcs: "J0561",
-    icd10: "A51.0",
-    fullprice: 30,
-    category: "meds",
-    keywords: ["bicillin", "syphilis"]
-  },
 
   // ======================
   // LABS
@@ -473,6 +443,33 @@ const procedures = [
     fullprice: 75,
     category: "meds",
     keywords: ["xulane", "patch", "birth control"]
+  },
+    {
+    name: "Doxycycline",
+    cpt: "",
+    hcpcs: "",
+    icd10: "A56.01",
+    fullprice: 1,
+    category: "meds",
+    keywords: ["doxycycline", "sti treatment", "antibiotic"]
+  },
+  {
+    name: "Rocephin (Ceftriaxone inj)",
+    cpt: "",
+    hcpcs: "J0696",
+    icd10: "A54.01",
+    fullprice: 20,
+    category: "meds",
+    keywords: ["rocephin", "ceftriaxone", "sti treatment"]
+  },
+  {
+    name: "Bicillin L-A",
+    cpt: "",
+    hcpcs: "J0561",
+    icd10: "A51.0",
+    fullprice: 30,
+    category: "meds",
+    keywords: ["bicillin", "syphilis"]
   },
 {
   name: "Azithromycin",
