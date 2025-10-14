@@ -438,8 +438,9 @@ async function exportToWord(sheets, headers) {
             new ImageRun({
               data: logoBuffer,
               transformation: {
-                width: 80,
-                height: 40
+          width: 100,
+          height: 80,
+          wrap: 'tight'
               }
             })
           ],
@@ -459,8 +460,9 @@ async function exportToWord(sheets, headers) {
             new ImageRun({
               data: paymentBuffer,
               transformation: {
-                width: 150,
-                height: 75
+                width: 400,
+                height: 200,
+                wrap: 'tight'
               }
             })
           ],
