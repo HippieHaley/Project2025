@@ -195,16 +195,27 @@ document.getElementById('exportExcelBtn').onclick = function() {
   XLSX.writeFile(wb, "Statements.xlsx");
 };
 
-document.getElementById('exportWordBtn').onclick = function() {
-  exportToWord(sheets, HEADERS);
+document.getElementById('exportWordBtn').onclick = async function() {
+  await exportToWord(sheets, HEADERS);
 };
 
 // ------- DOCX WORD EXPORT (with column removal and white-out logic) -------
-function exportToWord(sheets, headers) {
+async function exportToWord(sheets, headers) {
   const {
     Document, Packer, Paragraph, Table, TableRow, TableCell,
-    WidthType, TextRun, AlignmentType, BorderStyle, PageOrientation
+    WidthType, TextRun, AlignmentType, BorderStyle, PageOrientation,
+    ImageRun, Media
   } = window.docx;
+
+  // Function to load image as array buffer
+  async function loadImageAsArrayBuffer(imagePath) {
+    const response = await fetch(imagePath);
+    return await response.arrayBuffer();
+  }
+
+  // Load images
+  const logoBuffer = await loadImageAsArrayBuffer('./images/logo.png');
+  const paymentBuffer = await loadImageAsArrayBuffer('./images/payment.png');
 
   const currentDate = new Date().toLocaleDateString('en-US', {
     year: 'numeric', month: '2-digit', day: '2-digit'
@@ -420,6 +431,20 @@ function exportToWord(sheets, headers) {
         }
       },
       children: [
+        // Logo at top left corner
+        new Paragraph({
+          alignment: AlignmentType.LEFT,
+          children: [
+            new ImageRun({
+              data: logoBuffer,
+              transformation: {
+                width: 80,
+                height: 40
+              }
+            })
+          ],
+          spacing: { after: 50 }
+        }),
         new Paragraph({
           alignment: AlignmentType.RIGHT,
           children: [new TextRun({ text: `Statement Date: ${currentDate}`, bold: true, size: 24 })],
@@ -427,6 +452,21 @@ function exportToWord(sheets, headers) {
           indent: { left: 750 }
         }),
         payAmountBox,
+        // Payment image right under PAY THIS AMOUNT box
+        new Paragraph({
+          alignment: AlignmentType.RIGHT,
+          children: [
+            new ImageRun({
+              data: paymentBuffer,
+              transformation: {
+                width: 150,
+                height: 75
+              }
+            })
+          ],
+          spacing: { after: 100 },
+          indent: { left: 750 }
+        }),
         new Paragraph({ spacing: { after: 200 }, alignment: AlignmentType.CENTER, indent: { left: 750 } }),
         new Paragraph({ text: "", spacing: { after: 800 } }),
         new Paragraph({
