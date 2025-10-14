@@ -199,7 +199,7 @@ document.getElementById('exportWordBtn').onclick = function() {
   exportToWord(sheets, HEADERS);
 };
 
-// ------- DOCX WORD EXPORT (with proper white out logic for selected columns) -------
+// ------- DOCX WORD EXPORT (with column removal and white-out logic) -------
 function exportToWord(sheets, headers) {
   const {
     Document, Packer, Paragraph, Table, TableRow, TableCell,
@@ -233,6 +233,7 @@ function exportToWord(sheets, headers) {
     // --- Calculate total balance owed ---
     let balanceOwed = 0;
     let balanceColIdx = headers.findIndex(h => /balance owed|patient balance/i.test(h));
+    let patientChargeColIdx = headers.findIndex(h => h.toLowerCase() === "patient charge");
     sheet.tableRows.forEach(row => {
       let val = row[balanceColIdx];
       if (typeof val === 'string') {
@@ -246,9 +247,22 @@ function exportToWord(sheets, headers) {
       !(row[0] && row[0].toString().includes("Disclaimer: Charges/Adjustments made after statement date"))
     );
 
-    // --- Table rows ---
+    // --- Determine if "Patient Charge" column should be removed ---
+    let removePatientCharge = false;
+    for (const row of validRows) {
+      if (row[0] && row[0].includes("CL-") && row[patientChargeColIdx] === row[balanceColIdx]) {
+        removePatientCharge = true;
+        break;
+      }
+    }
+
+    // --- Build header row (remove "Patient Charge" if needed) ---
+    const filteredHeaders = removePatientCharge
+      ? headers.filter((h, i) => i !== patientChargeColIdx)
+      : headers;
+
     const headerRow = new TableRow({
-      children: headers.map(text =>
+      children: filteredHeaders.map(text =>
         new TableCell({
           children: [new Paragraph({ text, bold: true })],
           shading: { fill: "D3D3D3" }
@@ -256,8 +270,7 @@ function exportToWord(sheets, headers) {
       )
     });
 
-    // --------- WHITE OUT LOGIC FOR SELECTED COLUMNS ---------
-    // Only procedure, units, and unitRate columns will be whited out if whiteOut is true
+    // --- Build body rows (remove "Patient Charge" if needed; white out logic for procedure/units/unitRate columns only) ---
     const bodyRows = validRows.map((row, index) => {
       const isClaimRow = row[0]?.includes("CL-");
       const nextRow = validRows[index + 1];
@@ -267,41 +280,56 @@ function exportToWord(sheets, headers) {
       const blackText = (text) => new TextRun({ text: text ?? '', size: 22, color: '000000' });
       const whiteText = (text) => new TextRun({ text: text ?? '', size: 22, color: 'FFFFFF' });
 
+      // Remove Patient Charge column if needed
+      const filteredRow = removePatientCharge
+        ? row.filter((cell, i) => i !== patientChargeColIdx)
+        : row;
+
       return new TableRow({
-        children: [
-          new TableCell({ children: [new Paragraph({ children: [blackText(row[0])] })] }),
-          new TableCell({ children: [new Paragraph({ children: [blackText(row[1])] })] }),
-          new TableCell({ children: [new Paragraph({ children: [whiteOut ? whiteText(row[2]) : blackText(row[2])] })] }),
-          new TableCell({ children: [new Paragraph({ children: [whiteOut ? whiteText(row[3]) : blackText(row[3])] })] }),
-          new TableCell({ children: [new Paragraph({ children: [whiteOut ? whiteText(row[4]) : blackText(row[4])] })] }),
-          new TableCell({ children: [new Paragraph({ children: [blackText(row[5])] })] }),
-          new TableCell({ children: [new Paragraph({ children: [blackText(row[6])] })] }),
-          new TableCell({ children: [new Paragraph({ children: [blackText(row[7])] })] }),
-          new TableCell({ children: [new Paragraph({ children: [blackText(row[8])] })] }),
-          new TableCell({ children: [new Paragraph({ children: [blackText(row[9])] })] }),
-          new TableCell({ children: [new Paragraph({ children: [blackText(row[10])] })] }),
-          new TableCell({ children: [new Paragraph({ children: [blackText(row[11])] })] }),
-          new TableCell({ children: [new Paragraph({ children: [blackText(row[12])] })] }),
-          new TableCell({ children: [new Paragraph({ children: [blackText(row[13])] })] }),
-        ]
+        children: filteredRow.map((cell, colIdx) => {
+          // Map to correct column index in original headers
+          const originalColIdx = removePatientCharge && colIdx >= patientChargeColIdx ? colIdx + 1 : colIdx;
+          // Procedure (2), Units (3), Unit Rate (4) are white out columns
+          const isWhiteOutCol = [2, 3, 4].includes(originalColIdx);
+          return new TableCell({
+            children: [new Paragraph({
+              children: [whiteOut && isWhiteOutCol ? whiteText(cell) : blackText(cell)]
+            })]
+          });
+        })
       });
     });
-    // -------- END WHITE OUT LOGIC ---------
+
+    // --- Build total row ---
+    const filteredTotalRowChildren = removePatientCharge
+      ? [
+          new TableCell({
+            children: [new Paragraph({ text: "Total", bold: true })],
+            columnSpan: filteredHeaders.length - 1,
+            shading: { fill: "D3D3D3" }
+          }),
+          new TableCell({
+            children: [new Paragraph({ text: `$${balanceOwed.toFixed(2)}`, bold: true })],
+            shading: { fill: "D3D3D3" }
+          })
+        ]
+      : [
+          new TableCell({
+            children: [new Paragraph({ text: "Total", bold: true })],
+            columnSpan: headers.length - 1,
+            shading: { fill: "D3D3D3" }
+          }),
+          new TableCell({
+            children: [new Paragraph({ text: `$${balanceOwed.toFixed(2)}`, bold: true })],
+            shading: { fill: "D3D3D3" }
+          })
+        ];
 
     const totalRow = new TableRow({
-      children: [
-        new TableCell({
-          children: [new Paragraph({ text: "Total", bold: true })],
-          columnSpan: headers.length - 1,
-          shading: { fill: "D3D3D3" }
-        }),
-        new TableCell({
-          children: [new Paragraph({ text: `$${balanceOwed.toFixed(2)}`, bold: true })],
-          shading: { fill: "D3D3D3" }
-        })
-      ]
+      children: filteredTotalRowChildren
     });
 
+    // --- Pay amount box ---
     const payAmountBox = new Table({
       alignment: AlignmentType.RIGHT,
       width: { size: 50, type: WidthType.PERCENTAGE },
