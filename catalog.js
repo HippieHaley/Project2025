@@ -140,6 +140,24 @@ const procedures = [
   // PROCEDURES
   // ======================
   {
+  name: "Injection Fee",
+  cpt: "96372",
+  hcpcs: "",
+  icd10: "",
+  fullprice: 38,
+  category: "procedures",
+  keywords: ["injection", "96372"]
+},
+{
+  name: "Venipuncture",
+  cpt: "36415",
+  hcpcs: "",
+  icd10: "",
+  fullprice: 7,
+  category: "procedures",
+  keywords: ["venipuncture", "blood draw", "36415"]
+},
+  {
     name: "Implant Insertion",
     cpt: "11981",
     hcpcs: "J7307",
@@ -203,15 +221,6 @@ const procedures = [
   keywords: ["male genital wart", "wart treatment", "54050"]
 },
 {
-  name: "Injection Fee",
-  cpt: "96372",
-  hcpcs: "",
-  icd10: "",
-  fullprice: 38,
-  category: "procedures",
-  keywords: ["injection", "96372"]
-},
-{
   name: "Vasectomy",
   cpt: "55250",
   hcpcs: "",
@@ -219,15 +228,6 @@ const procedures = [
   fullprice: 847,
   category: "procedures",
   keywords: ["vasectomy", "male sterilization", "55250"]
-},
-{
-  name: "Venipuncture",
-  cpt: "36415",
-  hcpcs: "",
-  icd10: "",
-  fullprice: 7,
-  category: "procedures",
-  keywords: ["venipuncture", "blood draw", "36415"]
 },
   // ======================
   // COMMON MEDS
@@ -263,6 +263,51 @@ const procedures = [
   // ======================
   // LABS
   // ======================
+    {
+    name: "Liquid Based PAP",
+    cpt: "88175",
+    hcpcs: "",
+    icd10: "Z12.4",
+    fullprice: 30,
+    category: "labs",
+    keywords: ["pap", "liquid pap"]
+  },
+  {
+    name: "Conventional PAP",
+    cpt: "88164",
+    hcpcs: "",
+    icd10: "Z12.4",
+    fullprice: 20,
+    category: "labs",
+    keywords: ["pap", "conventional pap"]
+  },
+   {
+    name: "HPV",
+    cpt: "87624",
+    hcpcs: "",
+    icd10: "Z11.51",
+    fullprice: 52,
+    category: "labs",
+    keywords: ["hpv"]
+  },
+  {
+  name: "Pathology Interpretation",
+  cpt: "88141",
+  hcpcs: "",
+  icd10: "",
+  fullprice: 72,
+  category: "labs",
+  keywords: ["pathology", "interpretation", "88141"]
+},
+{
+  name: "Wet Mount/Gram Stain",
+  cpt: "87210",
+  hcpcs: "",
+  icd10: "N76.0",
+  fullprice: 15,
+  category: "labs",
+  keywords: ["wet mount", "gram stain", "87210"]
+},
   {
     name: "Chlamydia (CHL)",
     cpt: "87491",
@@ -281,59 +326,14 @@ const procedures = [
     category: "labs",
     keywords: ["gonorrhea", "gc"]
   },
-  {
-    name: "HPV",
-    cpt: "87624",
-    hcpcs: "",
-    icd10: "Z11.51",
-    fullprice: 52,
-    category: "labs",
-    keywords: ["hpv"]
-  },
-  {
-    name: "Liquid Based PAP",
-    cpt: "88175",
-    hcpcs: "",
-    icd10: "Z12.4",
-    fullprice: 30,
-    category: "labs",
-    keywords: ["pap", "liquid pap"]
-  },
-  {
-    name: "Conventional PAP",
-    cpt: "88164",
-    hcpcs: "",
-    icd10: "Z12.4",
-    fullprice: 20,
-    category: "labs",
-    keywords: ["pap", "conventional pap"]
-  },
-  {
-  name: "Herpes Viral Culture",
-  cpt: "87254",
-  hcpcs: "",
-  icd10: "A60.9",
-  fullprice: 35,
-  category: "labs",
-  keywords: ["herpes", "viral culture", "87254"]
-},
 {
-  name: "Syphilis-TPPA",
-  cpt: "86593",
+  name: "Urine Pregnancy Test",
+  cpt: "81025",
   hcpcs: "",
-  icd10: "A51.9",
-  fullprice: 30,
-  category: "labs",
-  keywords: ["syphilis", "TPPA", "86593"]
-},
-{
-  name: "RPR Qualitative",
-  cpt: "86592",
-  hcpcs: "",
-  icd10: "A51.9",
+  icd10: "Z32.02",
   fullprice: 20,
   category: "labs",
-  keywords: ["syphilis", "RPR", "86592"]
+  keywords: ["pregnancy test", "urine", "81025"]
 },
 {
   name: "HIV Rapid",
@@ -354,22 +354,22 @@ const procedures = [
   keywords: ["HIV", "serum", "87389"]
 },
 {
-  name: "Pathology Interpretation",
-  cpt: "88141",
+  name: "Syphilis-RPR Qualitative",
+  cpt: "86592",
   hcpcs: "",
-  icd10: "",
-  fullprice: 72,
-  category: "labs",
-  keywords: ["pathology", "interpretation", "88141"]
-},
-{
-  name: "Urine Pregnancy Test",
-  cpt: "81025",
-  hcpcs: "",
-  icd10: "Z32.02",
+  icd10: "A51.9",
   fullprice: 20,
   category: "labs",
-  keywords: ["pregnancy test", "urine", "81025"]
+  keywords: ["syphilis", "RPR", "86592"]
+},
+{
+  name: "Syphilis-TPPA",
+  cpt: "86593",
+  hcpcs: "",
+  icd10: "A51.9",
+  fullprice: 30,
+  category: "labs",
+  keywords: ["syphilis", "TPPA", "86593"]
 },
 {
   name: "HSV PCR",
@@ -381,27 +381,27 @@ const procedures = [
   keywords: ["herpes", "HSV PCR", "87529"]
 },
 {
-  name: "Wet Mount/Gram Stain",
-  cpt: "87210",
+  name: "HSV SERUM",
+  cpt: "87529",
   hcpcs: "",
-  icd10: "N76.0",
-  fullprice: 15,
+  icd10: "B00.9",
+  fullprice: 0,
   category: "labs",
-  keywords: ["wet mount", "gram stain", "87210"]
+  keywords: ["herpes", "HSV SERUM", "86695"]
+},
+  {
+  name: "Herpes Viral Culture",
+  cpt: "87254",
+  hcpcs: "",
+  icd10: "A60.9",
+  fullprice: 35,
+  category: "labs",
+  keywords: ["herpes", "viral culture", "87254"]
 },
 
   // ======================
   // SUPPLIES + CONTRACEPTIVES
   // ======================
-  {
-    name: "Depo (Medroxyprogesterone)",
-    cpt: "",
-    hcpcs: "J1050",
-    icd10: "Z30.42",
-    fullprice: 27,
-    category: "meds",
-    keywords: ["depo", "medroxyprogesterone", "j1050", "birth control"]
-  },
   {
     name: "Nexplanon",
     cpt: "",
@@ -410,6 +410,51 @@ const procedures = [
     fullprice: 573,
     category: "meds",
     keywords: ["nexplanon", "implant", "j7307", "birth control"]
+  },
+  {
+  name: "Liletta IUD",
+  cpt: "",
+  hcpcs: "J7297",
+  icd10: "Z30.430",
+  fullprice: 130,
+  category: "meds",
+  keywords: ["Liletta", "IUD", "J7297"]
+},
+{
+  name: "Bayer IUD",
+  cpt: "",
+  hcpcs: "J7302",
+  icd10: "Z30.430",
+  fullprice: 0,
+  category: "meds",
+  keywords: ["bayer", "IUD", "J7302"]
+},
+{
+  name: "Paragard IUD",
+  cpt: "",
+  hcpcs: "J7300",
+  icd10: "Z30.430",
+  fullprice: 315,
+  category: "meds",
+  keywords: ["Paragard", "IUD", "J7300"]
+},
+  {
+  name: "Mirena IUD",
+  cpt: "",
+  hcpcs: "J7302",
+  icd10: "Z30.430",
+  fullprice: 310,
+  category: "meds",
+  keywords: ["Mirena", "IUD", "J7302"]
+},
+{
+    name: "Depo (Medroxyprogesterone)",
+    cpt: "",
+    hcpcs: "J1050",
+    icd10: "Z30.42",
+    fullprice: 27,
+    category: "meds",
+    keywords: ["depo", "medroxyprogesterone", "j1050", "birth control"]
   },
   {
     name: "NuvaRing",
@@ -429,69 +474,6 @@ const procedures = [
     category: "meds",
     keywords: ["xulane", "patch", "birth control"]
   },
-  {
-  name: "Liletta IUD",
-  cpt: "",
-  hcpcs: "J7297",
-  icd10: "Z30.430",
-  fullprice: 130,
-  category: "meds",
-  keywords: ["Liletta", "IUD", "J7297"]
-},
-{
-  name: "Paragard IUD",
-  cpt: "",
-  hcpcs: "J7300",
-  icd10: "Z30.430",
-  fullprice: 315,
-  category: "meds",
-  keywords: ["Paragard", "IUD", "J7300"]
-},
-{
-  name: "Mirena IUD",
-  cpt: "",
-  hcpcs: "J7302",
-  icd10: "Z30.430",
-  fullprice: 310,
-  category: "meds",
-  keywords: ["Mirena", "IUD", "J7302"]
-},
-{
-  name: "Bayer IUD",
-  cpt: "",
-  hcpcs: "J7302",
-  icd10: "Z30.430",
-  fullprice: 0,
-  category: "meds",
-  keywords: ["bayer", "IUD", "J7302"]
-},
-{
-  name: "Basal Thermometer",
-  cpt: "",
-  hcpcs: "A4931",
-  icd10: "",
-  fullprice: 16,
-  category: "meds",
-  keywords: ["basal thermometer", "A4931"]
-},
-{
-  name: "VCF Foam",
-  cpt: "",
-  hcpcs: "A4269",
-  icd10: "",
-  fullprice: 16,
-  category: "meds",
-  keywords: ["VCF foam", "contraceptive", "A4269"]
-},
-{
-  name: "Gynol II",
-  cpt: "",
-  hcpcs: "A4269",
-  icd10: "",
-  fullprice: 7,
-  category: "meds",
-  keywords: ["Gynol II", "contraceptive", "A4269"]
-},
 {
   name: "Azithromycin",
   cpt: "",
@@ -563,6 +545,33 @@ const procedures = [
   fullprice: 0,
   category: "meds",
   keywords: ["clotrimazole", "cream", "antifungal"]
+},
+{
+name: "Basal Thermometer",
+  cpt: "",
+  hcpcs: "A4931",
+  icd10: "",
+  fullprice: 16,
+  category: "meds",
+  keywords: ["basal thermometer", "A4931"]
+},
+{
+  name: "VCF Foam",
+  cpt: "",
+  hcpcs: "A4269",
+  icd10: "",
+  fullprice: 16,
+  category: "meds",
+  keywords: ["VCF foam", "contraceptive", "A4269"]
+},
+{
+  name: "Gynol II",
+  cpt: "",
+  hcpcs: "A4269",
+  icd10: "",
+  fullprice: 7,
+  category: "meds",
+  keywords: ["Gynol II", "contraceptive", "A4269"]
 },
 
   // ======================
