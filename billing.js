@@ -200,20 +200,19 @@ document.getElementById('exportWordBtn').onclick = async function() {
 };
 
 // ------- DOCX WORD EXPORT (with column removal and white-out logic) -------
+// ------- DOCX WORD EXPORT (with centered logo and two-column layout) -------
 async function exportToWord(sheets, headers) {
   const {
     Document, Packer, Paragraph, Table, TableRow, TableCell,
     WidthType, TextRun, AlignmentType, BorderStyle, PageOrientation,
-    ImageRun, Media
+    ImageRun
   } = window.docx;
 
-  // Function to load image as array buffer
   async function loadImageAsArrayBuffer(imagePath) {
     const response = await fetch(imagePath);
     return await response.arrayBuffer();
   }
 
-  // Load images
   const logoBuffer = await loadImageAsArrayBuffer('./images/logo.png');
   const paymentBuffer = await loadImageAsArrayBuffer('./images/payment.png');
 
@@ -240,7 +239,8 @@ async function exportToWord(sheets, headers) {
     }
     if (sheet.infoLines[6]) addressLines[0] = sheet.infoLines[6];
     if (sheet.infoLines[7]) addressLines[1] = sheet.infoLines[7];
-  // --- Indices for relevant columns ---
+
+    // --- Indices for relevant columns ---
     let insurancePaidColIdx = headers.findIndex(h => h.toLowerCase() === "insurance paid");
     let insuranceBalanceColIdx = headers.findIndex(h => h.toLowerCase() === "insurance balance");
     let adjustmentColIdx = headers.findIndex(h => h.toLowerCase().includes("adjustment"));
@@ -274,7 +274,6 @@ async function exportToWord(sheets, headers) {
     }
 
     // --- Total Paid column always removed
-    // --- Determine if "Total Balance" column should be removed ---
     let removeTotalBalance = false;
     for (const row of validRows) {
       if (row[0] && row[0].includes("CL-") && row[totalBalanceColIdx] === row[balanceOwedColIdx]) {
@@ -283,7 +282,6 @@ async function exportToWord(sheets, headers) {
       }
     }
 
-    // --- Build filteredHeaders and move Balance Owed to last ---
     let filteredHeaders = headers.filter((h, i) =>
       i !== insurancePaidColIdx &&
       i !== insuranceBalanceColIdx &&
@@ -291,11 +289,9 @@ async function exportToWord(sheets, headers) {
       i !== totalPaidColIdx &&
       (!removePatientCharge || i !== patientChargeColIdx) &&
       (!removeTotalBalance || i !== totalBalanceColIdx) &&
-      i !== balanceOwedColIdx // We'll add this later
+      i !== balanceOwedColIdx
     );
-    // Add "Ins. Covered" where "Insurance Paid" used to be
     filteredHeaders.splice(insurancePaidColIdx, 0, "Ins. Covered");
-    // Add Balance Owed last
     filteredHeaders.push(headers[balanceOwedColIdx]);
 
     const headerRow = new TableRow({
@@ -307,7 +303,6 @@ async function exportToWord(sheets, headers) {
       )
     });
 
-    // --- Body rows ---
     const bodyRows = validRows.map((row, index) => {
       const isClaimRow = row[0]?.includes("CL-");
       const nextRow = validRows[index + 1];
@@ -317,7 +312,6 @@ async function exportToWord(sheets, headers) {
       const blackText = (text) => new TextRun({ text: text ?? '', size: 22, color: '000000' });
       const whiteText = (text) => new TextRun({ text: text ?? '', size: 22, color: 'FFFFFF' });
 
-      // Remove all the columns except balance owed (we'll add it last)
       let filteredRow = row.filter((cell, i) =>
         i !== insurancePaidColIdx &&
         i !== insuranceBalanceColIdx &&
@@ -328,7 +322,6 @@ async function exportToWord(sheets, headers) {
         i !== balanceOwedColIdx
       );
 
-      // Only add Ins. Covered value for CL rows
       let insCoveredValue = '';
       if (isClaimRow) {
         const insurancePaidVal = parseFloat(row[insurancePaidColIdx]?.replace(/[$,]/g, '')) || 0;
@@ -337,13 +330,10 @@ async function exportToWord(sheets, headers) {
         insCoveredValue = `$${(insurancePaidVal + insuranceBalanceVal + adjustmentVal).toFixed(2)}`;
       }
       filteredRow.splice(insurancePaidColIdx, 0, insCoveredValue);
-
-      // Add Balance Owed last
       filteredRow.push(row[balanceOwedColIdx]);
 
       return new TableRow({
         children: filteredRow.map((cell, colIdx) => {
-          // Map to correct column index in original headers
           let originalIndices = headers
             .map((h, i) => i)
             .filter(i =>
@@ -355,11 +345,10 @@ async function exportToWord(sheets, headers) {
               (!removeTotalBalance || i !== totalBalanceColIdx) &&
               i !== balanceOwedColIdx
             );
-          originalIndices.splice(insurancePaidColIdx, 0, insurancePaidColIdx); // for Ins. Covered col
-          originalIndices.push(balanceOwedColIdx); // for Balance Owed at end
+          originalIndices.splice(insurancePaidColIdx, 0, insurancePaidColIdx);
+          originalIndices.push(balanceOwedColIdx);
           const originalColIdx = originalIndices[colIdx];
 
-          // Procedure (2), Units (3), Unit Rate (4) are white out columns
           const isWhiteOutCol = [2, 3, 4].includes(originalColIdx);
           return new TableCell({
             children: [
@@ -372,7 +361,6 @@ async function exportToWord(sheets, headers) {
       });
     });
 
-    // --- Build total row (adjust for removed columns) ---
     const filteredTotalRowChildren = [
       new TableCell({
         children: [new Paragraph({ text: "Total", bold: true })],
@@ -389,10 +377,10 @@ async function exportToWord(sheets, headers) {
       children: filteredTotalRowChildren
     });
 
-    // --- Pay amount box ---
+    // Payment info box
     const payAmountBox = new Table({
       alignment: AlignmentType.RIGHT,
-      width: { size: 50, type: WidthType.PERCENTAGE },
+      width: { size: 100, type: WidthType.PERCENTAGE },
       rows: [
         new TableRow({
           children: [
@@ -400,11 +388,9 @@ async function exportToWord(sheets, headers) {
               children: [
                 new Paragraph({
                   alignment: AlignmentType.CENTER,
-                  indent: { left: 750 },
                   children: [
                     new TextRun({
                       text: `PAY THIS AMOUNT: $${balanceOwed.toFixed(2)}`,
-                      alignment: AlignmentType.CENTER,
                       bold: true,
                       size: 28
                     })
@@ -423,86 +409,97 @@ async function exportToWord(sheets, headers) {
       ]
     });
 
+    // Main two-column layout using a table
+    const layoutTable = new Table({
+      width: { size: 100, type: WidthType.PERCENTAGE },
+      alignment: AlignmentType.CENTER,
+      rows: [
+        new TableRow({
+          children: [
+            // Left column: Logo centered, address block
+            new TableCell({
+              width: { size: 50, type: WidthType.PERCENTAGE },
+              children: [
+                new Paragraph({
+                  alignment: AlignmentType.CENTER,
+                  children: [
+                    new ImageRun({
+                      data: logoBuffer,
+                      transformation: { width: 200, height: 160 }
+                    })
+                  ],
+                  spacing: { after: 150 }
+                }),
+                new Paragraph({ text: "", spacing: { after: 50 } }),
+                new Paragraph({
+                  children: [new TextRun({ text: clientName, bold: true, size: 24 })],
+                  alignment: AlignmentType.CENTER,
+                  spacing: { after: 150 }
+                }),
+                ...addressLines.map(line =>
+                  new Paragraph({
+                    children: [new TextRun({ text: line, size: 24, bold: true })],
+                    alignment: AlignmentType.CENTER,
+                    spacing: { after: 150 }
+                  })
+                )
+              ]
+            }),
+            // Right column: Statement date, pay amount box, payment info image, etc.
+            new TableCell({
+              width: { size: 50, type: WidthType.PERCENTAGE },
+              children: [
+                new Paragraph({
+                  alignment: AlignmentType.RIGHT,
+                  children: [new TextRun({ text: `Statement Date: ${currentDate}`, bold: true, size: 24 })],
+                  spacing: { after: 100 }
+                }),
+                payAmountBox,
+                new Paragraph({ text: "", spacing: { after: 50 } }),
+                new Paragraph({
+                  alignment: AlignmentType.RIGHT,
+                  children: [
+                    new ImageRun({
+                      data: paymentBuffer,
+                      transformation: { width: 400, height: 200 }
+                    })
+                  ],
+                  spacing: { after: 100 }
+                }),
+                // You can add more payment info paragraphs here if needed
+              ]
+            })
+          ]
+        })
+      ]
+    });
+
     return {
       properties: {
-      page: {
-        size: { width: 12240, height: 15840, orientation: PageOrientation.PORTRAIT },
-        margin: { top: 360, bottom: 360, left: 360, right: 360 }
-      }
+        page: {
+          size: { width: 12240, height: 15840, orientation: PageOrientation.PORTRAIT },
+          margin: { top: 360, bottom: 360, left: 360, right: 360 }
+        }
       },
       children: [
-      // Logo at top right corner
-      new Paragraph({
-        alignment: AlignmentType.LEFT,
-        children: [
-          new ImageRun({
-        data: logoBuffer,
-        transformation: { width: 200, height: 160 },
-        floating: {
-          horizontalPosition: {
-            relative: 'page',
-            align: 'left', // align to left edge of page
-            offset: 1440,      // no offset, flush with edge
-          },
-          verticalPosition: { relative: 'paragraph', align: 'top' },
-          wrap: { type: 'tight' }
-        }
-          })
-        ],
-        spacing: { after: 50 }
-      }),
-      new Paragraph({
-        alignment: AlignmentType.RIGHT,
-        children: [new TextRun({ text: `Statement Date: ${currentDate}`, bold: true, size: 24 })],
-        spacing: { after: 200 }
-      }),
-      payAmountBox,
-      // Payment image right under PAY THIS AMOUNT box, aligned center
-      new Paragraph({
-        alignment: AlignmentType.CENTER,
-        children: [
-        new ImageRun({
-          data: paymentBuffer,
-          transformation: { width: 400, height: 200 },
-          floating: {
-          horizontalPosition: { relative: 'page', align: 'right' },
-          verticalPosition: { relative: 'paragraph', align: 'top' },
-          wrap: { type: 'tight' }
-          }
-        })  
-        ],
-        spacing: { after: 100 }
-      }),
-      new Paragraph({ spacing: { after: 200 }, alignment: AlignmentType.RIGHT }),
-      new Paragraph({ text: "", spacing: { after: 800 } }),
-      new Paragraph({
-          children: [new TextRun({ text: clientName, bold: true, size: 24 })],
-          indent: { left: 1440 },
-          spacing: { after: 150 }
+        layoutTable,
+        new Paragraph({ spacing: { after: 750 } }),
+        new Table({
+          width: { size: 100, type: WidthType.PERCENTAGE },
+          alignment: AlignmentType.RIGHT,
+          rows: [headerRow, ...bodyRows, totalRow]
         }),
-        ...addressLines.map(line =>
-          new Paragraph({
-            children: [new TextRun({ text: line, size: 24, bold: true })],
-            indent: { left: 1440 },
-            spacing: { after: 150 }
-          })
-        ),
-      new Paragraph({ spacing: { after: 750 } }),
-      new Table({
-        width: { size: 100, type: WidthType.PERCENTAGE },
-        alignment: AlignmentType.RIGHT,
-        rows: [headerRow, ...bodyRows, totalRow]
-      }),
-      new Paragraph({
-        children: [
-        new TextRun({
-          text: "For any questions, concerns, or to make a payment over the phone, please call Family Health Education Services at (605) 717-8920. Our billing team is available Monday - Thursday, 8:00 AM to 5:00 PM. We offer payment plans in any amount and are happy to work with you on a schedule that fits your needs. Please note that accounts with no payment activity or effort to resolve the balance within 90 days of the billing date may be subject to collections.",
-          bold: true
-        })
-        ],
-        spacing: { before: 200 },
-      }),
-      ...(idx < sheets.length - 1 ? [new Paragraph({ children: [], pageBreakBefore: true })] : [])
+        new Paragraph({
+          children: [
+            new TextRun({
+              text: "For any questions, concerns, or to make a payment over the phone, please call Family Health Education Services at (605) 717-8920. Our billing team is available Monday - Thursday, 8:00[...]",
+              bold: true
+            })
+          ],
+          spacing: { before: 200 },
+          alignment: AlignmentType.RIGHT
+        }),
+        ...(idx < sheets.length - 1 ? [new Paragraph({ children: [], pageBreakBefore: true })] : [])
       ]
     };
   });
