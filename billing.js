@@ -227,15 +227,18 @@ function exportToWord(sheets, headers) {
         addressLines[1] = line.trim();
       }
     }
-    if (sheet.infoLines[4]) addressLines[0] = sheet.infoLines[4];
-    if (sheet.infoLines[5]) addressLines[1] = sheet.infoLines[5];
+    if (sheet.infoLines[7]) addressLines[0] = sheet.infoLines[7];
+    if (sheet.infoLines[8]) addressLines[1] = sheet.infoLines[8];
+// --- Indices for relevant columns ---
+    let insurancePaidColIdx = headers.findIndex(h => h.toLowerCase() === "insurance paid");
+    let insuranceBalanceColIdx = headers.findIndex(h => h.toLowerCase() === "insurance balance");
+    let patientChargeColIdx = headers.findIndex(h => h.toLowerCase() === "patient charge");
+    let balanceOwedColIdx = headers.findIndex(h => /balance owed|patient balance/i.test(h));
 
     // --- Calculate total balance owed ---
     let balanceOwed = 0;
-    let balanceColIdx = headers.findIndex(h => /balance owed|patient balance/i.test(h));
-    let patientChargeColIdx = headers.findIndex(h => h.toLowerCase() === "patient charge");
     sheet.tableRows.forEach(row => {
-      let val = row[balanceColIdx];
+      let val = row[balanceOwedColIdx];
       if (typeof val === 'string') {
         val = parseFloat(val.replace(/[$,]/g, ''));
         if (!isNaN(val)) balanceOwed += val;
@@ -247,19 +250,23 @@ function exportToWord(sheets, headers) {
       !(row[0] && row[0].toString().includes("Disclaimer: Charges/Adjustments made after statement date"))
     );
 
-    // --- Determine if "Patient Charge" column should be removed ---
+    // --- Remove Patient Charge column logic ---
     let removePatientCharge = false;
     for (const row of validRows) {
-      if (row[0] && row[0].includes("CL-") && row[patientChargeColIdx] === row[balanceColIdx]) {
+      if (row[0] && row[0].includes("CL-") && row[patientChargeColIdx] === row[balanceOwedColIdx]) {
         removePatientCharge = true;
         break;
       }
     }
 
-    // --- Build header row (remove "Patient Charge" if needed) ---
-    const filteredHeaders = removePatientCharge
-      ? headers.filter((h, i) => i !== patientChargeColIdx)
-      : headers;
+    // --- Build header row ---
+    let filteredHeaders = headers.filter((h, i) =>
+      i !== insurancePaidColIdx &&
+      i !== insuranceBalanceColIdx &&
+      (!removePatientCharge || i !== patientChargeColIdx)
+    );
+    // Add "Ins. Paid" where "Insurance Paid" used to be
+    filteredHeaders.splice(insurancePaidColIdx, 0, "Ins. Paid");
 
     const headerRow = new TableRow({
       children: filteredHeaders.map(text =>
@@ -270,7 +277,7 @@ function exportToWord(sheets, headers) {
       )
     });
 
-    // --- Build body rows (remove "Patient Charge" if needed; white out logic for procedure/units/unitRate columns only) ---
+    // --- Body rows ---
     const bodyRows = validRows.map((row, index) => {
       const isClaimRow = row[0]?.includes("CL-");
       const nextRow = validRows[index + 1];
@@ -280,50 +287,53 @@ function exportToWord(sheets, headers) {
       const blackText = (text) => new TextRun({ text: text ?? '', size: 22, color: '000000' });
       const whiteText = (text) => new TextRun({ text: text ?? '', size: 22, color: 'FFFFFF' });
 
-      // Remove Patient Charge column if needed
-      const filteredRow = removePatientCharge
-        ? row.filter((cell, i) => i !== patientChargeColIdx)
-        : row;
+      // Remove Patient Charge and Insurance cols
+      let filteredRow = row.filter((cell, i) =>
+        i !== insurancePaidColIdx &&
+        i !== insuranceBalanceColIdx &&
+        (!removePatientCharge || i !== patientChargeColIdx)
+      );
+      // Add summed insurance value
+      const insurancePaidVal = parseFloat(row[insurancePaidColIdx]?.replace(/[$,]/g, '')) || 0;
+      const insuranceBalanceVal = parseFloat(row[insuranceBalanceColIdx]?.replace(/[$,]/g, '')) || 0;
+      const insPaidValue = (insurancePaidVal + insuranceBalanceVal).toFixed(2);
+      filteredRow.splice(insurancePaidColIdx, 0, `$${insPaidValue}`);
 
       return new TableRow({
         children: filteredRow.map((cell, colIdx) => {
           // Map to correct column index in original headers
-          const originalColIdx = removePatientCharge && colIdx >= patientChargeColIdx ? colIdx + 1 : colIdx;
+          const originalColIdx =
+            colIdx >= insurancePaidColIdx ? colIdx + 1 : colIdx;
+          const adjustedColIdx =
+            removePatientCharge && originalColIdx >= patientChargeColIdx
+              ? originalColIdx + 1
+              : originalColIdx;
+
           // Procedure (2), Units (3), Unit Rate (4) are white out columns
-          const isWhiteOutCol = [2, 3, 4].includes(originalColIdx);
+          const isWhiteOutCol = [2, 3, 4].includes(adjustedColIdx);
           return new TableCell({
-            children: [new Paragraph({
-              children: [whiteOut && isWhiteOutCol ? whiteText(cell) : blackText(cell)]
-            })]
+            children: [
+              new Paragraph({
+                children: [whiteOut && isWhiteOutCol ? whiteText(cell) : blackText(cell)],
+              }),
+            ],
           });
-        })
+        }),
       });
     });
 
-    // --- Build total row ---
-    const filteredTotalRowChildren = removePatientCharge
-      ? [
-          new TableCell({
-            children: [new Paragraph({ text: "Total", bold: true })],
-            columnSpan: filteredHeaders.length - 1,
-            shading: { fill: "D3D3D3" }
-          }),
-          new TableCell({
-            children: [new Paragraph({ text: `$${balanceOwed.toFixed(2)}`, bold: true })],
-            shading: { fill: "D3D3D3" }
-          })
-        ]
-      : [
-          new TableCell({
-            children: [new Paragraph({ text: "Total", bold: true })],
-            columnSpan: headers.length - 1,
-            shading: { fill: "D3D3D3" }
-          }),
-          new TableCell({
-            children: [new Paragraph({ text: `$${balanceOwed.toFixed(2)}`, bold: true })],
-            shading: { fill: "D3D3D3" }
-          })
-        ];
+    // --- Build total row (adjust for removed columns) ---
+    const filteredTotalRowChildren = [
+      new TableCell({
+        children: [new Paragraph({ text: "Total", bold: true })],
+        columnSpan: filteredHeaders.length - 1,
+        shading: { fill: "D3D3D3" }
+      }),
+      new TableCell({
+        children: [new Paragraph({ text: `$${balanceOwed.toFixed(2)}`, bold: true })],
+        shading: { fill: "D3D3D3" }
+      })
+    ];
 
     const totalRow = new TableRow({
       children: filteredTotalRowChildren
