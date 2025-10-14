@@ -431,16 +431,16 @@ async function exportToWord(sheets, headers) {
       }
       },
       children: [
-      // Logo at top right corner with tight text wrap
+      // Logo at top right corner
       new Paragraph({
-        alignment: AlignmentType.RIGHT,
+        alignment: AlignmentType.LEFT,
         children: [
         new ImageRun({
           data: logoBuffer,
           transformation: { width: 100, height: 80 },
           floating: {
-          horizontalPosition: { relative: 'column', offset: 0 },
-          verticalPosition: { relative: 'paragraph', offset: 0 },
+          horizontalPosition: { relative: 'page', align: 'left' },
+          verticalPosition: { relative: 'paragraph', align: 'top' },
           wrap: { type: 'tight' }
           }
         })
@@ -450,8 +450,7 @@ async function exportToWord(sheets, headers) {
       new Paragraph({
         alignment: AlignmentType.RIGHT,
         children: [new TextRun({ text: `Statement Date: ${currentDate}`, bold: true, size: 24 })],
-        spacing: { after: 200 },
-        indent: { left: 750 }
+        spacing: { after: 200 }
       }),
       payAmountBox,
       // Payment image right under PAY THIS AMOUNT box, aligned right
@@ -460,32 +459,26 @@ async function exportToWord(sheets, headers) {
         children: [
         new ImageRun({
           data: paymentBuffer,
-          transformation: {
-          width: 400,
-          height: 200
-          },
+          transformation: { width: 400, height: 200 },
           floating: {
-          horizontalPosition: { relative: 'column', offset: 0 },
-          verticalPosition: { relative: 'paragraph', offset: 0 },
+          horizontalPosition: { relative: 'page', align: 'right' },
+          verticalPosition: { relative: 'paragraph', align: 'top' },
           wrap: { type: 'tight' }
           }
         })  
         ],
-        spacing: { after: 100 },
-        indent: { left: 750 }
+        spacing: { after: 100 }
       }),
-      new Paragraph({ spacing: { after: 200 }, alignment: AlignmentType.RIGHT, indent: { left: 750 } }),
+      new Paragraph({ spacing: { after: 200 }, alignment: AlignmentType.RIGHT }),
       new Paragraph({ text: "", spacing: { after: 800 } }),
       new Paragraph({
         children: [new TextRun({ text: clientName, bold: true, size: 24 })],
-        indent: { left: 1440 },
         spacing: { after: 150 },
-        alignment: AlignmentType.RIGHT
+        alignment: AlignmentType.LEFT
       }),
       ...addressLines.map(line =>
         new Paragraph({
         children: [new TextRun({ text: line, size: 24, bold: true })],
-        indent: { left: 1440 },
         spacing: { after: 150 },
         alignment: AlignmentType.RIGHT
         })
@@ -493,16 +486,8 @@ async function exportToWord(sheets, headers) {
       new Paragraph({ spacing: { after: 750 } }),
       new Table({
         width: { size: 100, type: WidthType.PERCENTAGE },
+        alignment: AlignmentType.RIGHT,
         rows: [headerRow, ...bodyRows, totalRow]
-      }),
-      new Paragraph({
-        children: [
-        new TextRun({
-          text: "Disclaimer: The Adjustment column shows total reductions applied to your charges. These include write-offs and adjustments from your insurance provider, as well as any discounts you received through our South Dakota sliding fee scale program. These amounts are not owed and have already been deducted from your balance.",
-          italics: true
-        })
-        ],
-        spacing: { before: 200 }
       }),
       new Paragraph({
         children: [
@@ -511,7 +496,8 @@ async function exportToWord(sheets, headers) {
           bold: true
         })
         ],
-        spacing: { before: 200 }
+        spacing: { before: 200 },
+        alignment: AlignmentType.RIGHT
       }),
       ...(idx < sheets.length - 1 ? [new Paragraph({ children: [], pageBreakBefore: true })] : [])
       ]
