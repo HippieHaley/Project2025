@@ -229,8 +229,10 @@ function exportToWord(sheets, headers) {
     }
     if (sheet.infoLines[6]) addressLines[0] = sheet.infoLines[6];
     if (sheet.infoLines[7]) addressLines[1] = sheet.infoLines[7];
- let insurancePaidColIdx = headers.findIndex(h => h.toLowerCase() === "insurance paid");
+  // --- Indices for relevant columns ---
+    let insurancePaidColIdx = headers.findIndex(h => h.toLowerCase() === "insurance paid");
     let insuranceBalanceColIdx = headers.findIndex(h => h.toLowerCase() === "insurance balance");
+    let adjustmentColIdx = headers.findIndex(h => h.toLowerCase().includes("adjustment"));
     let patientChargeColIdx = headers.findIndex(h => h.toLowerCase() === "patient charge");
     let balanceOwedColIdx = headers.findIndex(h => /balance owed|patient balance/i.test(h));
     let totalPaidColIdx = headers.findIndex(h => h.toLowerCase() === "total paid");
@@ -274,12 +276,13 @@ function exportToWord(sheets, headers) {
     let filteredHeaders = headers.filter((h, i) =>
       i !== insurancePaidColIdx &&
       i !== insuranceBalanceColIdx &&
+      i !== adjustmentColIdx &&
       i !== totalPaidColIdx &&
       (!removePatientCharge || i !== patientChargeColIdx) &&
       (!removeTotalBalance || i !== totalBalanceColIdx)
     );
-    // Add "Ins. Paid" where "Insurance Paid" used to be
-    filteredHeaders.splice(insurancePaidColIdx, 0, "Ins. Paid");
+    // Add "Ins. Covered" where "Insurance Paid" used to be
+    filteredHeaders.splice(insurancePaidColIdx, 0, "Ins. Covered");
 
     const headerRow = new TableRow({
       children: filteredHeaders.map(text =>
@@ -304,35 +307,37 @@ function exportToWord(sheets, headers) {
       let filteredRow = row.filter((cell, i) =>
         i !== insurancePaidColIdx &&
         i !== insuranceBalanceColIdx &&
+        i !== adjustmentColIdx &&
         i !== totalPaidColIdx &&
         (!removePatientCharge || i !== patientChargeColIdx) &&
         (!removeTotalBalance || i !== totalBalanceColIdx)
       );
 
-      // Only add Ins. Paid value for CL rows
-      let insPaidValue = '';
+      // Only add Ins. Covered value for CL rows
+      let insCoveredValue = '';
       if (isClaimRow) {
         const insurancePaidVal = parseFloat(row[insurancePaidColIdx]?.replace(/[$,]/g, '')) || 0;
         const insuranceBalanceVal = parseFloat(row[insuranceBalanceColIdx]?.replace(/[$,]/g, '')) || 0;
-        insPaidValue = `$${(insurancePaidVal + insuranceBalanceVal).toFixed(2)}`;
+        const adjustmentVal = parseFloat(row[adjustmentColIdx]?.replace(/[$,]/g, '')) || 0;
+        insCoveredValue = `$${(insurancePaidVal + insuranceBalanceVal + adjustmentVal).toFixed(2)}`;
       }
-      filteredRow.splice(insurancePaidColIdx, 0, insPaidValue);
+      filteredRow.splice(insurancePaidColIdx, 0, insCoveredValue);
 
       return new TableRow({
         children: filteredRow.map((cell, colIdx) => {
           // Map to correct column index in original headers
           // For whiteOut logic, need to figure out the original column index in headers
-          // Build a map of filtered to original indices:
           let originalIndices = headers
             .map((h, i) => i)
             .filter(i =>
               i !== insurancePaidColIdx &&
               i !== insuranceBalanceColIdx &&
+              i !== adjustmentColIdx &&
               i !== totalPaidColIdx &&
               (!removePatientCharge || i !== patientChargeColIdx) &&
               (!removeTotalBalance || i !== totalBalanceColIdx)
             );
-          originalIndices.splice(insurancePaidColIdx, 0, insurancePaidColIdx); // for Ins. Paid col
+          originalIndices.splice(insurancePaidColIdx, 0, insurancePaidColIdx); // for Ins. Covered col
           const originalColIdx = originalIndices[colIdx];
 
           // Procedure (2), Units (3), Unit Rate (4) are white out columns
