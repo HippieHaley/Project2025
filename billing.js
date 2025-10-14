@@ -425,88 +425,95 @@ async function exportToWord(sheets, headers) {
 
     return {
       properties: {
-        page: {
-          size: { width: 12240, height: 15840, orientation: PageOrientation.PORTRAIT },
-          margin: { top: 360, bottom: 360, left: 360, right: 360 }
-        }
+      page: {
+        size: { width: 12240, height: 15840, orientation: PageOrientation.PORTRAIT },
+        margin: { top: 360, bottom: 360, left: 360, right: 360 }
+      }
       },
       children: [
-        // Logo at top left corner with tight text wrap
-        new Paragraph({
-          alignment: AlignmentType.LEFT,
-          children: [
-            new ImageRun({
-              data: logoBuffer,
-              transformation: { width: 100, height: 80 },
-              floating: {
+      // Logo at top right corner with tight text wrap
+      new Paragraph({
+        alignment: AlignmentType.RIGHT,
+        children: [
+        new ImageRun({
+          data: logoBuffer,
+          transformation: { width: 100, height: 80 },
+          floating: {
           horizontalPosition: { relative: 'column', offset: 0 },
           verticalPosition: { relative: 'paragraph', offset: 0 },
           wrap: { type: 'tight' }
-              }
-            })
-          ],
-          spacing: { after: 50 }
-        }),
+          }
+        })
+        ],
+        spacing: { after: 50 }
+      }),
+      new Paragraph({
+        alignment: AlignmentType.RIGHT,
+        children: [new TextRun({ text: `Statement Date: ${currentDate}`, bold: true, size: 24 })],
+        spacing: { after: 200 },
+        indent: { left: 750 }
+      }),
+      payAmountBox,
+      // Payment image right under PAY THIS AMOUNT box, aligned right
+      new Paragraph({
+        alignment: AlignmentType.RIGHT,
+        children: [
+        new ImageRun({
+          data: paymentBuffer,
+          transformation: {
+          width: 400,
+          height: 200
+          },
+          floating: {
+          horizontalPosition: { relative: 'column', offset: 0 },
+          verticalPosition: { relative: 'paragraph', offset: 0 },
+          wrap: { type: 'tight' }
+          }
+        })  
+        ],
+        spacing: { after: 100 },
+        indent: { left: 750 }
+      }),
+      new Paragraph({ spacing: { after: 200 }, alignment: AlignmentType.RIGHT, indent: { left: 750 } }),
+      new Paragraph({ text: "", spacing: { after: 800 } }),
+      new Paragraph({
+        children: [new TextRun({ text: clientName, bold: true, size: 24 })],
+        indent: { left: 1440 },
+        spacing: { after: 150 },
+        alignment: AlignmentType.RIGHT
+      }),
+      ...addressLines.map(line =>
         new Paragraph({
-          alignment: AlignmentType.RIGHT,
-          children: [new TextRun({ text: `Statement Date: ${currentDate}`, bold: true, size: 24 })],
-          spacing: { after: 200 },
-          indent: { left: 750 }
-        }),
-        payAmountBox,
-        // Payment image right under PAY THIS AMOUNT box
-        new Paragraph({
-          alignment: AlignmentType.RIGHT,
-          children: [
-            new ImageRun({
-              data: paymentBuffer,
-              data: paymentBuffer,
-              transformation: {
-                width: 400,
-                height: 200
-              }
-          ],
-          spacing: { after: 100 },
-          indent: { left: 750 }
-        }),
-        new Paragraph({ spacing: { after: 200 }, alignment: AlignmentType.CENTER, indent: { left: 750 } }),
-        new Paragraph({ text: "", spacing: { after: 800 } }),
-        new Paragraph({
-          children: [new TextRun({ text: clientName, bold: true, size: 24 })],
-          indent: { left: 1440 },
-          spacing: { after: 150 }
-        }),
-        ...addressLines.map(line =>
-          new Paragraph({
-            children: [new TextRun({ text: line, size: 24, bold: true })],
-            indent: { left: 1440 },
-            spacing: { after: 150 }
-          })
-        ),
-        new Paragraph({ spacing: { after: 750 } }),
-        new Table({
-          width: { size: 100, type: WidthType.PERCENTAGE },
-          rows: [headerRow, ...bodyRows, totalRow]
-        }),
-        new Paragraph({
-          children: [
-            new TextRun({
-              text: "Disclaimer: The Adjustment column shows total reductions applied to your charges. These include write-offs and adjustments from your insurance provider, as well as any discounts you received through our South Dakota sliding fee scale program. These amounts are not owed and have already been deducted from your balance.",
-              italics: true
-            })
-          ],
-          spacing: { before: 200 }
-        }),
-        new Paragraph({
-          children: [
-            new TextRun({
-              text: "For any questions, concerns, or to make a payment over the phone, please call Family Health Education Services at (605) 717-8920. Our billing team is available Monday - Thursday, 8:00 AM to 5:00 PM. We offer payment plans in any amount and are happy to work with you on a schedule that fits your needs. Please note that accounts with no payment activity or effort to resolve the balance within 90 days of the billing date may be subject to collections.",
-              bold: true
-            })
-          ],
-          spacing: { before: 200 }
-        }),
-        ...(idx < sheets.length - 1 ? [new Paragraph({ children: [], pageBreakBefore: true })] : [])
+        children: [new TextRun({ text: line, size: 24, bold: true })],
+        indent: { left: 1440 },
+        spacing: { after: 150 },
+        alignment: AlignmentType.RIGHT
+        })
+      ),
+      new Paragraph({ spacing: { after: 750 } }),
+      new Table({
+        width: { size: 100, type: WidthType.PERCENTAGE },
+        rows: [headerRow, ...bodyRows, totalRow]
+      }),
+      new Paragraph({
+        children: [
+        new TextRun({
+          text: "Disclaimer: The Adjustment column shows total reductions applied to your charges. These include write-offs and adjustments from your insurance provider, as well as any discounts you received through our South Dakota sliding fee scale program. These amounts are not owed and have already been deducted from your balance.",
+          italics: true
+        })
+        ],
+        spacing: { before: 200 }
+      }),
+      new Paragraph({
+        children: [
+        new TextRun({
+          text: "For any questions, concerns, or to make a payment over the phone, please call Family Health Education Services at (605) 717-8920. Our billing team is available Monday - Thursday, 8:00 AM to 5:00 PM. We offer payment plans in any amount and are happy to work with you on a schedule that fits your needs. Please note that accounts with no payment activity or effort to resolve the balance within 90 days of the billing date may be subject to collections.",
+          bold: true
+        })
+        ],
+        spacing: { before: 200 }
+      }),
+      ...(idx < sheets.length - 1 ? [new Paragraph({ children: [], pageBreakBefore: true })] : [])
       ]
     };
   });
