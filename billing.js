@@ -437,13 +437,11 @@ async function exportToWord(sheets, headers) {
         children: [
         new ImageRun({
           data: logoBuffer,
-          transformation: { width: 100, height: 80 },
-          indent: { left: 1440 },
+          transformation: { width: 200, height: 160 },
           floating: {
-          horizontalPosition: { relative: 'page', align: 'left' },
+          horizontalPosition: { relative: 'page', offset: 1440 }, // 1440 twips = 1 inch
           verticalPosition: { relative: 'paragraph', align: 'top' },
           wrap: { type: 'tight' }
-          
           }
         })
         ],
@@ -499,7 +497,6 @@ async function exportToWord(sheets, headers) {
         })
         ],
         spacing: { before: 200 },
-        alignment: AlignmentType.RIGHT
       }),
       ...(idx < sheets.length - 1 ? [new Paragraph({ children: [], pageBreakBefore: true })] : [])
       ]
