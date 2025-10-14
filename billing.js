@@ -1,4 +1,3 @@
-
 pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.10.377/pdf.worker.min.js';
 
 const HEADERS = [
@@ -200,7 +199,7 @@ document.getElementById('exportWordBtn').onclick = function() {
   exportToWord(sheets, HEADERS);
 };
 
-// ------- DOCX WORD EXPORT (ahhhhh.html Style) -------
+// ------- DOCX WORD EXPORT (with proper white out logic for selected columns) -------
 function exportToWord(sheets, headers) {
   const {
     Document, Packer, Paragraph, Table, TableRow, TableCell,
@@ -213,7 +212,6 @@ function exportToWord(sheets, headers) {
 
   const sections = sheets.map((sheet, idx) => {
     // --- Extract client info from infoLines ---
-    // Try to find client name and address lines by keywords
     let clientName = "[CLIENT NAME]";
     let addressLines = ["[ADDRESS LINE 1]", "[CITY, STATE ZIP]"];
     for (let line of sheet.infoLines) {
@@ -229,24 +227,24 @@ function exportToWord(sheets, headers) {
         addressLines[1] = line.trim();
       }
     }
-    // fallback: always use infoLines[5] and infoLines[6] for address if available
     if (sheet.infoLines[4]) addressLines[0] = sheet.infoLines[4];
     if (sheet.infoLines[5]) addressLines[1] = sheet.infoLines[5];
 
     // --- Calculate total balance owed ---
     let balanceOwed = 0;
     let balanceColIdx = headers.findIndex(h => /balance owed|patient balance/i.test(h));
-sheet.tableRows.forEach(row => {
-  let val = row[balanceColIdx];
-  if (typeof val === 'string') {
-    val = parseFloat(val.replace(/[$,]/g, ''));
-    if (!isNaN(val)) balanceOwed += val;
-  }
-});
-// --- Filter out disclaimer rows ---
-const validRows = sheet.tableRows.filter(row =>
-  !(row[0] && row[0].toString().includes("Disclaimer: Charges/Adjustments made after statement date"))
-);
+    sheet.tableRows.forEach(row => {
+      let val = row[balanceColIdx];
+      if (typeof val === 'string') {
+        val = parseFloat(val.replace(/[$,]/g, ''));
+        if (!isNaN(val)) balanceOwed += val;
+      }
+    });
+
+    // --- Filter out disclaimer rows ---
+    const validRows = sheet.tableRows.filter(row =>
+      !(row[0] && row[0].toString().includes("Disclaimer: Charges/Adjustments made after statement date"))
+    );
 
     // --- Table rows ---
     const headerRow = new TableRow({
@@ -258,17 +256,37 @@ const validRows = sheet.tableRows.filter(row =>
       )
     });
 
-    const bodyRows = validRows.map((row, i) =>
-      new TableRow({
-        children: row.map((cell, colIdx) =>
-          new TableCell({
-            children: [new Paragraph({
-              children: [new TextRun({ text: cell ?? '', size: 22, color: '000000' })]
-            })]
-          })
-        )
-      })
-    );
+    // --------- WHITE OUT LOGIC FOR SELECTED COLUMNS ---------
+    // Only procedure, units, and unitRate columns will be whited out if whiteOut is true
+    const bodyRows = validRows.map((row, index) => {
+      const isClaimRow = row[0]?.includes("CL-");
+      const nextRow = validRows[index + 1];
+      const nextIsServiceLine = nextRow && nextRow[0]?.includes("Service Line#");
+      const whiteOut = isClaimRow && nextIsServiceLine;
+
+      const blackText = (text) => new TextRun({ text: text ?? '', size: 22, color: '000000' });
+      const whiteText = (text) => new TextRun({ text: text ?? '', size: 22, color: 'FFFFFF' });
+
+      return new TableRow({
+        children: [
+          new TableCell({ children: [new Paragraph({ children: [blackText(row[0])] })] }),
+          new TableCell({ children: [new Paragraph({ children: [blackText(row[1])] })] }),
+          new TableCell({ children: [new Paragraph({ children: [whiteOut ? whiteText(row[2]) : blackText(row[2])] })] }),
+          new TableCell({ children: [new Paragraph({ children: [whiteOut ? whiteText(row[3]) : blackText(row[3])] })] }),
+          new TableCell({ children: [new Paragraph({ children: [whiteOut ? whiteText(row[4]) : blackText(row[4])] })] }),
+          new TableCell({ children: [new Paragraph({ children: [blackText(row[5])] })] }),
+          new TableCell({ children: [new Paragraph({ children: [blackText(row[6])] })] }),
+          new TableCell({ children: [new Paragraph({ children: [blackText(row[7])] })] }),
+          new TableCell({ children: [new Paragraph({ children: [blackText(row[8])] })] }),
+          new TableCell({ children: [new Paragraph({ children: [blackText(row[9])] })] }),
+          new TableCell({ children: [new Paragraph({ children: [blackText(row[10])] })] }),
+          new TableCell({ children: [new Paragraph({ children: [blackText(row[11])] })] }),
+          new TableCell({ children: [new Paragraph({ children: [blackText(row[12])] })] }),
+          new TableCell({ children: [new Paragraph({ children: [blackText(row[13])] })] }),
+        ]
+      });
+    });
+    // -------- END WHITE OUT LOGIC ---------
 
     const totalRow = new TableRow({
       children: [
@@ -284,7 +302,6 @@ const validRows = sheet.tableRows.filter(row =>
       ]
     });
 
-    // --- Pay amount box ---
     const payAmountBox = new Table({
       alignment: AlignmentType.RIGHT,
       width: { size: 50, type: WidthType.PERCENTAGE },
@@ -318,7 +335,6 @@ const validRows = sheet.tableRows.filter(row =>
       ]
     });
 
-    // --- Section children ---
     return {
       properties: {
         page: {
@@ -356,7 +372,7 @@ const validRows = sheet.tableRows.filter(row =>
         new Paragraph({
           children: [
             new TextRun({
-              text: "Disclaimer: The Adjustment column shows total reductions applied to your charges. These include write-offs and adjustments from your insurance provider, as well as any discounts you may have received. Charges/adjustments made after statement date will appear on your next statement.",
+              text: "Disclaimer: The Adjustment column shows total reductions applied to your charges. These include write-offs and adjustments from your insurance provider, as well as any discounts you received through our South Dakota sliding fee scale program. These amounts are not owed and have already been deducted from your balance.",
               italics: true
             })
           ],
@@ -365,7 +381,7 @@ const validRows = sheet.tableRows.filter(row =>
         new Paragraph({
           children: [
             new TextRun({
-              text: "For any questions, concerns, or to make a payment over the phone, please call Family Health Education Services at (605) 717-8920. Our billing team is available Monday - Thursday, 8:00 AM to 4:00 PM MT.",
+              text: "For any questions, concerns, or to make a payment over the phone, please call Family Health Education Services at (605) 717-8920. Our billing team is available Monday - Thursday, 8:00 AM to 5:00 PM. We offer payment plans in any amount and are happy to work with you on a schedule that fits your needs. Please note that accounts with no payment activity or effort to resolve the balance within 90 days of the billing date may be subject to collections.",
               bold: true
             })
           ],
