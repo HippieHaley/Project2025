@@ -237,8 +237,8 @@ async function exportToWord(sheets, headers) {
         addressLines[1] = line.trim();
       }
     }
-    if (sheet.infoLines[6]) addressLines[0] = sheet.infoLines[6];
-    if (sheet.infoLines[7]) addressLines[1] = sheet.infoLines[7];
+    if (sheet.infoLines[4]) addressLines[0] = sheet.infoLines[4];
+    if (sheet.infoLines[5]) addressLines[1] = sheet.infoLines[5];
 
     // --- Indices for relevant columns ---
     let insurancePaidColIdx = headers.findIndex(h => h.toLowerCase() === "insurance paid");
