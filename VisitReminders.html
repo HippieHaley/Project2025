@@ -327,6 +327,14 @@ button:hover {
       });
       document.body.appendChild(container);
     }
+
+    function clearSmsSuggestions() {
+      const existingContainer = document.getElementById('smsSuggestionContainer');
+      if (existingContainer) {
+        existingContainer.remove();
+      }
+    }
+
   function updateInputVisibility(row) {
   const templateSelector = row.querySelector('.template-selector');
   const selectedTemplate = templateSelector ? templateSelector.value : 'default';
