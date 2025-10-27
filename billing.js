@@ -463,7 +463,7 @@ async function exportToWord(sheets, headers) {
             children: [
             new ImageRun({
               data: paymentBuffer,
-              transformation: { width: 400, height: 200 }
+              transformation: { width: 300, height: 175 }
             })
             ]
           })
