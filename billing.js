@@ -446,7 +446,7 @@ async function exportToWord(sheets, headers) {
         new Paragraph({
         children: [new TextRun({ text: line, size: 24, bold: true })],
         alignment: AlignmentType.CENTER,
-        spacing: { after: 50 }
+        spacing: { after: 100 }
         })
         )
         ]
