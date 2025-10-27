@@ -415,102 +415,117 @@ async function exportToWord(sheets, headers) {
       alignment: AlignmentType.CENTER,
       rows: [
       new TableRow({
+      children: [
+      // Left column: Logo centered, address block
+      new TableCell({
+        width: { size: 50, type: WidthType.PERCENTAGE },
+        borders: { 
+        top: { size: 0, color: "FFFFFF" }, 
+        bottom: { size: 0, color: "FFFFFF" }, 
+        left: { size: 0, color: "FFFFFF" }, 
+        right: { size: 0, color: "FFFFFF" } 
+        },
         children: [
-        // Left column: Logo centered, address block
-        new TableCell({
-          width: { size: 50, type: WidthType.PERCENTAGE },
-          borders: { top: { size: 0 }, bottom: { size: 0 }, left: { size: 0 }, right: { size: 0 } },
-          children: [
-          new Paragraph({
-            alignment: AlignmentType.CENTER,
-            children: [
-            new ImageRun({
-              data: logoBuffer,
-              transformation: { width: 200, height: 160 }
-            })
-            ],
-            spacing: { after: 50 }
-          }),
-          new Paragraph({ text: "", spacing: { after: 50 } }),
-          new Paragraph({
-            children: [new TextRun({ text: clientName, bold: true, size: 24 })],
-            alignment: AlignmentType.CENTER,
-            spacing: { after: 50 }
-          }),
-          ...addressLines.map(line =>
-            new Paragraph({
-            children: [new TextRun({ text: line, size: 24, bold: true })],
-            alignment: AlignmentType.CENTER,
-            spacing: { after: 50 }
-            })
-          )
-          ]
+        new Paragraph({
+        alignment: AlignmentType.CENTER,
+        children: [
+        new ImageRun({
+          data: logoBuffer,
+          transformation: { width: 200, height: 160 }
+        })
+        ],
+        spacing: { after: 50 }
         }),
-        // Right column: Statement date, pay amount box, payment info image, etc.
-        new TableCell({
-          width: { size: 50, type: WidthType.PERCENTAGE },
-          borders: { top: { size: 0 }, bottom: { size: 0 }, left: { size: 0 }, right: { size: 0 } },
-          children: [
-          new Paragraph({
-            alignment: AlignmentType.RIGHT,
-            children: [new TextRun({ text: `Statement Date: ${currentDate}`, bold: true, size: 24 })],
-            spacing: { after: 100 }
-          }),
-          payAmountBox,
-          new Paragraph({ text: "", spacing: { after: 50 } }),
-          new Paragraph({
-            alignment: AlignmentType.RIGHT,
-            children: [
-            new ImageRun({
-              data: paymentBuffer,
-              transformation: { width: 300, height: 175 }
-            })
-            ]
-          })
-          ]
+        new Paragraph({ text: "", spacing: { after: 50 } }),
+        new Paragraph({
+        children: [new TextRun({ text: clientName, bold: true, size: 24 })],
+        alignment: AlignmentType.CENTER,
+        spacing: { after: 50 }
+        }),
+        ...addressLines.map(line =>
+        new Paragraph({
+        children: [new TextRun({ text: line, size: 24, bold: true })],
+        alignment: AlignmentType.CENTER,
+        spacing: { after: 50 }
+        })
+        )
+        ]
+      }),
+      // Right column: Statement date, pay amount box, payment info image, etc.
+      new TableCell({
+        width: { size: 50, type: WidthType.PERCENTAGE },
+        borders: { 
+        top: { size: 0, color: "FFFFFF" }, 
+        bottom: { size: 0, color: "FFFFFF" }, 
+        left: { size: 0, color: "FFFFFF" }, 
+        right: { size: 0, color: "FFFFFF" } 
+        },
+        children: [
+        new Paragraph({
+        alignment: AlignmentType.RIGHT,
+        children: [new TextRun({ text: `Statement Date: ${currentDate}`, bold: true, size: 24 })],
+        spacing: { after: 100 }
+        }),
+        payAmountBox,
+        new Paragraph({ text: "", spacing: { after: 50 } }),
+        new Paragraph({
+        alignment: AlignmentType.RIGHT,
+        children: [
+        new ImageRun({
+          data: paymentBuffer,
+          transformation: { width: 300, height: 175 }
+        })
+        ]
         })
         ]
       })
+      ]
+      })
       ],
-      borders: { top: { size: 0 }, bottom: { size: 0 }, left: { size: 0 }, right: { size: 0 } }
+      borders: { 
+      top: { size: 0, color: "FFFFFF" }, 
+      bottom: { size: 0, color: "FFFFFF" }, 
+      left: { size: 0, color: "FFFFFF" }, 
+      right: { size: 0, color: "FFFFFF" } 
+      }
     });    // You can add more payment info paragraphs here if needed
     return {
       properties: {
-        page: {
-          size: { width: 12240, height: 15840, orientation: PageOrientation.PORTRAIT },
-          margin: { top: 360, bottom: 360, left: 360, right: 360 }
-        }
+      page: {
+        size: { width: 12240, height: 15840, orientation: PageOrientation.PORTRAIT },
+        margin: { top: 360, bottom: 360, left: 360, right: 360 }
+      }
       },
       children: [
-  layoutTable,
-  new Paragraph({ spacing: { after: 150 } }),
-  new Paragraph({
+    layoutTable,
+    new Paragraph({ spacing: { after: 150 } }),
+    new Paragraph({
     border: {
       bottom: {
-        color: "auto",
-        space: 1,
-        style: "dotted",
-        size: 12
+      color: "auto",
+      space: 1,
+      style: "dotted",
+      size: 12
       }
     },
     spacing: { after: 150 }
-  }),
-        new Table({
-          width: { size: 100, type: WidthType.PERCENTAGE },
-          alignment: AlignmentType.LEFT,
-          rows: [headerRow, ...bodyRows, totalRow]
+    }),
+      new Table({
+        width: { size: 100, type: WidthType.PERCENTAGE },
+        alignment: AlignmentType.LEFT,
+        rows: [headerRow, ...bodyRows, totalRow]
+      }),
+      new Paragraph({
+        children: [
+        new TextRun({
+          text: "For any questions, concerns, or to make a payment over the phone, please call Family Health Education Services at (605) 717-8920. Our billing team is available Monday - Thursday, 8:00 AM to 5:00 PM. We offer payment plans in any amount and are happy to work with you on a schedule that meets your needs. Please note that accounts with no payment activity or effort to resolve the balance within 90 days of the billing date may be subject to collections.",
+          bold: true
         }),
-        new Paragraph({
-          children: [
-            new TextRun({
-              text: "For any questions, concerns, or to make a payment over the phone, please call Family Health Education Services at (605) 717-8920. Our billing team is available Monday - Thursday, 8:00 AM to 5:00 PM. We offer payment plans in any amount and are happy to work with you on a schedule that meets your needs. Please note that accounts with no payment activity or effort to resolve the balance within 90 days of the billing date may be subject to collections.",
-              bold: true
-            }),
-          ],
-          spacing: { before: 200 },
-          alignment: AlignmentType.LEFT
-        }),
-        ...(idx < sheets.length - 1 ? [new Paragraph({ children: [], pageBreakBefore: true })] : [])
+        ],
+        spacing: { before: 200 },
+        alignment: AlignmentType.LEFT
+      }),
+      ...(idx < sheets.length - 1 ? [new Paragraph({ children: [], pageBreakBefore: true })] : [])
       ]
     };
   });
