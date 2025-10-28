@@ -215,6 +215,7 @@ async function exportToWord(sheets, headers) {
 
   const logoBuffer = await loadImageAsArrayBuffer('./images/logo.png');
   const paymentBuffer = await loadImageAsArrayBuffer('./images/payment.png');
+  const returnBuffer = await loadImageAsArrayBuffer('./images/return.png');
 
   const currentDate = new Date().toLocaleDateString('en-US', {
     year: 'numeric', month: '2-digit', day: '2-digit'
@@ -431,12 +432,12 @@ async function exportToWord(sheets, headers) {
         children: [
         new ImageRun({
           data: logoBuffer,
-          transformation: { width: 200, height: 160 }
+          transformation: { width: 170, height: 130 }
         })
         ],
         spacing: { after: 50 }
         }),
-        new Paragraph({ text: "", spacing: { after: 50 } }),
+        new Paragraph({ text: "", spacing: { after: 300 } }),
         new Paragraph({
         children: [new TextRun({ text: clientName, bold: true, size: 24 })],
         alignment: AlignmentType.CENTER,
@@ -467,8 +468,16 @@ async function exportToWord(sheets, headers) {
         spacing: { after: 100 }
         }),
         payAmountBox,
-        new Paragraph({ text: "", spacing: { after: 50 },wrap:{ type: "tight" } }),
+        new Paragraph({ text: "", spacing: { after: 300 },wrap:{ type: "tight" } }),
         new Paragraph({
+        alignment: AlignmentType.CENTER,
+        children: [
+        new ImageRun({
+          data: returnBuffer,
+          transformation: { width: 225, height: 100 }
+        })
+        ],
+        spacing: { after: 100 }
         })
         ]
       })
