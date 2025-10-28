@@ -467,7 +467,7 @@ async function exportToWord(sheets, headers) {
         spacing: { after: 100 }
         }),
         payAmountBox,
-        new Paragraph({ text: "", spacing: { after: 50 } }),
+        new Paragraph({ text: "", spacing: { after: 50 },wrap:{ type: "tight" } }),
         new Paragraph({
         alignment: AlignmentType.RIGHT,
         children: [
