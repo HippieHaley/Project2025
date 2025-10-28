@@ -468,7 +468,17 @@ async function exportToWord(sheets, headers) {
         spacing: { after: 100 }
         }),
         payAmountBox,
-        new Paragraph({ text: "", spacing: { after: 300 },wrap:{ type: "tight" } }),
+        new Paragraph({ text: "", spacing: { after: 250 },wrap:{ type: "tight" } }),
+        new Paragraph({
+        alignment: AlignmentType.RIGHT,
+        children: [
+        new ImageRun({
+          data: returnBuffer,
+          transformation: { width: 230, height: 200}
+        })
+        ],
+        spacing: { after: 100 }
+        })
         ]
       })
       ]
