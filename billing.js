@@ -523,11 +523,11 @@ async function exportToWord(sheets, headers) {
           children: [
             new ImageRun({
               data: paymentBuffer,
-              transformation: { width: 400, height: 300 }
+              transformation: { width: 800, height: 200 }
             })
           ], 
           pageBreakBefore: true,
-          alignment: AlignmentType.CENTER,
+          alignment: AlignmentType.LEFT,
           spacing: { after: 200 }
         })
       ] : [])
