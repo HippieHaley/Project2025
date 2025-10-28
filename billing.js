@@ -469,13 +469,6 @@ async function exportToWord(sheets, headers) {
         payAmountBox,
         new Paragraph({ text: "", spacing: { after: 50 },wrap:{ type: "tight" } }),
         new Paragraph({
-        alignment: AlignmentType.RIGHT,
-        children: [
-        new ImageRun({
-          data: paymentBuffer,
-          transformation: { width: 275,  height: 200 }
-        })
-        ]
         })
         ]
       })
@@ -525,7 +518,19 @@ async function exportToWord(sheets, headers) {
         spacing: { before: 200 },
         alignment: AlignmentType.LEFT
       }),
-      ...(idx < sheets.length - 1 ? [new Paragraph({ children: [], pageBreakBefore: true })] : [])
+      ...(idx < sheets.length - 1 ? [
+        new Paragraph({ 
+          children: [
+            new ImageRun({
+              data: paymentBuffer,
+              transformation: { width: 400, height: 300 }
+            })
+          ], 
+          pageBreakBefore: true,
+          alignment: AlignmentType.CENTER,
+          spacing: { after: 200 }
+        })
+      ] : [])
       ]
     };
   });
