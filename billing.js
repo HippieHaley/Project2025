@@ -432,12 +432,12 @@ async function exportToWord(sheets, headers) {
         children: [
         new ImageRun({
           data: logoBuffer,
-          transformation: { width: 170, height: 130 }
+          transformation: { width: 200, height: 160 }
         })
         ],
         spacing: { after: 50 }
         }),
-        new Paragraph({ text: "", spacing: { after: 300 } }),
+        new Paragraph({ text: "", spacing: { after: 250 } }),
         new Paragraph({
         children: [new TextRun({ text: clientName, bold: true, size: 24 })],
         alignment: AlignmentType.CENTER,
