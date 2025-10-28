@@ -441,7 +441,7 @@ async function exportToWord(sheets, headers) {
         new Paragraph({
         children: [new TextRun({ text: clientName, bold: true, size: 24 })],
         alignment: AlignmentType.CENTER,
-        spacing: { after: 50 }
+        spacing: { after: 100 }
         }),
         ...addressLines.map(line =>
         new Paragraph({
