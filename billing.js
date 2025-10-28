@@ -517,7 +517,7 @@ async function exportToWord(sheets, headers) {
         spacing: { before: 200 },
         alignment: AlignmentType.LEFT
       }),
-      ...(idx < sheets.length - 1 ? [
+      ...(idx < sheets.length ? [
         new Paragraph({ 
           children: [
             new ImageRun({
