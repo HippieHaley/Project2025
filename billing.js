@@ -299,13 +299,13 @@ async function exportToWord(sheets, headers) {
       children: filteredHeaders.map((text, index) => {
         // Define column widths as percentages
         const columnWidths = [
-          20, // Claim Number
-          12, // Service Date
-          25, // Procedure (and Codes)
-          8,  // Units
-          10, // Unit Rate
-          10, // Total Charge
-          15  // Balance Owed
+          18,// Claim Number
+          7,  // Service Date (minimized)
+          37,// Procedure (and Codes) (increased)
+          5,  // Units (minimized)
+          12, // Unit Rate (increased)
+          12, // Total Charge (increased)
+          9 // patient paid (minimized)
         ];
         
         return new TableCell({
@@ -366,13 +366,13 @@ async function exportToWord(sheets, headers) {
           
           // Define column widths as percentages (same as header)
           const columnWidths = [
-            20, // Claim Number
-            12, // Service Date
-            25, // Procedure (and Codes)
-            8,  // Units
-            10, // Unit Rate
-            10, // Total Charge
-            15  // Balance Owed
+            18,// Claim Number
+            7,  // Service Date (minimized)
+            37,// Procedure (and Codes) (increased)
+            5,  // Units (minimized)
+            12, // Unit Rate (increased)
+            12, // Total Charge (increased)
+            9 // patient paid (minimized)
           ];
           
           return new TableCell({
