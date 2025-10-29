@@ -203,7 +203,7 @@ document.getElementById('exportWordBtn').onclick = async function() {
 // ------- DOCX WORD EXPORT (with centered logo and two-column layout) -------
 async function exportToWord(sheets, headers) {
   const {
-    Document, Packer, Paragraph, Table, TableRow, TableCell,
+    Document, Paragraph, Table, TableRow, TableCell,
     WidthType, TextRun, AlignmentType, BorderStyle, PageOrientation,
     ImageRun
   } = window.docx;
@@ -283,7 +283,7 @@ async function exportToWord(sheets, headers) {
       }
     }
 
-    let filteredHeaders = headers.filter((h, i) =>
+    let filteredHeaders = headers.filter((_, i) =>
       i !== insurancePaidColIdx &&
       i !== insuranceBalanceColIdx &&
       i !== adjustmentColIdx &&
@@ -325,7 +325,7 @@ async function exportToWord(sheets, headers) {
       const blackText = (text) => new TextRun({ text: text ?? '', size: 22, color: '000000' });
       const whiteText = (text) => new TextRun({ text: text ?? '', size: 22, color: 'FFFFFF' });
 
-      let filteredRow = row.filter((cell, i) =>
+      let filteredRow = row.filter((_, i) =>
         i !== insurancePaidColIdx &&
         i !== insuranceBalanceColIdx &&
         i !== adjustmentColIdx &&
@@ -348,7 +348,7 @@ async function exportToWord(sheets, headers) {
       return new TableRow({
         children: filteredRow.map((cell, colIdx) => {
           let originalIndices = headers
-            .map((h, i) => i)
+            .map((_, i) => i)
             .filter(i =>
               i !== insurancePaidColIdx &&
               i !== insuranceBalanceColIdx &&
