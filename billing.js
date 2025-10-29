@@ -301,7 +301,7 @@ async function exportToWord(sheets, headers) {
         const columnWidths = [
           15, // Claim Number
           7,  // Service Date (minimized)
-          30, // Procedure (and Codes) (increased)
+          32, // Procedure (and Codes) (increased)
           5,  // Units (minimized)
           8,  // Unit Rate
           8,  // Total Charge
@@ -370,13 +370,13 @@ async function exportToWord(sheets, headers) {
           const columnWidths = [
             15, // Claim Number
             7,  // Service Date (minimized)
-            30, // Procedure (and Codes) (increased)
+            32, // Procedure (and Codes) (increased)
             5,  // Units (minimized)
             8,  // Unit Rate
             8,  // Total Charge
-            8,  // Ins. Covered (added column)
-            10, // Patient Paid
-            9   // Balance Owed (last column)
+            8,  // Patient Paid
+            8, // Ins. Covered (added column)
+            8   // Balance Owed (last column)
           ];
           
           return new TableCell({
