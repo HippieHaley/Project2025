@@ -553,7 +553,17 @@ async function exportToWord(sheets, headers) {
           size: 24,
           bold: true,
           font: "Times New Roman"
-        }),
+        })
+        ]
+      }),
+      new Paragraph({
+        children: [
+          new TextRun({
+            text: "Disclaimer: This statement is billed services through end of September. Visits made after September are not reflected.",
+            size: 24,
+          bold: true,
+          font: "Times New Roman"
+          })
         ],
         spacing: { before: 200, line: 276 },
         alignment: AlignmentType.LEFT
