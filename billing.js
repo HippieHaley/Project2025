@@ -321,8 +321,23 @@ async function exportToWord(sheets, headers) {
     const bodyRows = validRows.map((row, index) => {
       const isClaimRow = row[0]?.includes("CL-");
       const nextRow = validRows[index + 1];
-      const nextIsServiceLine = nextRow && nextRow[0]?.includes("Service Line#");
-      const whiteOut = isClaimRow && nextIsServiceLine;
+      const hasServiceLines = (() => {
+    if (!isClaimRow) return false;
+    
+    // Look ahead to find service lines (rows without "CL-")
+    for (let i = index + 1; i < validRows.length; i++) {
+      const futureRow = validRows[i];
+      if (!futureRow[0]) continue;
+      
+      // If we hit another claim, stop looking
+      if (futureRow[0].includes("CL-")) return false;
+      
+      // If we found a non-claim row with content, this claim has service lines
+      if (futureRow[0].trim() !== "") return true;
+    }
+    return false;
+  })();
+      const whiteOut = isClaimRow && hasServiceLines;
 
       const blackText = (text) => new TextRun({ text: text ?? '', size: 22, color: '000000' });
       const whiteText = (text) => new TextRun({ text: text ?? '', size: 22, color: 'FFFFFF' });
