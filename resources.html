@@ -92,10 +92,44 @@
       color: white;
       transition: background-color 0.2s ease;
     }
+    .search-container {
+      display: flex;
+      gap: .5rem;
+      align-items: center;
+      margin: 1rem 0 2rem;
+    }
 
-    @media (max-width: 768px) {
+    .search-input {
+      flex: 1 1 auto;
+      padding: .6rem .75rem;
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      font-size: 1rem;
+      outline: none;
+      background: white;
+    }
+
+    .search-input:focus {
+      box-shadow: 0 0 0 3px rgba(196,215,242,0.35);
+      border-color: var(--accent-blue);
+    }
+
+    .search-clear {
+      background: var(--accent-pink);
+      color: white;
+      border: none;
+      padding: .6rem .9rem;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: 600;
+    }
+
+    @media (max-width: 420px) {
+      
+    @media (max-width: 1000px) {
       table, thead, tbody, th, td, tr {
-        display: block;
+        display: block;.search-clear { padding: .5rem; font-size: .9rem; }
+    }
       }
 
       th {
@@ -132,6 +166,10 @@
     <p>Accessible local services for health, wellness, and support</p>
   </header>
 <script src="resources.js"></script>
+<div class="search-container" aria-hidden="false">
+        <input id="resource-search" class="search-input" type="search" placeholder="Search resources (name, phone, address, description)..." aria-label="Search resources">
+        <button id="search-clear" class="search-clear" type="button" aria-label="Clear search">Clear</button>
+      </div>
     <main id="resource-container">
         <section>
             <h2>Dental Resources</h2>
@@ -140,7 +178,7 @@
                     <tr>
                         <th>Name</th>
                         <th>Phone Number</th>
-                        <th>Address</th>
+                        <th>Address/URL</th>
                         <th>Open Hours</th>
                         <th>Description</th>
                     </tr>
@@ -310,7 +348,7 @@
         <table>
             <thead>
                 <tr>
-                    <th>Name</th><th>Phone / Text</th><th>Address / Notes</th><th>Availability</th><th>Description</th>
+                    <th>Name</th><th>Phone Number</th><th>Address / Notes</th><th>Open Hours</th><th>Description</th>
                 </tr>
             </thead>
             <tbody id="youth-hotlines-table-body"></tbody>
@@ -550,7 +588,7 @@
         <table>
             <thead>
                 <tr>
-                    <th>Name</th><th>Address</th><th>Meeting Time</th><th>Notes</th><th></th>
+                    <th>Name</th><th>Phone Number</th><th>Open Hours</th><th>Description</th>
                 </tr>
             </thead>
             <tbody id="aa-meetings-table-body"></tbody>
@@ -562,7 +600,7 @@
         <table>
             <thead>
                 <tr>
-                    <th>Name</th><th>Address</th><th>Meeting Time</th><th>Notes</th><th></th>
+                    <th>Name</th><th>Phone Number</th><th>Address / Notes</th><th>Open Hours</th><th>Description</th>
                 </tr>
             </thead>
             <tbody id="na-meetings-table-body"></tbody>
@@ -574,7 +612,7 @@
         <table>
             <thead>
                 <tr>
-                    <th>Program</th><th>Phone</th><th>Address</th><th>Hours</th><th>Description</th>
+                    <th>Program</th><th>Phone Number</th><th>Address / Notes</th><th>Open Hours</th><th>Description</th>
                 </tr>
             </thead>
             <tbody id="elderly-disability-table-body"></tbody>
@@ -586,7 +624,7 @@
         <table>
             <thead>
                 <tr>
-                    <th>Name</th><th>Phone</th><th>Address</th><th>Hours</th><th>Description</th>
+                    <th>Name</th><th>Phone Number</th><th>Address / Notes</th><th>Open Hours</th><th>Description</th>
                 </tr>
             </thead>
             <tbody id="pet-care-table-body"></tbody>
@@ -598,10 +636,149 @@
         <table>
             <thead>
                 <tr>
-                    <th>Name</th><th>Phone / Text</th><th>Notes</th><th>Availability</th><th></th>
+                    <th>Name</th><th>Phone Number</th><th>Address / Notes</th><th>Open Hours</th><th>Description</th>
                 </tr>
             </thead>
             <tbody id="miscellaneous-hotlines-table-body"></tbody>
         </table>
     </section>
 </main>
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      document.querySelectorAll("#resource-container section").forEach((section, idx) => {
+        const h2 = section.querySelector("h2");
+        const table = section.querySelector("table");
+        const tbody = section.querySelector("tbody");
+        if (!h2 || !table || !tbody) return;
+
+        // ensure tbody has an id (render script relies on these ids)
+        if (!tbody.id) tbody.id = `tbody-${idx}`;
+
+        // create toggle button reusing the .section-header style
+        const btn = document.createElement("button");
+        btn.type = "button";
+        btn.className = "section-header section-toggle";
+        btn.setAttribute("aria-expanded", "true");
+        btn.setAttribute("aria-controls", tbody.id);
+        btn.innerHTML = `<span class="chev" aria-hidden="true">▾</span> ${h2.textContent.trim()}`;
+
+        // replace heading text with the button (keeps semantic h2)
+        h2.textContent = "";
+        h2.appendChild(btn);
+
+        // toggle handler: hide/show the table (keeps tbody id intact)
+        btn.addEventListener("click", () => {
+          const expanded = btn.getAttribute("aria-expanded") === "true";
+          btn.setAttribute("aria-expanded", String(!expanded));
+          table.style.display = expanded ? "none" : "";
+          btn.querySelector(".chev").textContent = expanded ? "▸" : "▾";
+        });
+      });
+    });
+    document.addEventListener("DOMContentLoaded", () => {
+      const sections = Array.from(document.querySelectorAll("#resource-container > section"));
+      sections.forEach((section, idx) => {
+        const h2 = section.querySelector("h2");
+        const table = section.querySelector("table");
+        const tbody = section.querySelector("tbody");
+        if (!h2 || !table || !tbody) return;
+
+        if (!tbody.id) tbody.id = `tbody-${idx}`;
+
+        const btn = document.createElement("button");
+        btn.type = "button";
+        btn.className = "section-header section-toggle";
+        btn.setAttribute("aria-expanded", "true");
+        btn.setAttribute("aria-controls", tbody.id);
+        btn.innerHTML = `<span class="chev" aria-hidden="true">▾</span> ${h2.textContent.trim()}`;
+
+        h2.textContent = "";
+        h2.appendChild(btn);
+
+        btn.addEventListener("click", () => {
+          const expanded = btn.getAttribute("aria-expanded") === "true";
+          btn.setAttribute("aria-expanded", String(!expanded));
+          table.style.display = expanded ? "none" : "";
+          btn.querySelector(".chev").textContent = expanded ? "▸" : "▾";
+        });
+      });
+
+      // Search functionality
+      const searchInput = document.getElementById("resource-search");
+      const clearBtn = document.getElementById("search-clear");
+      if (!searchInput) return;
+
+      function normalize(text) {
+        return (text || "").toString().toLowerCase();
+      }
+
+      function filterResources(query) {
+        const q = normalize(query);
+        let anyMatch = false;
+        sections.forEach(section => {
+          const table = section.querySelector("table");
+          const tbody = section.querySelector("tbody");
+          const toggle = section.querySelector(".section-toggle");
+          if (!tbody) return;
+
+          const rows = Array.from(tbody.querySelectorAll("tr"));
+          let sectionHasMatch = false;
+
+          rows.forEach(row => {
+            const cellsText = Array.from(row.querySelectorAll("td"))
+              .map(td => normalize(td.textContent || td.innerText))
+              .join(" ");
+            const match = q === "" || cellsText.includes(q);
+            row.style.display = match ? "" : "none";
+            if (match) sectionHasMatch = true;
+          });
+
+          // show/hide table and update toggle state
+          if (sectionHasMatch) {
+            table.style.display = "";
+            if (toggle) {
+              toggle.setAttribute("aria-expanded", "true");
+              const chev = toggle.querySelector(".chev");
+              if (chev) chev.textContent = "▾";
+            }
+            anyMatch = true;
+          } else {
+            table.style.display = "none";
+            if (toggle) {
+              toggle.setAttribute("aria-expanded", "false");
+              const chev = toggle.querySelector(".chev");
+              if (chev) chev.textContent = "▸";
+            }
+          }
+        });
+        return anyMatch;
+      }
+
+      // debounce helper
+      function debounce(fn, wait = 200) {
+        let t;
+        return (...args) => {
+          clearTimeout(t);
+          t = setTimeout(() => fn(...args), wait);
+        };
+      }
+
+      const debouncedFilter = debounce((e) => {
+        filterResources(e.target.value || "");
+      }, 180);
+
+      searchInput.addEventListener("input", debouncedFilter);
+
+      clearBtn && clearBtn.addEventListener("click", () => {
+        searchInput.value = "";
+        filterResources("");
+        searchInput.focus();
+      });
+
+      // expose a quick initial filter (shows all)
+      filterResources("");
+    });
+  </script>
+</body>
+</html>
+
