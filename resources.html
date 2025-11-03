@@ -631,8 +631,7 @@
           btn.querySelector(".chev").textContent = expanded ? "▸" : "▾";
         });
       });
-
-      // Search functionality
+      // Search functionality (supports synonyms and "Free: yes")
       const searchInput = document.getElementById("resource-search");
       const clearBtn = document.getElementById("search-clear");
       if (!searchInput) return;
@@ -641,9 +640,48 @@
         return (text || "").toString().toLowerCase();
       }
 
+      // synonyms map: token -> array of alternatives to accept
+      const SYNONYMS = {
+        dentist: ["dentist", "dental", "dentistry"],
+        dental: ["dental", "dentist", "dentistry"],
+        pediatrics: ["pediatric", "pediatrics", "children"],
+        childcare: ["childcare", "children"],
+        phone: ["phone", "tel", "telephone"]
+        // add more as needed
+      };
+
+      function buildTokenAlternatives(rawQuery) {
+        const tokens = rawQuery.split(/\s+/).filter(Boolean);
+        return tokens.map(t => {
+          if (SYNONYMS[t]) return SYNONYMS[t];
+          // split simple "name:val" tokens preserved as-is
+          return [t];
+        });
+      }
+
       function filterResources(query) {
-        const q = normalize(query);
+        let raw = (query || "").trim().toLowerCase();
+
+        // detect "free: yes" or "free: y" or "free: true"
+        let requireFree = false;
+        const freeMatch = raw.match(/(^|\s)free\s*:\s*(yes|y|true)\b/);
+        if (freeMatch) {
+          requireFree = true;
+          // remove that clause from the search text
+          raw = raw.replace(/(^|\s)free\s*:\s*(yes|y|true)\b/g, "").trim();
+        }
+
+        // if user types just "free" treat it as free:true shorthand
+        if (!requireFree && /^\s*free\s*$/i.test(query)) {
+          requireFree = true;
+          raw = "";
+        }
+
+        // no search tokens -> show rows (but still filter by free flag if required)
+        const tokenAlternatives = raw ? buildTokenAlternatives(raw) : [];
+
         let anyMatch = false;
+        const sections = document.querySelectorAll("#resource-container section");
         sections.forEach(section => {
           const table = section.querySelector("table");
           const tbody = section.querySelector("tbody");
@@ -657,9 +695,27 @@
             const cellsText = Array.from(row.querySelectorAll("td"))
               .map(td => normalize(td.textContent || td.innerText))
               .join(" ");
-            const match = q === "" || cellsText.includes(q);
-            row.style.display = match ? "" : "none";
-            if (match) sectionHasMatch = true;
+
+            // free filter check
+            if (requireFree && row.dataset.free !== "true") {
+              row.style.display = "none";
+              return;
+            }
+
+            // if there are no tokens left, it's a match
+            if (tokenAlternatives.length === 0) {
+              row.style.display = "";
+              sectionHasMatch = true;
+              return;
+            }
+
+            // check all token groups: each group requires at least one alternative to appear
+            const matchedAllTokens = tokenAlternatives.every(alts =>
+              alts.some(opt => cellsText.includes(opt))
+            );
+
+            row.style.display = matchedAllTokens ? "" : "none";
+            if (matchedAllTokens) sectionHasMatch = true;
           });
 
           // show/hide table and update toggle state
@@ -680,11 +736,13 @@
             }
           }
         });
+
         return anyMatch;
       }
-
+   // initial state
+      filterResources("");
       // debounce helper
-      function debounce(fn, wait = 200) {
+      function debounce(fn, wait = 180) {
         let t;
         return (...args) => {
           clearTimeout(t);
@@ -703,9 +761,6 @@
         filterResources("");
         searchInput.focus();
       });
-
-      // expose a quick initial filter (shows all)
-      filterResources("");
     });
   </script>
 </body>
