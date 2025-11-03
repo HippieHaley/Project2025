@@ -670,35 +670,6 @@
         h2.textContent = "";
         h2.appendChild(btn);
 
-        // toggle handler: hide/show the table (keeps tbody id intact)
-        btn.addEventListener("click", () => {
-          const expanded = btn.getAttribute("aria-expanded") === "true";
-          btn.setAttribute("aria-expanded", String(!expanded));
-          table.style.display = expanded ? "none" : "";
-          btn.querySelector(".chev").textContent = expanded ? "▸" : "▾";
-        });
-      });
-    });
-    document.addEventListener("DOMContentLoaded", () => {
-      const sections = Array.from(document.querySelectorAll("#resource-container > section"));
-      sections.forEach((section, idx) => {
-        const h2 = section.querySelector("h2");
-        const table = section.querySelector("table");
-        const tbody = section.querySelector("tbody");
-        if (!h2 || !table || !tbody) return;
-
-        if (!tbody.id) tbody.id = `tbody-${idx}`;
-
-        const btn = document.createElement("button");
-        btn.type = "button";
-        btn.className = "section-header section-toggle";
-        btn.setAttribute("aria-expanded", "true");
-        btn.setAttribute("aria-controls", tbody.id);
-        btn.innerHTML = `<span class="chev" aria-hidden="true">▾</span> ${h2.textContent.trim()}`;
-
-        h2.textContent = "";
-        h2.appendChild(btn);
-
         btn.addEventListener("click", () => {
           const expanded = btn.getAttribute("aria-expanded") === "true";
           btn.setAttribute("aria-expanded", String(!expanded));
