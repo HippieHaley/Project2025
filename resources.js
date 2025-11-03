@@ -1075,11 +1075,87 @@ function renderResources(category, tableId) {
     tableBody.appendChild(row);
   });
 }
+// --- Helper to normalize resource entries ---
+function flattenResource(data) {
+  if (!data) return [];
+  if (Array.isArray(data)) return data;
+  if (typeof data === "object") {
+    // concatenate any array-valued properties (handles nested sections like elderlyAndDisability, petCare)
+    return Object.values(data)
+      .filter(v => Array.isArray(v))
+      .flat();
+  }
+  return [];
+}
 
-// --- Load all sections ---
+// --- Single rendering function (handles items with phone/address/hours/description/notes) ---
+function renderResources(categoryKey, tableId) {
+  const tableBody = document.getElementById(tableId);
+  if (!tableBody) return;
+  const items = flattenResource(resources[categoryKey]);
+  items.forEach((item) => {
+    const phone = item.phone || item.phoneNumber || "";
+    const address = item.address || item.address || item.address === "" ? item.address : "";
+    const hours = item.hours || item.hours === "" ? item.hours : "";
+    const description = item.description || item.notes || item.notes === "" ? (item.description || item.notes) : "";
+
+    const row = document.createElement("tr");
+    row.innerHTML = `
+      <td data-label="Name">${item.name || ""}</td>
+      <td data-label="Phone Number">${phone}</td>
+      <td data-label="Address">${address}</td>
+      <td data-label="Open Hours">${hours}</td>
+      <td data-label="Description">${description}</td>
+    `;
+    tableBody.appendChild(row);
+  });
+}
+
+// --- Map of HTML tbody IDs to resource keys ---
+const renderMap = {
+  "dental-table-body": "dental",
+  "medical-table-body": "medical",
+  "pregnancy-table-body": "pregnancy",
+  "family-planning-table-body": "familyPlanning",
+  "family-education-table-body": "familyEducation",
+  "adoption-table-body": "adoption",
+  "foster-care-table-body": "fosterCareServices",
+  "breastfeeding-table-body": "breastfeeding",
+  "car-seat-table-body": "carSeatPrograms",
+  "child-support-table-body": "childSupportEnforcement",
+  "sd-health-programs-table-body": "sdHealthPrograms",
+  "youth-programs-table-body": "youthPrograms",
+  "foster-transition-table-body": "fosterTransitionResources",
+  "youth-hotlines-table-body": "youthHotlines",
+  "food-assistance-table-body": "foodAssistance",
+  "nutrition-table-body": "nutrition",
+  "clothing-household-table-body": "clothingAndHousehold",
+  "emergency-loans-table-body": "emergencyLoans",
+  "housing-assistance-table-body": "housingAssistance",
+  "legal-assistance-table-body": "legalAssistance",
+  "utility-assistance-table-body": "utilityAssistance",
+  "weatherization-table-body": "weatherizationPrograms",
+  "employment-services-table-body": "employmentServices",
+  "literacy-education-table-body": "literacyAndEducation",
+  "financial-literacy-table-body": "financialLiteracy",
+  "mental-health-table-body": "mentalHealthAndSubstanceUse",
+  "crisis-intervention-table-body": "crisisIntervention",
+  "grief-support-table-body": "griefSupport",
+  "transportation-table-body": "transportation",
+  "drivers-licensing-table-body": "driversLicensing",
+  "cultural-community-table-body": "culturalAndCommunity",
+  "cancer-support-table-body": "cancerSupport",
+  "diabetes-support-table-body": "diabetesSupport",
+  "aa-meetings-table-body": "aaMeetings",
+  "na-meetings-table-body": "naMeetings",
+  "elderly-disability-table-body": "elderlyAndDisability",
+  "pet-care-table-body": "petCare",
+  "miscellaneous-hotlines-table-body": "miscellaneousHotlines"
+};
+
+// --- Load all mapped sections ---
 document.addEventListener("DOMContentLoaded", () => {
-  renderResources("dental", "dental-table-body");
-  renderResources("medical", "medical-table-body");
-  renderResources("pregnancy", "pregnancy-table-body");
-  renderResources("familyPlanning", "family-planning-table-body");
+  Object.entries(renderMap).forEach(([tableId, categoryKey]) => {
+    renderResources(categoryKey, tableId);
+  });
 });
