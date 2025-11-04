@@ -364,14 +364,17 @@ const resources = {
     {
       name: "South Dakota Dept. of Health – All Women Count",
       phone: "(1-800) 738-2301",
-      address: "Provides screening services (ages 30–64); eligibility based on income; services available at most local clinics",
-      hours: ""
+      address: "",
+      hours: "",
+      description: "Provides screening services (ages 30–64); eligibility based on income; services available at most local clinics"
     },
     {
       name: "South Dakota Dept. of Health – WIC",
       phone: "(1-800) 738-2301",
-      address: "Nutrition education, breastfeeding support, healthy food for pregnant women, infants, children to age five; income-based eligibility",
-      hours: ""
+      address: "",
+      hours: "",
+      description: "Nutrition education, breastfeeding support, healthy food for pregnant women, infants, children to age five; income-based eligibility"
+
     },
     {
       name: "South Dakota QuitLine",
@@ -412,14 +415,16 @@ const resources = {
     {
       name: "Children's Home Society of South Dakota",
       phone: "(605) 965-3192",
-      address: "Visit their website or contact offices directly",
-      hours: ""
+      address: "",
+      hours: "Visit their website or contact offices directly",
+      description: ""
     },
     {
       name: "Foster Youth to Independence (FYI) Initiative",
       phone: "202-708-1112",
-      address: "Resources for foster youth transitioning to independent living; contact local public housing agency or HUD website",
-      hours: ""
+      address: "",
+      hours: "",
+      description: "Resources for foster youth transitioning to independent living; contact local public housing agency or HUD website"
     }
   ],
 
