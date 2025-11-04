@@ -128,7 +128,25 @@
       cursor: pointer;
       font-weight: 600;
     }
-
+ /* subtitle for contact / correction info */
+   .contact-subtitle {
+     max-width: 1100px;
+     margin: 0.5rem auto 1.25rem;
+     padding: 0.5rem 1rem;
+     color: #2f2f2f;
+     font-size: 0.95rem;
+     line-height: 1.3;
+     text-align: center;
+     background: rgba(255,255,255,0.6);
+     border-left: 4px solid var(--accent-pink);
+     border-radius: 8px;
+     box-shadow: 0 1px 2px rgba(0,0,0,0.03);
+   }
+   .contact-subtitle a {
+     color: #0b66a3;
+     font-weight: 600;+     text-decoration: underline;
+     text-decoration: underline;
+   }
  @media (max-width: 1000px) {
       .search-clear { padding: .5rem; font-size: .9rem; }
 
@@ -168,7 +186,11 @@
   <header>
     <h1>Black Hills Community Resource Hub</h1>
     <p>Accessible local services for health, wellness, and support</p>
-  </header>
+  
+  <p class="contact-subtitle">
+    If any information is incorrect, please
+    <a href="mailto: sens-fhes@monument.health">email corrections here.</a>
+  </p></header>
 <script src="resources.js"></script>
 <div class="search-container" aria-hidden="false">
         <input id="resource-search" class="search-input" type="search" placeholder="Search resources (name, phone, address, description)..." aria-label="Search resources">
