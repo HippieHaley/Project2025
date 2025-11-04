@@ -177,9 +177,9 @@ const resources = {
     },
     {
       name: "Common Sense Parenting Program",
-      phone: "Call for class schedules",
+      phone: "",
       address: "",
-      hours: ""
+      hours: "Call for class schedule"
     },
     {
       name: "Black Hills Special Services Cooperative (boys club)",
