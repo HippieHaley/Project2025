@@ -662,17 +662,141 @@
       function normalize(text) {
         return (text || "").toString().toLowerCase();
       }
+const SYNONYMS = {
+  // dental / dentists
+  dentist: ["dentist", "dentists", "dental", "dentistry", "oral health", "oralcare", "tooth", "teeth"],
+  dental: ["dental", "dentist", "dentistry", "oral health", "oralcare", "tooth", "teeth"],
+  dentistry: ["dentistry", "dental", "dentist", "oral health"],
 
-      // synonyms map: token -> array of alternatives to accept
-      const SYNONYMS = {
-        dentist: ["dentist", "dental", "dentistry"],
-        dental: ["dental", "dentist", "dentistry"],
-        pediatrics: ["pediatric", "pediatrics", "children"],
-        childcare: ["childcare", "children"],
-        phone: ["phone", "tel", "telephone"]
-        // add more as needed
-      };
+  // medical / clinics / hospitals
+  medical: ["medical", "medicine", "clinic", "clinics", "hospital", "hospitals", "urgent care", "emergency", "primary care", "walk-in"],
+  clinic: ["clinic", "clinics", "community clinic", "health center", "healthcentre", "primary care"],
+  hospital: ["hospital", "hospitals", "er", "emergency room", "inpatient"],
 
+  // pregnancy / maternal / postpartum
+  pregnancy: ["pregnancy", "pregnant", "pregnancy center", "pregnancycenter", "maternal", "maternity", "prenatal", "postpartum"],
+  maternal: ["maternal", "postpartum", "prenatal", "perinatal"],
+
+  // family planning / contraception
+  familyplanning: ["family planning", "family-planning", "familyplanning", "contraception", "birth control", "planned parenthood", "fp clinic"],
+  contraception: ["contraception", "birth control", "iud", "pill", "implant", "condom"],
+
+  // family education / parenting
+  familyeducation: ["family education", "parenting", "parent education", "parenting classes", "early childhood", "parent education program"],
+
+  // adoption / foster care
+  adoption: ["adoption", "adopt", "adoptive", "adoption services", "adoption agency"],
+  fostercare: ["foster care", "fostercare", "foster", "foster parent", "foster services", "foster-care"],
+
+  // breastfeeding / lactation
+  breastfeeding: ["breastfeeding", "lactation", "lactation support", "breastfeeding support", "lactation consultant"],
+
+  // car seat / child safety
+  carseat: ["car seat", "carseat", "child seat", "child safety seat", "car seat program", "child safety"],
+
+  // child support enforcement / child support
+  childsupport: ["child support", "childsupport", "support enforcement", "child support enforcement"],
+
+  // state health programs / WIC / SNAP
+  sdhealth: ["department of health", "state health", "sd dept of health", "wic", "WIC Program", "WIC", "public health"],
+  wic: ["wic", "women infants children", "women, infants, and children"],
+  snap: ["snap", "snap benefits", "food stamps", "supplemental nutrition assistance", "snap program"],
+
+  // youth / youth programs
+  youth: ["youth", "youth programs", "teen", "adolescent", "kids", "children", "youth services"],
+
+  // transition resources for foster youth
+  fostertransition: ["transition", "foster transition", "fyi", "independent living", "transition resources"],
+
+  // hotlines / crisis lines
+  hotline: ["hotline", "hotlines", "crisis line", "crisis", "helpline", "988", "suicide hotline", "lifeline"],
+  youthhotline: ["youthline", "youth hotline", "teenline"],
+
+  // food / pantry / meals / nutrition
+  food: ["food", "food assistance", "food pantry", "pantry", "meals", "meal", "soup kitchen", "food bank", "feeding"],
+  nutrition: ["nutrition", "nutrition services", "diet", "dietary", "nutrition education", "wic", "snap"],
+
+  // clothing & household / thrift / reStore
+  clothing: ["clothing", "clothes", "thrift", "thrift store", "donation", "reStore", "household", "household items"],
+
+  // emergency loans / financial aid
+  emergencyloan: ["emergency loan", "loan", "emergency assistance", "financial assistance", "emergency funds"],
+  financial: ["financial", "finance", "financial literacy", "money management", "credit counseling"],
+
+  // housing / shelter / rental assistance / eviction
+  housing: ["housing", "shelter", "homeless", "rental assistance", "eviction", "housing assistance", "public housing", "housing rehab"],
+  shelter: ["shelter", "emergency shelter", "transitional housing"],
+
+  // legal assistance / pro bono
+  legal: ["legal", "law", "legal assistance", "legal aid", "pro bono", "lawyer", "attorney"],
+
+  // utility assistance / energy / bills
+  utility: ["utility", "utilities", "utility assistance", "energy assistance", "energy", "heat", "electric", "gas", "water bill"],
+
+  // weatherization / home energy
+  weatherization: ["weatherization", "weatherize", "home weatherization", "insulation", "energy efficiency"],
+
+  // employment / job services / unemployment
+  employment: ["employment", "jobs", "job service", "job training", "unemployment", "career services", "workforce"],
+
+  // literacy / education / adult ed
+  literacy: ["literacy", "adult education", "continued education", "GED", "ESL", "reading", "education program"],
+
+  // mental health / substance use / counseling
+  mentalhealth: ["mental health", "behavioral health", "counseling", "therapy", "psychologist", "psychiatry", "substance use", "addiction", "rehab"],
+  substanceuse: ["substance use", "substance abuse", "addiction", "recovery", "detox"],
+
+  // crisis intervention / victim services
+  crisis: ["crisis intervention", "crisis", "victim services", "domestic violence", "rape crisis", "victims"],
+
+  // grief support / bereavement
+  grief: ["grief", "bereavement", "loss support", "grief counseling"],
+
+  // transportation / transit / paratransit
+  transit: ["transportation", "transit", "bus", "prairie hills", "paratransit", "rideshare", "transport"],
+
+  // driver's licensing / ID services
+  driverslicense: ["driver's license", "drivers license", "driver license", "id", "identification", "licensing", "dmv", "driver licensing"],
+
+  // cultural & community groups
+  cultural: ["cultural", "community", "community groups", "tribal", "native", "american indian", "ndn", "cultural center"],
+
+  // cancer / oncology / support groups
+  cancer: ["cancer", "oncology", "cancer support", "cancer care", "survivor support"],
+
+  // diabetes support
+  diabetes: ["diabetes", "diabetic", "diabetes support", "diabetes education"],
+
+  // AA / NA meetings
+  aa: ["aa", "alcoholics anonymous", "recovery meeting", "alcohol support"],
+  na: ["na", "narcotics anonymous", "drug recovery", "recovery meeting"],
+
+  // elderly & disability / in-home care / meals on wheels / transit
+  elderly: ["elderly", "senior", "seniors", "aging", "elder", "older adults", "senior services"],
+  disability: ["disability", "disabled", "disability services", "rehabilitation", "rehab services", "vocational rehabilitation"],
+  "in-home": ["in-home", "in home", "home health", "homecare", "home care", "home health care"],
+  "meals-on-wheels": ["meals on wheels", "meals-on-wheels", "meal delivery", "senior meals"],
+
+  // pet care / humane society / spay & neuter / vet assistance
+  pet: ["pet", "pets", "pet care", "pet assistance", "humane society", "animal shelter", "spay", "neuter", "vet", "veterinary"],
+  humane: ["humane society", "humane", "animal shelter", "rescue"],
+  spayneuter: ["spay", "neuter", "spay/neuter", "clinic spay", "low-cost spay"],
+
+  // miscellaneous hotlines / helplines
+  helpline: ["helpline", "hotline", "211", "poison control", "suicide", "domestic violence", "human trafficking"],
+
+  // data/utility search helpers
+  phone: ["phone", "tel", "telephone", "call", "contact"],
+  address: ["address", "location", "site", "url", "website"],
+  hours: ["hours", "open", "availability", "schedule", "times"],
+
+  // free / no-cost indicators (special token; your filter recognizes "free: yes")
+  free: ["free", "no cost", "no-cost", "gratis", "complimentary", "sliding scale", "low cost", "low-cost", "reduced cost", "pay what you can"],
+
+  // common synonyms / abbreviations
+  svc: ["service", "services", "program", "programs", "resource", "resources"],
+  provider: ["provider", "providers", "agency", "agencies", "organization", "org", "nonprofit", "non-profit"]
+};
       function buildTokenAlternatives(rawQuery) {
         const tokens = rawQuery.split(/\s+/).filter(Boolean);
         return tokens.map(t => {
@@ -682,86 +806,96 @@
         });
       }
 
-      function filterResources(query) {
-        let raw = (query || "").trim().toLowerCase();
+function matchSynonyms(text) {
+  const normalized = text.toLowerCase();
+  for (const [key, synonyms] of Object.entries(SYNONYMS)) {
+    if (synonyms.some(syn => normalized.includes(syn))) {
+      return key;
+    }
+  }
+  return normalized;
+}
 
-        // detect "free: yes" or "free: y" or "free: true"
-        let requireFree = false;
-        const freeMatch = raw.match(/(^|\s)free\s*:\s*(yes|y|true)\b/);
-        if (freeMatch) {
-          requireFree = true;
-          // remove that clause from the search text
-          raw = raw.replace(/(^|\s)free\s*:\s*(yes|y|true)\b/g, "").trim();
-        }
+function filterResources(query) {
+  let raw = (query || "").trim().toLowerCase();
 
-        // if user types just "free" treat it as free:true shorthand
-        if (!requireFree && /^\s*free\s*$/i.test(query)) {
-          requireFree = true;
-          raw = "";
-        }
+  // detect "free: yes" or "free: y" or "free: true"
+  let requireFree = false;
+  const freeMatch = raw.match(/(^|\s)free\s*:\s*(yes|y|true)\b/);
+  if (freeMatch) {
+    requireFree = true;
+    // remove that clause from the search text
+    raw = raw.replace(/(^|\s)free\s*:\s*(yes|y|true)\b/g, "").trim();
+  }
 
-        // no search tokens -> show rows (but still filter by free flag if required)
-        const tokenAlternatives = raw ? buildTokenAlternatives(raw) : [];
+  // if user types just "free" treat it as free:true shorthand
+  if (!requireFree && /^\s*free\s*$/i.test(query)) {
+    requireFree = true;
+    raw = "";
+  }
 
-        let anyMatch = false;
-        const sections = document.querySelectorAll("#resource-container section");
-        sections.forEach(section => {
-          const table = section.querySelector("table");
-          const tbody = section.querySelector("tbody");
-          const toggle = section.querySelector(".section-toggle");
-          if (!tbody) return;
+  // no search tokens -> show rows (but still filter by free flag if required)
+  const tokenAlternatives = raw ? buildTokenAlternatives(raw) : [];
 
-          const rows = Array.from(tbody.querySelectorAll("tr"));
-          let sectionHasMatch = false;
+  let anyMatch = false;
+  const sections = document.querySelectorAll("#resource-container section");
+  sections.forEach(section => {
+    const table = section.querySelector("table");
+    const tbody = section.querySelector("tbody");
+    const toggle = section.querySelector(".section-toggle");
+    if (!tbody) return;
 
-          rows.forEach(row => {
-            const cellsText = Array.from(row.querySelectorAll("td"))
-              .map(td => normalize(td.textContent || td.innerText))
-              .join(" ");
+    const rows = Array.from(tbody.querySelectorAll("tr"));
+    let sectionHasMatch = false;
 
-            // free filter check
-            if (requireFree && row.dataset.free !== "true") {
-              row.style.display = "none";
-              return;
-            }
+    rows.forEach(row => {
+      const cellsText = Array.from(row.querySelectorAll("td"))
+        .map(td => normalize(td.textContent || td.innerText))
+        .join(" ");
 
-            // if there are no tokens left, it's a match
-            if (tokenAlternatives.length === 0) {
-              row.style.display = "";
-              sectionHasMatch = true;
-              return;
-            }
-
-            // check all token groups: each group requires at least one alternative to appear
-            const matchedAllTokens = tokenAlternatives.every(alts =>
-              alts.some(opt => cellsText.includes(opt))
-            );
-
-            row.style.display = matchedAllTokens ? "" : "none";
-            if (matchedAllTokens) sectionHasMatch = true;
-          });
-
-          // show/hide table and update toggle state
-          if (sectionHasMatch) {
-            table.style.display = "";
-            if (toggle) {
-              toggle.setAttribute("aria-expanded", "true");
-              const chev = toggle.querySelector(".chev");
-              if (chev) chev.textContent = "▾";
-            }
-            anyMatch = true;
-          } else {
-            table.style.display = "none";
-            if (toggle) {
-              toggle.setAttribute("aria-expanded", "false");
-              const chev = toggle.querySelector(".chev");
-              if (chev) chev.textContent = "▸";
-            }
-          }
-        });
-
-        return anyMatch;
+      // free filter check
+      if (requireFree && row.dataset.free !== "true") {
+        row.style.display = "none";
+        return;
       }
+
+      // if there are no tokens left, it's a match
+      if (tokenAlternatives.length === 0) {
+        row.style.display = "";
+        sectionHasMatch = true;
+        return;
+      }
+
+      // check all token groups: each group requires at least one alternative to appear
+      const matchedAllTokens = tokenAlternatives.every(alts =>
+        alts.some(opt => cellsText.includes(opt))
+      );
+
+      row.style.display = matchedAllTokens ? "" : "none";
+      if (matchedAllTokens) sectionHasMatch = true;
+    });
+
+    // show/hide table and update toggle state
+    if (sectionHasMatch) {
+      table.style.display = "";
+      if (toggle) {
+        toggle.setAttribute("aria-expanded", "true");
+        const chev = toggle.querySelector(".chev");
+        if (chev) chev.textContent = "▾";
+      }
+      anyMatch = true;
+    } else {
+      table.style.display = "none";
+      if (toggle) {
+        toggle.setAttribute("aria-expanded", "false");
+        const chev = toggle.querySelector(".chev");
+        if (chev) chev.textContent = "▸";
+      }
+    }
+  });
+
+  return anyMatch;
+}
    // initial state
       filterResources("");
       // debounce helper
