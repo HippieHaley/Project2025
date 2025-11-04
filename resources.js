@@ -315,8 +315,8 @@ const resources = {
     },
     {
       name: "Safe Kids Worldwide – South Dakota",
-      phone: "networkmembers@safekids.org",
-      address: "",
+      phone: "",
+      address: "networkmembers@safekids.org",
       hours: ""
     }
   ],
