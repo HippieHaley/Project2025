@@ -752,7 +752,19 @@ const resources = {
       name: "Ensō Mental Health",
       phone: "(605) 519-5850",
       address: "717 North 5th Street, Spearfish, SD",
-      hours: "Mon–Thu: 8:00AM – 5:00PM; Fri: 8:00AM – 2:00PM; other times by appt"
+      hours: "Monday – Thursday: 8:00AM – 5:00PM; Friday: 8:00AM – 2:00PM; Other times by appointment"
+    },
+    {
+      name: "Spruce Canyon Wellness",
+      phone: "(605) 580-7358",
+      address: "310 South 26th Street, Spearfish, SD",
+      hours: "Monday – Thursday: 9:00AM – 5:00PM; Friday: 9:00AM – 4:00PM; Other times by appointment"
+    },
+    {
+      name: "Spearfish Counseling",
+      phone: "(605) 644-7494",
+      address: "1320 North Avenue, Spearfish, SD",
+      hours: "By Appointment Only"
     },
     {
       name: "Funk Counseling",
@@ -761,15 +773,57 @@ const resources = {
       hours: "Monday and Thursday evenings by appointment"
     },
     {
+      name: "Northern Hills Counseling Associates",
+      phone: "(605) 559-2006",
+      address: "211 North Main Street, Suite 203, Spearfish, SD",
+      hours: "By Appointment Only"
+    },
+    {
+      name: "Living Lightly Mental Health, LLC",
+      phone: "(605) 641-2661",
+      address: "Spearfish, SD",
+      hours: "By Appointment Only"
+    },
+    {
+      name: "Transformations Mental Health",
+      phone: "(605) 412-8600",
+      address: "611 Dahl Road, Suite 3, Spearfish, SD",
+      hours: "By Appointment Only"
+    },
+    {
+      name: "West River Mental Health (BMS)",
+      phone: "(605) 642-2777",
+      address: "623 Dahl Road, Spearfish, SD",
+      hours: "Monday – Friday: 8:00AM – 5:00PM"
+    },
+    {
+      name: "Black Hills Psychology",
+      phone: "(605) 645-0100",
+      address: "115 N 7th St #6, Spearfish, SD",
+      hours: "Monday – Friday: 8:00AM – 5:00PM"
+    },
+    {
       name: "Consumer Credit Counseling Service of the Black Hills (CCCSBH)",
       phone: "(605) 348-4550, (1-800) 568-6615",
       address: "2310 North Maple Avenue, Rapid City, SD",
-      hours: "Mon–Tue: 8:00AM – 5:00PM; Wed: 8:00AM – 8:30PM; Thu: 8:00AM – 5:00PM; Fri: 8:00AM – 3:00PM"
+      hours: "Monday – Tuesday: 8:00AM – 5:00PM; Wednesday: 8:00AM – 8:30PM; Thursday: 8:00AM – 5:00PM; Friday: 8:00AM – 3:00PM"
     },
     {
-      name: "Lutheran Social Services of SD – Center for Financial Resources",
+      name: "Lutheran Social Services of South Dakota – Center for Financial Resources",
       phone: "(605) 330-2700, 1-888-258-2227",
       address: "705 East 41st Street, Suite 100, Sioux Falls, SD",
+      hours: "Monday – Friday: 8:00AM – 5:00PM"
+    },
+    {
+      name: "National Foundation for Credit Counseling (NFCC)",
+      phone: "(1-800) 388-2227",
+      address: "",
+      hours: ""
+    },
+    {
+      name: "Northern Hills Alcohol/Drug Services DBA Compass Point",
+      phone: "(605) 642-7093",
+      address: "710 East Colorado Boulevard, Spearfish, SD",
       hours: "Monday – Friday: 8:00AM – 5:00PM"
     }
   ],
