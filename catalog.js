@@ -80,7 +80,7 @@ const procedures = [
     cpt: "99384",
     hcpcs: "",
     icd10: "",
-    fullprice: 306,
+    fullprice: 162,
     category: "visits",
     visitType: "preventive",
     keywords: ["preventive new", "99384", "12–17"]
@@ -100,7 +100,7 @@ const procedures = [
     cpt: "99386",
     hcpcs: "",
     icd10: "",
-    fullprice: 431,
+    fullprice: 343,
     category: "visits",
     visitType: "preventive",
     keywords: ["preventive new", "99386", "40–64"]
@@ -110,7 +110,7 @@ const procedures = [
     cpt: "99394",
     hcpcs: "",
     icd10: "",
-    fullprice: 245,
+    fullprice: 262,
     category: "visits",
     visitType: "preventive",
     keywords: ["preventive established", "99394", "12–17"]
@@ -120,7 +120,7 @@ const procedures = [
     cpt: "99395",
     hcpcs: "",
     icd10: "",
-    fullprice: 245,
+    fullprice: 267,
     category: "visits",
     visitType: "preventive",
     keywords: ["preventive established", "99395", "18–39"]
@@ -130,7 +130,7 @@ const procedures = [
     cpt: "99396",
     hcpcs: "",
     icd10: "",
-    fullprice: 431,
+    fullprice: 285,
     category: "visits",
     visitType: "preventive",
     keywords: ["preventive established", "99396", "40–64"]
