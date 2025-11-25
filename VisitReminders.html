@@ -21,7 +21,7 @@ table {
   box-shadow: 0 4px 8px rgba(0,0,0,0.1);
 }
 th, td {
-  padding: 15px;
+  padding: 20px;
   border: 1px solid #333;
   background-color: #f8c9f9;
   color: #333;
@@ -170,7 +170,7 @@ button:hover {
   opacity: 1;
 }
 .template-selector {
-  padding: 8px 12px;
+  padding: 8px 32px 8px 12px;
   border-radius: 20px;
   border: 1px solid #333;
   background-color: #acdbf9; 
@@ -185,6 +185,10 @@ button:hover {
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   margin-left: 8px;
   margin-right: 8px;
+  background-image: url('data:image/svg+xml;utf8,<svg fill="%23333" height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg"><path d="M7 10l5 5 5-5z"/></svg>');
+  background-repeat: no-repeat;
+  background-position: right 8px center;
+  background-size: 20px;
 }
 .template-selector:focus {
   outline: none;
@@ -192,7 +196,7 @@ button:hover {
   background-color:  #acdbf9; 
 }
 .time-selector {
-  padding: 8px 12px;
+  padding: 10px;
   border-radius: 20px;
   border: 1px solid #000;
   background-color: #ffffff; 
@@ -223,8 +227,8 @@ button:hover {
   font-style: italic;
 }
 .sms-email-input {
-  padding: 10px 15px;
-  border-radius: 30px;
+  padding: 10px;
+  border-radius: 20px;
   border: 1px solid #000;
   font-size: 1rem;
   font-weight: normal;
@@ -312,18 +316,20 @@ button:hover {
             </select>
           </td>
           <td>
-            <label style="display:inline-flex;align-items:center;margin-bottom:4px;">
-              <input type="checkbox" class="income-doc-checkbox" style="margin-right:6px;"> income docs needed
-            </label>
-            <select class="template-selector">
-              <option value="default">Appt Reminder</option>
-              <option value="reschedule">Reschedule</option>
-              <option value="CallClinic">Call Clinic</option>
-              <option value="AEDue">AE Due</option>
-              <option value="MissedAppt">Missed Appt</option>
-              <option value="IncomeDocReminder">Income Doc Reminder </option>
-            </select>
-          <button onclick="deleteRow(this)">Delete row</button>
+            <div style="display: flex; justify-content: space-between; align-items: center; gap: 8px;">
+              <label style="display:inline-flex;align-items:center;">
+                <input type="checkbox" class="income-doc-checkbox" style="margin-right:6px;"> income docs needed
+              </label>
+              <select class="template-selector">
+                <option value="default">Appt Reminder</option>
+                <option value="reschedule">Reschedule</option>
+                <option value="CallClinic">Call Clinic</option>
+                <option value="AEDue">AE Due</option>
+                <option value="MissedAppt">Missed Appt</option>
+                <option value="IncomeDocReminder">Income Doc Reminder </option>
+              </select>
+              <button onclick="deleteRow(this)">Delete row</button>
+            </div>
           </td>
         </tr>
       </tbody>
