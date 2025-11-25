@@ -363,24 +363,109 @@ button:hover {
 
     function handleSmsAutocomplete(e) {
       const input = e.target;
-      const sanitized = input.value.replace(/\D/g, '');
-
-      const providers = [
-        '@txt.att.net',
-        '@tmomail.net',
-        '@vtext.com',
-        '@messaging.sprintpcs.com',
-        '@vmobl.com',
-        '@mypixmessages.com',
-        '@mymetropcs.com',
-        '@sms.cricketwireless.net'
-      ];
-
-      if (sanitized.length >= 7) {
+      let value = input.value;
+      
+      // Strip all non-digit characters to check if it's a phone number
+      const sanitized = value.replace(/\D/g, '');
+      
+      // Check if input contains only numbers and phone formatting characters
+      const isPhoneNumber = /^[\d\s\-\(\)]+$/.test(value) && sanitized.length > 0;
+      
+      // If it's a phone number format, clean it up and show suggestions
+      if (isPhoneNumber && sanitized.length >= 7) {
+        // Auto-clean the input to show only digits
+        if (value !== sanitized) {
+          input.value = sanitized;
+        }
+        
+        const providers = [
+          '@txt.att.net',
+          '@tmomail.net',
+          '@vtext.com',
+          '@messaging.sprintpcs.com',
+          '@vmobl.com',
+          '@mypixmessages.com',
+          '@mymetropcs.com',
+          '@sms.cricketwireless.net'
+        ];
         showSmsSuggestions(input, sanitized, providers);
-      } else {
+      } 
+      // If it contains @ and numbers before @, it's a text message email
+      else if (value.includes('@') && /^\d+@/.test(value)) {
+        // Already an SMS email format, don't interfere
         clearSmsSuggestions();
       }
+      // If it contains @ or has letters (regular email), show common email domains
+      else if (value.includes('@') || /[a-zA-Z]/.test(value)) {
+        showEmailSuggestions(input, value);
+      } 
+      else {
+        clearSmsSuggestions();
+      }
+    }
+    
+    function showEmailSuggestions(input, value) {
+      clearSmsSuggestions();
+      
+      // Split by @ to get the username part
+      const parts = value.split('@');
+      const username = parts[0];
+      const domain = parts[1] || '';
+      
+      if (!username) return;
+      
+      const commonDomains = [
+        '@gmail.com',
+        '@yahoo.com',
+        '@hotmail.com',
+        '@outlook.com',
+        '@icloud.com',
+        '@aol.com',
+      ];
+      
+      // Filter domains that match what user is typing after @
+      const matchingDomains = domain 
+        ? commonDomains.filter(d => d.toLowerCase().includes('@' + domain.toLowerCase()))
+        : commonDomains;
+      
+      if (matchingDomains.length === 0) return;
+      
+      const container = document.createElement('div');
+      container.setAttribute('id', 'smsSuggestionContainer');
+      container.style.border = '1px solid #333';
+      container.style.background = '#fff';
+      container.style.position = 'absolute';
+      container.style.zIndex = '9999';
+      container.style.width = `${input.offsetWidth}px`;
+      container.style.maxHeight = '200px';
+      container.style.overflowY = 'auto';
+      
+      const rect = input.getBoundingClientRect();
+      container.style.left = `${rect.left + window.scrollX}px`;
+      container.style.top = `${rect.bottom + window.scrollY}px`;
+      
+      matchingDomains.forEach(domain => {
+        const item = document.createElement('div');
+        const suggestion = username + domain;
+        item.textContent = suggestion;
+        item.style.padding = '8px';
+        item.style.cursor = 'pointer';
+        item.style.backgroundColor = '#f8c9f9';
+        item.style.borderBottom = '1px solid #e0e0e0';
+        item.addEventListener('mouseenter', () => {
+          item.style.backgroundColor = '#e8b3e8';
+        });
+        item.addEventListener('mouseleave', () => {
+          item.style.backgroundColor = '#f8c9f9';
+        });
+        item.addEventListener('click', () => {
+          input.value = suggestion;
+          clearSmsSuggestions();
+        });
+        container.appendChild(item);
+      });
+      
+      document.body.appendChild(container);
     }
     function showSmsSuggestions(input, number, providers) {
       clearSmsSuggestions();
