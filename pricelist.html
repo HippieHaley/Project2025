@@ -66,7 +66,7 @@ body {
   border-color: #8aa9ff;
   background: #fff;
 }
-#toggleCodes { 
+#toggleCodes, #adjustments { 
   margin-top: 10px;
   padding: 0.5rem 1.5rem;
   background-color: var(--pink);
@@ -76,6 +76,85 @@ body {
   color: #333;
   font-weight: bold;
   font-size: 1rem;
+}
+#adjustments {
+  margin-left:24px;
+}
+
+.adjustment-modal {
+  display: none;
+  position: fixed;
+  z-index: 1000;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0,0,0,0.4);
+}
+
+.adjustment-modal-content {
+  background-color: var(--blue);
+  margin: 15% auto;
+  padding: 30px;
+  border: 2px solid var(--pink);
+  border-radius: 14px;
+  width: 400px;
+  max-width: 90%;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.2);
+}
+
+.adjustment-modal-content h2 {
+  margin-top: 0;
+  color: var(--ink);
+  border-bottom: 2px solid var(--pink);
+  padding-bottom: 10px;
+}
+
+.adjustment-input-group {
+  margin: 20px 0;
+}
+
+.adjustment-input-group label {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.adjustment-input-group input {
+  width: 100%;
+  padding: 10px;
+  font-size: 1rem;
+  border: 1px solid var(--pink);
+  border-radius: 7px;
+  background: white;
+  box-sizing: border-box;
+}
+
+.adjustment-buttons {
+  display: flex;
+  gap: 12px;
+  margin-top: 20px;
+}
+
+.adjustment-buttons button {
+  flex: 1;
+  padding: 10px 20px;
+  font-size: 1rem;
+  font-weight: bold;
+  border: 1px solid #000;
+  border-radius: 20px;
+  cursor: pointer;
+}
+
+.adjustment-buttons button:first-child {
+  background-color: var(--pink);
+  color: #333;
+}
+
+.adjustment-buttons button:last-child {
+  background-color: #ddd;
+  color: #333;
 }
 
 .flex-container {
@@ -553,6 +632,7 @@ body {
         <option value="25">25%</option>
       </select>
       <button id="toggleCodes">Show/Hide Codes</button>
+      <button id="adjustments">Adjustments</button>
     </div>
   <div class="page">
     <!-- Left: Pricelist -->
@@ -597,6 +677,26 @@ body {
       </div>
     </div>
   </div>
+
+  <!-- Adjustment Modal -->
+  <div id="adjustmentModal" class="adjustment-modal">
+    <div class="adjustment-modal-content">
+      <h2>Adjust Total</h2>
+      <div class="adjustment-input-group">
+        <label for="adjustmentAmount">Amount (use - for subtraction):</label>
+        <input type="number" id="adjustmentAmount" step="0.01" placeholder="e.g., 10.00 or -5.00">
+      </div>
+      <div class="adjustment-input-group">
+        <label for="adjustmentNote">Note (optional):</label>
+        <input type="text" id="adjustmentNote" placeholder="e.g., Discount, Additional fee">
+      </div>
+      <div class="adjustment-buttons">
+        <button id="applyAdjustment">Apply</button>
+        <button id="cancelAdjustment">Cancel</button>
+      </div>
+    </div>
+  </div>
+
   <!-- Load JS at end of body for best performance -->
   <script type="module" src="pricelist.js"></script>
   
@@ -609,11 +709,37 @@ body {
       document.getElementById('helpModal').style.display = 'none';
     }
     
+    // Adjustment modal functionality
+    document.getElementById('adjustments').addEventListener('click', function() {
+      document.getElementById('adjustmentModal').style.display = 'block';
+      document.getElementById('adjustmentAmount').value = '';
+      document.getElementById('adjustmentNote').value = '';
+    });
+    
+    document.getElementById('cancelAdjustment').addEventListener('click', function() {
+      document.getElementById('adjustmentModal').style.display = 'none';
+    });
+    
+    document.getElementById('applyAdjustment').addEventListener('click', function() {
+      const amount = parseFloat(document.getElementById('adjustmentAmount').value) || 0;
+      const note = document.getElementById('adjustmentNote').value;
+      
+      if (amount !== 0 && window.addAdjustment) {
+        window.addAdjustment(amount, note || 'Adjustment');
+      }
+      
+      document.getElementById('adjustmentModal').style.display = 'none';
+    });
+    
     // Close modal when clicking outside of it
     window.onclick = function(event) {
-      const modal = document.getElementById('helpModal');
-      if (event.target == modal) {
-        modal.style.display = 'none';
+      const helpModal = document.getElementById('helpModal');
+      const adjustmentModal = document.getElementById('adjustmentModal');
+      if (event.target == helpModal) {
+        helpModal.style.display = 'none';
+      }
+      if (event.target == adjustmentModal) {
+        adjustmentModal.style.display = 'none';
       }
     }
   </script>

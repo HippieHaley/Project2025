@@ -4,6 +4,7 @@ import procedures from './catalog.js';
  *  State
  *  ======================== */
 let selected = new Map(); // key -> { item, qty, unitPrice }
+let adjustments = new Map(); // key -> { note, amount }
 let showCodes = false;
 let percent = 1.0;
 let grandTotalValue = 0;
@@ -287,19 +288,24 @@ function recomputeTotal() {
   for (const [, entry] of selected) {
     grandTotalValue += entry.unitPrice * entry.qty;
   }
+  for (const [, adj] of adjustments) {
+    grandTotalValue += adj.amount;
+  }
   if (grandTotalEl) grandTotalEl.textContent = fmt(grandTotalValue);
 }
 
 function renderReceipt() {
   if (!receiptItems) return;
 
-  if (selected.size === 0) {
+  if (selected.size === 0 && adjustments.size === 0) {
     receiptItems.innerHTML = '<div class="empty-receipt">No items added yet</div>';
     recomputeTotal();
     return;
   }
 
   receiptItems.innerHTML = '';
+  
+  // Render service items
   for (const [key, entry] of selected) {
     const { item, qty, unitPrice } = entry;
     const line = document.createElement('div');
@@ -345,7 +351,40 @@ function renderReceipt() {
 
     receiptItems.appendChild(line);
   }
+  
+  // Render adjustment items
+  for (const [key, adj] of adjustments) {
+    const line = document.createElement('div');
+    line.className = 'receipt-item';
+
+    const info = document.createElement('div');
+    info.className = 'receipt-item-info';
+    const nm = document.createElement('div');
+    nm.className = 'receipt-item-name';
+    nm.textContent = adj.note || 'Adjustment';
+    info.appendChild(nm);
+
+    const lineTotal = document.createElement('span');
+    lineTotal.textContent = fmt(adj.amount);
+
+    const removeBtn = document.createElement('button');
+    removeBtn.className = 'remove';
+    removeBtn.textContent = 'Remove';
+    removeBtn.addEventListener('click', () => removeAdjustment(key));
+
+    line.appendChild(info);
+    line.appendChild(lineTotal);
+    line.appendChild(removeBtn);
+
+    receiptItems.appendChild(line);
+  }
+  
   recomputeTotal();
+}
+
+function removeAdjustment(key) {
+  adjustments.delete(key);
+  renderReceipt();
 }
 
 function addLine(name, qty = 1) {
@@ -386,12 +425,17 @@ if (copyBtn) {
     for (const [name, entry] of selected) {
       lines.push(`${name} x${entry.qty} — ${fmt(entry.unitPrice * entry.qty)}`);
     }
+    const adjLines = [];
+    for (const [, adj] of adjustments) {
+      adjLines.push(`${adj.note || 'Adjustment'} — ${fmt(adj.amount)}`);
+    }
     const text = [
       '=== Receipt ===',
       `Date: ${new Date().toLocaleDateString()}`,
       `Fee Percentage: ${Math.round(percent * 100)}%`,
       'Services:',
       ...lines,
+      ...(adjLines.length > 0 ? ['Adjustments:', ...adjLines] : []),
       `Total: ${fmt(grandTotalValue)}`
     ].join('\n');
     navigator.clipboard.writeText(text)
@@ -447,3 +491,10 @@ function init() {
   renderCatalog();
   renderReceipt();
 }
+
+// Expose functions for adjustment modal
+window.addAdjustment = function(amount, note) {
+  const key = `adj-${Date.now()}`;
+  adjustments.set(key, { amount, note });
+  renderReceipt();
+};
