@@ -162,7 +162,7 @@ const procedures = [
     cpt: "11981",
     hcpcs: "J7307",
     icd10: "Z30.017",
-    fullprice: 318,
+    fullprice: 316,
     category: "procedures",
     keywords: ["implant insert", "nexplanon", "insertion"]
   },
@@ -247,7 +247,7 @@ const procedures = [
     cpt: "88164",
     hcpcs: "",
     icd10: "Z12.4",
-    fullprice: 20,
+    fullprice: 23,
     category: "labs",
     keywords: ["pap", "conventional pap"]
   },
@@ -337,7 +337,7 @@ const procedures = [
   cpt: "86593",
   hcpcs: "",
   icd10: "A51.9",
-  fullprice: 30,
+  fullprice: 35,
   category: "labs",
   keywords: ["syphilis", "TPPA", "86593"]
 },
@@ -352,21 +352,12 @@ const procedures = [
 },
 {
   name: "HSV SERUM",
-  cpt: "87529",
+  cpt: "86695",
   hcpcs: "",
   icd10: "B00.9",
-  fullprice: 0,
+  fullprice: 39,
   category: "labs",
   keywords: ["herpes", "HSV SERUM", "86695"]
-},
-  {
-  name: "Herpes Viral Culture",
-  cpt: "87254",
-  hcpcs: "",
-  icd10: "A60.9",
-  fullprice: 35,
-  category: "labs",
-  keywords: ["herpes", "viral culture", "87254"]
 },
 
   // ======================
@@ -413,7 +404,7 @@ const procedures = [
   cpt: "",
   hcpcs: "J7302",
   icd10: "Z30.430",
-  fullprice: 310,
+  fullprice: 315,
   category: "meds",
   keywords: ["Mirena", "IUD", "J7302"]
 },
@@ -431,7 +422,7 @@ const procedures = [
     cpt: "",
     hcpcs: "J7303",
     icd10: "Z30.011",
-    fullprice: 75,
+    fullprice: 8,
     category: "meds",
     keywords: ["nuvaring", "ring", "birth control"]
   },
@@ -458,7 +449,7 @@ const procedures = [
     cpt: "",
     hcpcs: "J0696",
     icd10: "A54.01",
-    fullprice: 20,
+    fullprice: 1,
     category: "meds",
     keywords: ["rocephin", "ceftriaxone", "sti treatment"]
   },
@@ -467,7 +458,7 @@ const procedures = [
     cpt: "",
     hcpcs: "J0561",
     icd10: "A51.0",
-    fullprice: 30,
+    fullprice: 1,
     category: "meds",
     keywords: ["bicillin", "syphilis"]
   },
@@ -651,7 +642,7 @@ name: "Basal Thermometer",
     cpt: "",
     hcpcs: "S4993",
     icd10: "",
-    fullprice: 6,
+    fullprice: 2,
     category: "oral contraceptives",
     keywords: ["Heather", "oc", "pill", "S4993"]
   },
@@ -678,7 +669,7 @@ name: "Basal Thermometer",
     cpt: "",
     hcpcs: "S4993",
     icd10: "Z30.011",
-    fullprice: 5,
+    fullprice: 2,
     category: "oral contraceptives",
     keywords: ["sprintec", "oc", "pill"]
   },
@@ -777,7 +768,7 @@ name: "Basal Thermometer",
   cpt: "",
   hcpcs: "S4993",
   icd10: "Z30.011",
-  fullprice: 6,
+  fullprice: 4,
   category: "oral contraceptives",
   keywords: ["Nortrel 777", "oc", "pill", "S4993"]
 },
@@ -813,7 +804,7 @@ name: "Basal Thermometer",
   cpt: "",
   hcpcs: "S4993",
   icd10: "",
-  fullprice: 5,
+  fullprice: 14,
   category: "oral contraceptives",
   keywords: ["Simpresse", "oc", "pill", "S4993"]
 },
