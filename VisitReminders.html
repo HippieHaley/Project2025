@@ -427,23 +427,42 @@ function getEmailRowData(row) {
 
   return { email, subject, body };
 }
-function createDraft(button) {
-  const row = button.closest('tr');
-  const { email, subject, body } = getEmailRowData(row);
-  let mailto = `mailto:${email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
-  window.open(mailto, '_blank');
-
-  // Only create Income Doc Reminder draft if checkbox is checked
-  const incomeDocCheckbox = row.querySelector('.income-doc-checkbox');
-  if (incomeDocCheckbox && incomeDocCheckbox.checked) {
-    const inputs = row.getElementsByTagName('input');
-    const date = inputs[1].value;
-    const incomeDocSubject = 'SECUREMAIL From Monument Health.';
-    const incomeDocBody = `Please bring some sort of income documentation for your appointment on ${date}. This could be w-2s or a month of paystubs. Thank you.`;
-    const incomeMailto = `mailto:${email}?subject=${encodeURIComponent(incomeDocSubject)}&body=${encodeURIComponent(incomeDocBody)}`;
+function createDraft() {
+  const table = document.getElementById('emailTable').getElementsByTagName('tbody')[0];
+  const rows = table.getElementsByTagName('tr');
+  
+  let delay = 0;
+  
+  for (let i = 0; i < rows.length; i++) {
+    const row = rows[i];
+    const { email, subject, body } = getEmailRowData(row);
+    
+    if (!email) {
+      continue; // Skip rows without email
+    }
+    
+    // Create main draft
+    const currentDelay = delay;
     setTimeout(() => {
-      window.open(incomeMailto, '_blank');
-    }, 500);
+      let mailto = `mailto:${email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+      window.open(mailto, '_blank');
+    }, currentDelay);
+    delay += 500;
+    
+    // Only create Income Doc Reminder draft if checkbox is checked
+    const incomeDocCheckbox = row.querySelector('.income-doc-checkbox');
+    if (incomeDocCheckbox && incomeDocCheckbox.checked) {
+      const inputs = row.getElementsByTagName('input');
+      const date = inputs[1].value;
+      const incomeDocSubject = 'SECUREMAIL From Monument Health.';
+      const incomeDocBody = `Please bring some sort of income documentation for your appointment on ${date}. This could be w-2s or a month of paystubs. Thank you.`;
+      const incomeMailto = `mailto:${email}?subject=${encodeURIComponent(incomeDocSubject)}&body=${encodeURIComponent(incomeDocBody)}`;
+      const incomeDelay = delay;
+      setTimeout(() => {
+        window.open(incomeMailto, '_blank');
+      }, incomeDelay);
+      delay += 500;
+    }
   }
 }
 window.addEventListener('DOMContentLoaded', () => {
