@@ -211,39 +211,41 @@ button:hover {
   <a href="index.html" class="back-home">Back to Home</a>
   <h1>Email Draft Generator</h1><div style="margin-bottom: 20px;"></div>
   <div id="previewPopup" class="notification"></div>
-  <table id="emailTable">
-    <thead>
-      <tr>
-        <th>Email</th>
-        <th>Date</th>
-        <th>Time</th>
-        <th>Actions</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><input type="email" class="sms-email-input" placeholder=""></td>
-        <td><input type="date"></td>
-        <td><input type="time"></td>
-        <td>
-          <label style="display:inline-flex;align-items:center;margin-bottom:4px;">
-            <input type="checkbox" class="income-doc-checkbox" style="margin-right:6px;"> Income Doc Reminder
-          </label>
-          <button onclick="addRow()">+ Add Row</button>
-          <button onclick="deleteRow(this)">Delete</button>
-          <button onclick="createDraft(this)">Create Draft</button>
-          <select class="template-selector">
-            <option value="default">Appt Reminder</option>
-            <option value="reschedule">Reschedule</option>
-            <option value="CallClinic">Call Clinic</option>
-            <option value="AEDue">AE Due</option>
-            <option value="MissedAppt">Missed Appt</option>
-            <option value="IncomeDocReminder">Income Doc Reminder </option>
-          </select>      
-        </td>
-      </tr>
-    </tbody>
-  </table>
+  <div style="display: flex; align-items: flex-start; gap: 10px;">
+    <button onclick="addRow()" style="margin-top: 60px;">+ Add Row</button>
+    <table id="emailTable">
+      <thead>
+        <tr>
+          <th>Email</th>
+          <th>Date</th>
+          <th>Time</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><input type="email" class="sms-email-input" placeholder=""></td>
+          <td><input type="date"></td>
+          <td><input type="time"></td>
+          <td>
+            <label style="display:inline-flex;align-items:center;margin-bottom:4px;">
+              <input type="checkbox" class="income-doc-checkbox" style="margin-right:6px;"> Income docs needed
+            </label>
+            <select class="template-selector">
+              <option value="default">Appt Reminder</option>
+              <option value="reschedule">Reschedule</option>
+              <option value="CallClinic">Call Clinic</option>
+              <option value="AEDue">AE Due</option>
+              <option value="MissedAppt">Missed Appt</option>
+              <option value="IncomeDocReminder">Income Doc Reminder </option>
+            </select>
+            <button onclick="deleteRow(this)">Delete</button>
+            <button onclick="createDraft(this)">Create Draft</button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
  <button class="alt-button" onclick="previewAll()">Preview All</button>
   <div id="preview" class="alert-preview"></div>
   <script>
