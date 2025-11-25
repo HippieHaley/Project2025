@@ -124,12 +124,82 @@
       #results tbody td:nth-child(3),
       #results tbody td:nth-child(5){ display:none; } /* hide HCPCS + Modifier on narrow screens */
     }
+    
+    .help-icon {
+      display: inline-block;
+      width: 30px;
+      height: 30px;
+      margin-left: 10px;
+      cursor: pointer;
+      vertical-align: middle;
+      transition: transform 0.2s ease;
+    }
+    .help-icon:hover {
+      transform: scale(1.1);
+    }
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 10000;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.5);
+    }
+    .modal-content {
+      background-color: var(--pink);
+      margin: 10% auto;
+      padding: 30px;
+      border: 2px solid var(--ink);
+      border-radius: 20px;
+      width: 80%;
+      max-width: 600px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+    }
+    .close-modal {
+      color: var(--ink);
+      float: right;
+      font-size: 28px;
+      font-weight: bold;
+      cursor: pointer;
+      line-height: 20px;
+    }
+    .close-modal:hover {
+      color: #000;
+    }
+    .modal-content h2 {
+      margin-top: 0;
+      color: var(--ink);
+    }
+    .modal-content ol {
+      text-align: left;
+      line-height: 1.8;
+    }
   </style>
 </head>
 <body>
   <a href="./index.html" class="back-home">Back to Home</a>
 
-  <h1>CPT Locator</h1>
+  <!-- Help Modal -->
+  <div id="helpModal" class="modal">
+    <div class="modal-content">
+      <span class="close-modal" onclick="closeHelp()">&times;</span>
+      <h2>How to Use CPT Locator</h2>
+      <ol>
+        <li><strong>Search Fields:</strong> Use any combination of search fields to find procedures.</li>
+        <li><strong>Service/Keywords:</strong> Search by service name or related keywords (e.g., "ultrasound", "x-ray").</li>
+        <li><strong>CPT Code:</strong> Enter a CPT code to find specific procedures (e.g., "99213").</li>
+        <li><strong>HCPCS:</strong> Search by HCPCS code if applicable.</li>
+        <li><strong>ICD-10:</strong> Enter ICD-10 diagnosis codes to find related procedures.</li>
+        <li><strong>Modifier:</strong> Search by modifier codes (e.g., "25", "59").</li>
+        <li><strong>Results:</strong> Results display in a table showing Name, CPT, HCPCS, ICD-10, and Modifier information.</li>
+      </ol>
+      <p><strong>Tip:</strong> Leave fields blank to see all procedures, or combine multiple search terms to narrow results!</p>
+    </div>
+  </div>
+
+  <h1>CPT Locator<img src="images/heart.png" alt="Help" class="help-icon" onclick="openHelp()"></h1>
   <div class="sub">Search by any combination of fields. Service search also checks keywords.</div>
 
   <div class="mh-searchbar" role="search" aria-label="CPT Locator search">
@@ -142,6 +212,23 @@
   </div>
   <div id="results"></div>
   <script type="module">
+  // Help modal functions
+  window.openHelp = function() {
+    document.getElementById('helpModal').style.display = 'block';
+  }
+  
+  window.closeHelp = function() {
+    document.getElementById('helpModal').style.display = 'none';
+  }
+  
+  // Close modal when clicking outside of it
+  window.onclick = function(event) {
+    const modal = document.getElementById('helpModal');
+    if (event.target == modal) {
+      modal.style.display = 'none';
+    }
+  }
+  
   // 1) Make sure catalog.js ends with:  export default procedures;
   import procedures from './catalog.js';
 

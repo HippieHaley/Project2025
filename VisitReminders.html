@@ -256,13 +256,83 @@ button:hover {
   background-color: #acdbf9;
   box-shadow: 0 0 5px rgba(232, 184, 232, 0.5);
 }
+.help-icon {
+  display: inline-block;
+  width: 30px;
+  height: 30px;
+  margin-left: 10px;
+  cursor: pointer;
+  vertical-align: middle;
+  transition: transform 0.2s ease;
+}
+.help-icon:hover {
+  transform: scale(1.1);
+}
+.modal {
+  display: none;
+  position: fixed;
+  z-index: 10000;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+}
+.modal-content {
+  background-color: #f8c9f9;
+  margin: 10% auto;
+  padding: 30px;
+  border: 2px solid #333;
+  border-radius: 20px;
+  width: 80%;
+  max-width: 600px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+}
+.close-modal {
+  color: #333;
+  float: right;
+  font-size: 28px;
+  font-weight: bold;
+  cursor: pointer;
+  line-height: 20px;
+}
+.close-modal:hover {
+  color: #000;
+}
+.modal-content h2 {
+  margin-top: 0;
+  color: #333;
+}
+.modal-content ol {
+  text-align: left;
+  line-height: 1.8;
+}
   </style>
 </head>
 <body>  
   <a href="index.html" class="back-home">Back to Home</a>
+  
+  <!-- Help Modal -->
+  <div id="helpModal" class="modal">
+    <div class="modal-content">
+      <span class="close-modal" onclick="closeHelp()">&times;</span>
+      <h2>How to Use the Draft Generator</h2>
+      <ol>
+        <li><strong>Add Rows:</strong> Click "+ Add Row" to add more recipients.</li>
+        <li><strong>Email/Phone:</strong> Enter an email address or phone number. Phone numbers will auto-format and show SMS provider options.</li>
+        <li><strong>Date & Time:</strong> Select the appointment date and time from the dropdowns.</li>
+        <li><strong>Template:</strong> Choose the appropriate message template (Appt Reminder, Reschedule, etc.).</li>
+        <li><strong>Income Docs:</strong> Check the box if you need to send an additional income documentation reminder.</li>
+        <li><strong>Create Drafts:</strong> Click "Create Drafts" to generate email drafts for all rows.</li>
+        <li><strong>Delete Row:</strong> Use the "Delete row" button to remove unwanted entries.</li>
+      </ol>
+      <p><strong>Tip:</strong> When typing an email, common domains will auto-suggest. For phone numbers, paste formatted numbers and they'll auto-clean!</p>
+    </div>
+  </div>
+  
   <div style="display: flex; align-items: flex-start; gap: 10px;">
     <div style="flex-grow: 1;">
-      <h1>Draft Generator</h1>      
+      <h1>Draft Generator<img src="images/heart.png" alt="Help" class="help-icon" onclick="openHelp()"></h1>      
       <table id="emailTable">
       <thead>
         <tr>
@@ -342,6 +412,22 @@ button:hover {
     </div>
   </div>
   <script>
+    function openHelp() {
+      document.getElementById('helpModal').style.display = 'block';
+    }
+    
+    function closeHelp() {
+      document.getElementById('helpModal').style.display = 'none';
+    }
+    
+    // Close modal when clicking outside of it
+    window.onclick = function(event) {
+      const modal = document.getElementById('helpModal');
+      if (event.target == modal) {
+        modal.style.display = 'none';
+      }
+    }
+    
     function addRow() {
       const table = document.getElementById('emailTable').getElementsByTagName('tbody')[0];
       const newRow = table.rows[0].cloneNode(true);
