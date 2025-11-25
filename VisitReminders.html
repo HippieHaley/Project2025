@@ -240,14 +240,12 @@ button:hover {
               <option value="IncomeDocReminder">Income Doc Reminder </option>
             </select>
             <button onclick="deleteRow(this)">Delete row</button>
-            <button onclick="createDraft(this)">Create draft</button>
           </td>
         </tr>
       </tbody>
     </table>
   </div>
- <button class="alt-button" onclick="createAllDrafts()">Create All Drafts</button>
-  <div id="preview" class="alert-preview"></div>
+ <button class="alt-button" onclick="createDraft()">Create Drafts</button>
   <script>
     function addRow() {
       const table = document.getElementById('emailTable').getElementsByTagName('tbody')[0];
@@ -405,10 +403,6 @@ function formatTime12H(time) {
   return `${hour}:${minute} ${ampm}`;
 }
 
-// Then in getEmailRowData:
-const formattedTime = formatTime12H(time);
-// use formattedTime instead of time in your templates
-
 function getEmailRowData(row) {
   const inputs = row.getElementsByTagName('input');
   const email = inputs[0].value;
@@ -450,42 +444,6 @@ function createDraft(button) {
     setTimeout(() => {
       window.open(incomeMailto, '_blank');
     }, 500);
-  }
-}
-    function createAllDrafts() {
-  const rows = document.getElementById('emailTable').getElementsByTagName('tbody')[0].rows;
-  let count = 0;
-  let delay = 0;
-
-  for (let row of rows) {
-    const inputs = row.getElementsByTagName('input');
-    const email = inputs[0].value;
-    
-    if (email && email.trim() !== '') {
-      setTimeout(() => {
-        const { email, subject, body } = getEmailRowData(row);
-        let mailto = `mailto:${email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
-        window.open(mailto, '_blank');
-
-        // Check for income doc checkbox
-        const incomeDocCheckbox = row.querySelector('.income-doc-checkbox');
-        if (incomeDocCheckbox && incomeDocCheckbox.checked) {
-          const date = inputs[1].value;
-          const incomeDocSubject = 'SECUREMAIL From Monument Health.';
-          const incomeDocBody = `Please bring some sort of income documentation for your appointment on ${date}. This could be w-2s or a month of paystubs. Thank you.`;
-          const incomeMailto = `mailto:${email}?subject=${encodeURIComponent(incomeDocSubject)}&body=${encodeURIComponent(incomeDocBody)}`;
-          setTimeout(() => {
-            window.open(incomeMailto, '_blank');
-          }, 500);
-        }
-      }, delay);
-      delay += 1000; // 1 second delay between each draft
-      count++;
-    }
-  }
-
-  if (count === 0) {
-    alert('No valid emails to create drafts for.');
   }
 }
 window.addEventListener('DOMContentLoaded', () => {
