@@ -422,7 +422,7 @@ const procedures = [
     cpt: "",
     hcpcs: "J7303",
     icd10: "Z30.011",
-    fullprice: 8,
+    fullprice: 1,
     category: "meds",
     keywords: ["nuvaring", "ring", "birth control"]
   },
@@ -431,7 +431,7 @@ const procedures = [
     cpt: "",
     hcpcs: "J7304",
     icd10: "Z30.011",
-    fullprice: 75,
+    fullprice: 74,
     category: "meds",
     keywords: ["xulane", "patch", "birth control"]
   },
