@@ -27,6 +27,11 @@ th, td {
   color: #333;
   text-align: center;
 }
+th:last-child, td:last-child {
+  padding: 8px;
+  width: 1%;
+  white-space: nowrap;
+}
 input[type="email"],
 input[type="date"],
 input[type="time"] {
@@ -59,8 +64,8 @@ input.dimmed {
 }
 
 button {
-  padding: 8px 16px;
-  font-size: 0.9rem;
+  padding: 12px 24px;
+  font-size: 1rem;
   font-weight: bold;
   color: #333;
   background-color: #acdbf9; 
@@ -73,8 +78,8 @@ button:hover {
   background-color: #acdbf9; 
 }
 .alt-button {
-  padding: 8px 16px;
-  font-size: 0.9rem;
+  padding: 12px 24px;
+  font-size: 1rem;
   font-weight: bold;
   color: #333;
   background-color: #f8c9f9; /* pastel pink */
@@ -193,7 +198,7 @@ button:hover {
 .template-selector:focus {
   outline: none;
   border-color: #000;
-  background-color:  #acdbf9; 
+  background-color: #acdbf9; 
 }
 .time-selector {
   padding: 10px;
@@ -219,7 +224,7 @@ button:hover {
   box-shadow: 0 0 5px rgba(232, 184, 232, 0.5);
 }
 .time-selector option[value=""] {
-  color: #999;
+  color: #000000;
   font-style: italic;
 }
 .time-selector:invalid {
