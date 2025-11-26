@@ -285,14 +285,28 @@
       // Apply date color coding to the HTML
       html = colorCodeDates(html);
       
-      // Clean up the HTML but preserve line breaks
-      html = html.replace(/<div>/g, '').replace(/<\/div>/g, '<br>');
+      // Convert div tags to paragraph tags (contenteditable uses divs for Enter key)
+      html = html.replace(/<div>/gi, '<p>');
+      html = html.replace(/<\/div>/gi, '</p>');
       
-      // Remove multiple consecutive <br> tags
-      html = html.replace(/(<br\s*\/?>\s*)+/gi, '<br>');
+      // Handle br tags as paragraphs too
+      html = html.replace(/<br\s*\/?>/gi, '</p><p>');
       
-      // Remove trailing/leading breaks
-      html = html.replace(/^(<br\s*\/?>)+|(<br\s*\/?>)+$/gi, '');
+      // Clean up empty paragraphs
+      html = html.replace(/<p><\/p>/gi, '');
+      html = html.replace(/<p>\s*<\/p>/gi, '');
+      
+      // If content doesn't start with <p>, wrap it
+      if (!html.startsWith('<p>')) {
+        html = '<p>' + html;
+      }
+      // If content doesn't end with </p>, close it
+      if (!html.endsWith('</p>')) {
+        html = html + '</p>';
+      }
+      
+      // Clean up
+      html = html.trim();
     }
     
     document.getElementById('output').textContent = html;
