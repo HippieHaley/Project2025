@@ -32,6 +32,7 @@
     margin-bottom: 20px;
     background-color: white;
     overflow-y: auto;
+    box-sizing: border-box;
   }
   #editor:empty:before {
     content: attr(placeholder);
@@ -48,6 +49,7 @@
     flex-wrap: nowrap;
     padding: 10px;
     background-color: #ffd5ff;
+    box-sizing: border-box;
     border: 2px solid #333;
     border-radius: 8px;
     align-items: center;
@@ -142,6 +144,8 @@
     min-height: 200px;
     font-family: monospace;
     overflow-x: auto;
+    width: 100%;
+    box-sizing: border-box;
   }
   .notification {
     margin-top: 10px;
