@@ -277,16 +277,19 @@
     // Apply date color coding to the HTML
     html = colorCodeDates(html);
     
-    // Clean up the HTML
-    html = html.replace(/<div>/g, '<p>').replace(/<\/div>/g, '</p>');
-    html = html.replace(/<br\s*\/?>/gi, '</p><p>');
-    html = html.replace(/<p><\/p>/g, '');
-    html = html.replace(/<p>\s*<\/p>/g, '');
+    // Clean up the HTML but preserve line breaks
+    html = html.replace(/<div>/g, '').replace(/<\/div>/g, '<br>');
+    
+    // Remove multiple consecutive <br> tags
+    html = html.replace(/(<br\s*\/?>\s*)+/gi, '<br>');
+    
+    // Remove trailing/leading breaks
+    html = html.replace(/^(<br\s*\/?>)+|(<br\s*\/?>)+$/gi, '');
     
     // If empty, create template
-    if (!html.trim() || html.trim() === '<p></p>') {
+    if (!html.trim()) {
       const defaultLabels = ['ARU', 'AE', 'Pap', 'Mammo', 'Depo'];
-      html = defaultLabels.map(label => `<p>${label} Due: _____________</p>`).join('\n');
+      html = defaultLabels.map(label => `${label} Due: _____________`).join('<br>');
     }
     
     document.getElementById('output').textContent = html;
