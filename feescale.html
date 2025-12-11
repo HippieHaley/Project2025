@@ -291,8 +291,8 @@ th {
           <p>Average: $<span id="biweeklyAverage">0</span></p>
           <div class="space"></div>
           <p>Annual: $<span id="biweeklyAnnual">0</span></p>
-        </div>
-<div class="section">
+        </section>
+        <section class="card">
           <h2>Weekly Income</h2>
           <div class="example"></div>
           <p>Example: Every Friday</p>
@@ -305,11 +305,9 @@ th {
           <p>Average: $<span id="weeklyAverage">0</span></p>
           <div class="space"></div>
           <p>Annual: $<span id="weeklyAnnual">0</span></p>
-        </div>
-      </div>
+        </section>
       <!-- Column 2: Twice a Month and Weekly Verbal Income Sections -->
-      <div class="column">
-        <div class="section">
+      <section class="card">
           <h2>Twice a Month Income</h2>
           <div class="example"></div>
           <p>Example: 1st and 15th</p>
@@ -322,8 +320,8 @@ th {
           <p>Average: $<span id="twiceMonthAverage">0</span></p>
           <div class="space"></div>
           <p>Annual: $<span id="twiceMonthAnnual">0</span></p>
-        </div>
-        <div class="section">
+      </section>
+        <section class="card">
           <h2>Weekly Verbal Income</h2>
           <div class="example"></div>
           <p> Example: Freelance or hourly work</p>
@@ -335,11 +333,9 @@ th {
           <p>Average: $<span id="verbalAverage">0</span></p>
           <div class="space"></div>
           <p>Annual: $<span id="verbalAnnual">0</span></p>
-        </div>
-      </div>
+        </section>
       <!-- Column 3: Grand Total and Household Information Section -->
-      <div class="column">
-        <div class="section">
+      <section class="card">
           <h2>Extra Income Sources</h2>
           <div class="example"></div>
           <label>Tips per week: $<input type="number" id="AnnualTips" value="0" onchange="calculateGrandTotal()"></label><br>
@@ -348,8 +344,8 @@ th {
           <div class="space"></div>
           <label>Other Income by year: $<input type="number" id="OtherAnnual" value="0" onchange="calculateGrandTotal()"></label><br>
           <div class="space"></div>
-        </div>
-        <div class="section">
+      </section>
+        <section class="card">
         <h2>Household Info</h2>
       <div class="example"></div>
           <p> People per Household:</p>
@@ -388,9 +384,7 @@ th {
         </table>
       </div>
     </div>
-</div>
-            </div>
-            <div class="space"></div>
+            <div class="space">
             <p><strong>AWC! qualification: <span id="awcQualification">N/A</span></strong>
               <span class="modal-trigger" id="triggerModal2">
                 <img src="images/heart.png" class="heart" alt="Heart icon">
@@ -404,7 +398,6 @@ th {
         </table>
       </div>
     </div>
-
     <!-- Notes panel -->
     <div id="notesContainer">
       <label for="userNotes">Notes:</label><br/>
