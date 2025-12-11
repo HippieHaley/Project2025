@@ -242,8 +242,7 @@ th {
 </style>
 </head>
 <body>
-  <a href="index.html" class="back-home">Back to Home</a>
-
+    <a href="index.html" class="back-home">Back to Home</a>
   <!-- Help Modal -->
   <div id="helpModal" class="help-modal">
     <div class="help-modal-content">
@@ -262,133 +261,134 @@ th {
       <p><strong>Tip:</strong> The calculator automatically converts all income types to annual income and compares against Federal Poverty Guidelines!</p>
     </div>
   </div>
-
-  <div class="page">
-    <h1>Income Calculator<img src="images/heart.png" alt="Help" class="help-icon" onclick="openHelp()"></h1>
-
+<h1>Income Calculator<img src="images/heart.png" alt="Help" class="help-icon" onclick="openHelp()"></h1>
+<div class="page">
+      <label for="workingAt">Working @</label>
+      <input type="text" id="workingAt" placeholder="Where?" />
+      <button class="notes-btn toggleNotes">+ Add Notes</button>
+<label for="workingAt">Working @</label>
+      <input type="text" id="workingAt" placeholder="Where?" />
+      <button class="notes-btn toggleNotes">+ Add Notes</button>
+    </div>
+    <div class="cards">
+      <!-- Biweekly -->
+      <section class="card">
     <div class="toolbar">
-      <label for="incomeType">Income Type:</label>
-      <select id="incomeType">
+  <div class="page">
+    <div style="margin: 20px 0;">
+      <label for="incomeType"><strong>Income Type:</strong></label>
+      <select id="incomeType" style="padding: 6px 10px; border-radius: 10px; margin-left: 10px;">
         <option value="" selected disabled hidden>Select one...</option>
         <option value="W2">W2</option>
         <option value="Paycheck">Paycheck</option>
         <option value="NEED INCOME DOCS">NEED INCOME DOCS-VERBAL INCOME</option>
       </select>
-
-      <label for="workingAt">Working @</label>
-      <input type="text" id="workingAt" placeholder="Where?" />
-      <button class="notes-btn toggleNotes">+ Add Notes</button>
-    </div>
-
-    <div class="cards">
-      <!-- Biweekly -->
-      <section class="card">
-        <h2>Biweekly Income</h2>
-        <p>Example: Every other Friday</p>
-        <label>Paystub one: $
-          <input type="number" id="paystub1" value="0" onchange="calculateIncome('biweekly')">
-        </label>
-        <label>Paystub two: $
-          <input type="number" id="paystub2" value="0" onchange="calculateIncome('biweekly')">
-        </label>
-        <div class="hidden"><p>Total: $<span id="biweeklyTotal">0</span></p></div>
-        <p>Average: $<span id="biweeklyAverage">0</span></p>
-        <p>Annual: $<span id="biweeklyAnnual">0</span></p>
-      </section>
-
-      <!-- Weekly -->
-      <section class="card">
-        <h2>Weekly Income</h2>
-        <p>Example: Every Friday</p>
-        <label>Paystub one: $
-          <input type="number" id="weeklyPaystub1" value="0" onchange="calculateIncome('weekly')">
-        </label>
-        <label>Paystub two: $
-          <input type="number" id="weeklyPaystub2" value="0" onchange="calculateIncome('weekly')">
-        </label>
-        <div class="hidden"><p>Total: $<span id="weeklyTotal">0</span></p></div>
-        <p>Average: $<span id="weeklyAverage">0</span></p>
-        <p>Annual: $<span id="weeklyAnnual">0</span></p>
-      </section>
-
-      <!-- Twice a Month -->
-      <section class="card">
-        <h2>Twice a Month Income</h2>
-        <p>Example: 1st and 15th</p>
-        <label>Paystub one: $
-          <input type="number" id="twiceMonthPaystub1" value="0" onchange="calculateIncome('twiceMonth')">
-        </label>
-        <label>Paystub two: $
-          <input type="number" id="twiceMonthPaystub2" value="0" onchange="calculateIncome('twiceMonth')">
-        </label>
-        <div class="hidden"><p>Total: $<span id="twiceMonthTotal">0</span></p></div>
-        <p>Average: $<span id="twiceMonthAverage">0</span></p>
-        <p>Annual: $<span id="twiceMonthAnnual">0</span></p>
-      </section>
-
-      <!-- Weekly Verbal -->
-      <section class="card">
-        <h2>Weekly Verbal Income</h2>
-        <p>Example: Freelance or hourly work</p>
-        <label>Hours worked:
-          <input type="number" id="verbalHours" value="0" onchange="calculateIncome('verbal')">
-        </label>
-        <label>Hourly Pay: $
-          <input type="number" id="verbalRate" value="0" onchange="calculateIncome('verbal')">
-        </label>
-        <div class="hidden"><p>Total: $<span id="verbalTotal">0</span></p></div>
-        <p>Average: $<span id="verbalAverage">0</span></p>
-        <p>Annual: $<span id="verbalAnnual">0</span></p>
-      </section>
-
-      <!-- Extra Income -->
-      <section class="card">
-        <h2>Extra Income Sources</h2>
-        <label>Tips per week: $
-          <input type="number" id="AnnualTips" value="0" onchange="calculateGrandTotal()">
-        </label>
-        <label>Other Income per month: $
-          <input type="number" id="AnnualOtherMonthly" value="0" onchange="calculateGrandTotal()">
-        </label>
-        <label>Other Income by year: $
-          <input type="number" id="OtherAnnual" value="0" onchange="calculateGrandTotal()">
-        </label>
-      </section>
-
-      <!-- Household Info -->
-      <section class="card">
-        <button class="icon-button" onclick="copyIncomeInfo()" aria-label="Copy Household Info">
-          <svg width="24" height="24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24">
-            <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
-            <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
-          </svg>
-        </button>
+      <label for="workingAt" style="margin-left: 20px;">Working @</label>
+<input type="text" id="workingAt" placeholder="Where?" style="padding: 8px; border-radius: 10px; border: 1px solid #f8c9f9;" />
+<button style="padding: 8px; border-radius: 10px;  width: 130px;
+height: 40px;
+border: 2px solid #f8c9f9;
+border-radius: 30px; /* Rounded edges */
+background-color: #f8c9f9; /* Soft pink background */" class="toggleNotes">+ Add Notes</button>
+    </div>      
+    <div class="container">
+      <!-- Column 1: Biweekly and Weekly Income Sections -->
+      <div class="column">
+        <div class="section">
+          <h2>Biweekly Income</h2>
+          <div class="example"></div>
+          <p>Example: Every other Friday</p>
+          <div class="example"></div>
+          <label>Paystub one: $<input type="number" id="paystub1" value="0" onchange="calculateIncome('biweekly')"></label><br>
+          <div class="space"></div>
+          <label>Paystub two: $<input type="number" id="paystub2" value="0" onchange="calculateIncome('biweekly')"></label><br>
+            <div class=" hidden"><p>Total: $<span id="biweeklyTotal">0</span></p></div>
+          <p>Average: $<span id="biweeklyAverage">0</span></p>
+          <div class="space"></div>
+          <p>Annual: $<span id="biweeklyAnnual">0</span></p>
+        </div>
+      </div>
+        <div class="section">
+          <h2>Weekly Income</h2>
+          <div class="example"></div>
+          <p>Example: Every Friday</p>
+          <div class="example"></div>
+          <label>Paystub one: $<input type="number" id="weeklyPaystub1" value="0" onchange="calculateIncome('weekly')"></label><br>
+          <div class="space"></div>
+          <label>Paystub two: $<input type="number" id="weeklyPaystub2" value="0" onchange="calculateIncome('weekly')"></label><br>
+          <div class=" hidden">
+            <p>Total: $<span id="weeklyTotal">0</span></p></div>
+          <p>Average: $<span id="weeklyAverage">0</span></p>
+          <div class="space"></div>
+          <p>Annual: $<span id="weeklyAnnual">0</span></p>
+        </div>
+      </div>
+      <!-- Column 2: Twice a Month and Weekly Verbal Income Sections -->
+      <div class="column">
+        <div class="section">
+          <h2>Twice a Month Income</h2>
+          <div class="example"></div>
+          <p>Example: 1st and 15th</p>
+          <div class="example"></div>
+          <label>Paystub one: $<input type="number" id="twiceMonthPaystub1" value="0" onchange="calculateIncome('twiceMonth')"></label><br>
+          <div class="space"></div>
+          <label>Paystub two: $<input type="number" id="twiceMonthPaystub2" value="0" onchange="calculateIncome('twiceMonth')"></label><br>
+          <div class=" hidden">
+            <p>Total: $<span id="twiceMonthTotal">0</span></p></div>
+          <p>Average: $<span id="twiceMonthAverage">0</span></p>
+          <div class="space"></div>
+          <p>Annual: $<span id="twiceMonthAnnual">0</span></p>
+        </div>
+        <div class="section">
+          <h2>Weekly Verbal Income</h2>
+          <div class="example"></div>
+          <p> Example: Freelance or hourly work</p>
+          <div class="example"></div>
+          <label>Hours worked: <input type="number" id="verbalHours" value="0" onchange="calculateIncome('verbal')"></label><br>
+          <div class="space"></div>
+          <label>Hourly Pay: $<input type="number" id="verbalRate" value="0" onchange="calculateIncome('verbal')"></label><br>
+          <div class=" hidden"><p>Total: $<span id="verbalTotal">0</span></p></div>
+          <p>Average: $<span id="verbalAverage">0</span></p>
+          <div class="space"></div>
+          <p>Annual: $<span id="verbalAnnual">0</span></p>
+        </div>
+      </div>
+      <!-- Column 3: Grand Total and Household Information Section -->
+      <div class="column">
+        <div class="section">
+          <h2>Extra Income Sources</h2>
+          <div class="example"></div>
+          <label>Tips per week: $<input type="number" id="AnnualTips" value="0" onchange="calculateGrandTotal()"></label><br>
+          <div class="space"></div>
+          <label>Other Income per month: $<input type="number" id="AnnualOtherMonthly" value="0" onchange="calculateGrandTotal()"></label><br>
+          <div class="space"></div>
+          <label>Other Income by year: $<input type="number" id="OtherAnnual" value="0" onchange="calculateGrandTotal()"></label><br>
+          <div class="space"></div>
+        </div>
+        <div class="section">
         <h2>Household Info</h2>
-        <p>People per Household:</p>
-        <input type="number" id="householdSize" min="1" value="1">
-        <h2>Household Income</h2>
-        <div class="space"></div>
-        <p><strong>Total Income: $<span id="grandTotal">0</span></strong></p>
-        <div class="space"></div>
-        <p><strong>Client Pay: <span id="coverageLevel">N/A</span></strong>
-          <span class="modal-trigger" id="triggerModal1">
-            <img src="images/heart.png" class="heart" alt="Coverage chart">
-          </span>
-        </p>
-        <div class="space"></div>
-        <p><strong>AWC! qualification: <span id="awcQualification">N/A</span></strong>
-          <span class="modal-trigger" id="triggerModal2">
-            <img src="images/heart.png" class="heart" alt="AWC limits">
-          </span>
-        </p>
-      </section>
-
-      <!-- Household Members Section - CORRECTED -->
-      <section id="householdMembersSection" style="display: none;">
-        <h2>Other Household Members</h2>
-        <div id="householdMembersContainer"></div>
-      </section>
-    </div>
+      <div class="example"></div>
+          <p> People per Household:</p>
+           <input type="number" id="householdSize" min="1" value="1" onchange="updateHouseholdIncome()"><br>
+           <div class=" hidden"><p>spacing fix</p></div>
+          <class="lookup-section" style="position: relative;">
+            <button class="button icon-button" onclick="copyIncomeInfo()" aria-label="Copy Household Info">
+              <!-- Inli</button>ne SVG icon for 'copy' -->
+              <svg width="24" height="24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24">
+                <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+              </svg>
+            </button>
+ <div class="example"></div>
+      <h2> Household Income</h2>
+      <div class="example"></div>
+          <p><strong>Total Income: $<span id="grandTotal">0</span></strong></p>
+          <div class="space"></div>
+          <p><strong>Client Pay: <span id="coverageLevel">N/A</span></strong>
+            <span class="modal-trigger" id="triggerModal1">
+              <img src="images/heart.png" class="heart" alt="Heart icon">
+            </span>
+     
 
     <!-- ADDED MODAL OVERLAYS -->
     <div class="modal-overlay" id="modalOverlay1">
@@ -404,7 +404,13 @@ th {
         </table>
       </div>
     </div>
-
+</div>
+            </div>
+            <div class="space"></div>
+            <p><strong>AWC! qualification: <span id="awcQualification">N/A</span></strong>
+              <span class="modal-trigger" id="triggerModal2">
+                <img src="images/heart.png" class="heart" alt="Heart icon">
+              </span>             
     <div class="modal-overlay" id="modalOverlay2">
       <div class="modal">
         <h2>AWC! Program Eligibility</h2>
@@ -421,23 +427,16 @@ th {
       <textarea id="userNotes" placeholder="Enter any additional notes..." rows="8"></textarea>
     </div>
   </div>
-  
-  <script>
-    function openHelp() {
-      document.getElementById('helpModal').style.display = 'block';
-    }
-    
-    function closeHelp() {
-      document.getElementById('helpModal').style.display = 'none';
-    }
-    
-    // Close modal when clicking outside of it
-    window.onclick = function(event) {
-      const modal = document.getElementById('helpModal');
-      if (event.target == modal) {
-        modal.style.display = 'none';
-      }
-    }
-  </script>
+   </div>
+    </div>
+    <div class=" space"></div>
+    </div>  
+  <div id="householdMembersSection" class="section" style="margin-top: 20px;">
+      <h2>Other Household Members</h2>
+      <div id="householdMembersContainer"></div></div>
+      <div id="notesContainer">
+        <label for="userNotes">Notes:</label><br>
+        <textarea id="userNotes" placeholder="Enter any additional notes..." rows="8"></textarea>
+      </div>      
 </body>
 </html>
