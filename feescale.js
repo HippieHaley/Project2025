@@ -525,7 +525,17 @@ function populateCoverageChart() {
     tbody.appendChild(row);
   }
 }
+// Initialize everything on page load
+    calculateGrandTotal();
+document.getElementById('householdSize').addEventListener('change', () => {
+  updateHouseholdMemberFields();
+});
 
+document.querySelectorAll('.toggleNotes').forEach(button => {
+    button.addEventListener('click', () => {
+        const notes = document.getElementById('notesContainer');
+        notes.style.display = (notes.style.display === 'none' || notes.style.display === '') ? 'block' : 'none';
+    });
 function populateAWCChart() {
   const tbody = document.getElementById('awcTableBody');
   if (!tbody) return;
