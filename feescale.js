@@ -231,18 +231,32 @@ function setupHouseholdSectionToggle() {
   const initialSize = parseInt(householdInput.value, 10) || 1;
   householdSection.style.display = initialSize > 1 ? 'block' : 'none';
   
-  // Update household members immediately
-  updateHouseholdMemberFields();
+  // Update household members immediately if size > 1
+  if (initialSize > 1) {
+    updateHouseholdMemberFields();
+  }
 
-  // Handle input changes
+  // Handle input changes with smooth toggle
   householdInput.addEventListener('input', () => {
     const size = parseInt(householdInput.value, 10) || 1;
     if (size > 1) {
       householdSection.style.display = 'block';
+      updateHouseholdMemberFields();
     } else {
       householdSection.style.display = 'none';
     }
-    updateHouseholdMemberFields();
+    updateHouseholdIncome();
+  });
+  
+  // Also handle change event for when user uses arrows or types
+  householdInput.addEventListener('change', () => {
+    const size = parseInt(householdInput.value, 10) || 1;
+    if (size > 1) {
+      householdSection.style.display = 'block';
+      updateHouseholdMemberFields();
+    } else {
+      householdSection.style.display = 'none';
+    }
     updateHouseholdIncome();
   });
 }

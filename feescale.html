@@ -147,9 +147,19 @@ th {
     position:fixed; top:110px; right:24px; width:300px;
     display:none; padding:15px; background:var(--pink);
     border:2px solid #000; border-radius:20px; box-shadow:0 0 10px rgba(0,0,0,.08);
+    z-index:1000;
   }
   #notesContainer textarea{
     width:100%; border-radius:10px; padding:10px; border:1px solid #ccc; resize:vertical; background:#fff;
+  }
+  #householdMembersSection{
+    position:fixed; top:110px; right:24px; width:300px;
+    display:none; padding:15px; background:var(--pink);
+    border:2px solid #000; border-radius:20px; box-shadow:0 0 10px rgba(0,0,0,.08);
+    z-index:1000;
+  }
+  #householdMembersSection h3{
+    margin-top:0;
   }
  .coverage-row--highlight,
 .coverage-row--highlight td {
@@ -168,14 +178,6 @@ th {
   flex-wrap: wrap;       /* allow children to wrap inside */
   gap: 15px;
       justify-content: center;
-  width: 100%;           /* stretch full width of its parent */
-  grid-column: 1 / -1;   /* if you're using CSS grid above */
-}
-#householdMembersSection {
-  transition: all 0.3s ease;
-  flex-wrap: wrap;       /* allow children to wrap inside */
-      justify-content: center;
-  gap: 15px;
   width: 100%;           /* stretch full width of its parent */
   grid-column: 1 / -1;   /* if you're using CSS grid above */
 }
@@ -352,13 +354,6 @@ th {
            <input type="number" id="householdSize"  min="1" value="1"><br>
            <div class=" hidden"><p>spacing fix</p></div>
           
-          <!-- Household Members Section -->
-          <div id="householdMembersSection" style="display: none;">
-            <div class="example"></div>
-            <h3>Household Members</h3>
-            <div id="householdMembersContainer"></div>
-          </div>
-
           <class="lookup-section" style="position: relative;">
             <button class="button icon-button" onclick="copyIncomeInfo()" aria-label="Copy Household Info">
               <!-- Inline SVG icon for 'copy' -->
@@ -390,6 +385,12 @@ th {
       <div id="notesContainer">
         <h3>Additional Notes</h3>
         <textarea id="userNotes" rows="6" placeholder="Add any additional notes here..."></textarea>
+      </div>
+
+      <!-- Household Members Section -->
+      <div id="householdMembersSection" style="display: none;">
+        <h3>Household Members</h3>
+        <div id="householdMembersContainer"></div>
       </div>
 
     <!-- Coverage Modal -->
