@@ -293,6 +293,30 @@ th {
           <p>Annual: $<span id="biweeklyAnnual">0</span></p>
         </section>
         <section class="card">
+          <h2>Twice a Month Income</h2>
+          <div class="example"></div>
+          <p>Example: 1st and 15th</p>
+          <div class="example"></div>
+          <label>Paystub one: $<input type="number" id="twiceMonthPaystub1" value="0" onchange="calculateIncome('twiceMonth')"></label><br>
+          <div class="space"></div>
+          <label>Paystub two: $<input type="number" id="twiceMonthPaystub2" value="0" onchange="calculateIncome('twiceMonth')"></label><br>
+          <div class=" hidden">
+            <p>Total: $<span id="twiceMonthTotal">0</span></p></div>
+          <p>Average: $<span id="twiceMonthAverage">0</span></p>
+          <div class="space"></div>
+          <p>Annual: $<span id="twiceMonthAnnual">0</span></p>
+      </section>
+      <section class="card">
+          <h2>Extra Income Sources</h2>
+          <div class="example"></div>
+          <label>Tips per week: $<input type="number" id="AnnualTips" value="0" onchange="calculateGrandTotal()"></label><br>
+          <div class="space"></div>
+          <label>Other Income per month: $<input type="number" id="AnnualOtherMonthly" value="0" onchange="calculateGrandTotal()"></label><br>
+          <div class="space"></div>
+          <label>Other Income by year: $<input type="number" id="OtherAnnual" value="0" onchange="calculateGrandTotal()"></label><br>
+          <div class="space"></div>
+      </section>
+        <section class="card">
           <h2>Weekly Income</h2>
           <div class="example"></div>
           <p>Example: Every Friday</p>
@@ -307,20 +331,6 @@ th {
           <p>Annual: $<span id="weeklyAnnual">0</span></p>
         </section>
       <!-- Column 2: Twice a Month and Weekly Verbal Income Sections -->
-      <section class="card">
-          <h2>Twice a Month Income</h2>
-          <div class="example"></div>
-          <p>Example: 1st and 15th</p>
-          <div class="example"></div>
-          <label>Paystub one: $<input type="number" id="twiceMonthPaystub1" value="0" onchange="calculateIncome('twiceMonth')"></label><br>
-          <div class="space"></div>
-          <label>Paystub two: $<input type="number" id="twiceMonthPaystub2" value="0" onchange="calculateIncome('twiceMonth')"></label><br>
-          <div class=" hidden">
-            <p>Total: $<span id="twiceMonthTotal">0</span></p></div>
-          <p>Average: $<span id="twiceMonthAverage">0</span></p>
-          <div class="space"></div>
-          <p>Annual: $<span id="twiceMonthAnnual">0</span></p>
-      </section>
         <section class="card">
           <h2>Weekly Verbal Income</h2>
           <div class="example"></div>
@@ -335,16 +345,6 @@ th {
           <p>Annual: $<span id="verbalAnnual">0</span></p>
         </section>
       <!-- Column 3: Grand Total and Household Information Section -->
-      <section class="card">
-          <h2>Extra Income Sources</h2>
-          <div class="example"></div>
-          <label>Tips per week: $<input type="number" id="AnnualTips" value="0" onchange="calculateGrandTotal()"></label><br>
-          <div class="space"></div>
-          <label>Other Income per month: $<input type="number" id="AnnualOtherMonthly" value="0" onchange="calculateGrandTotal()"></label><br>
-          <div class="space"></div>
-          <label>Other Income by year: $<input type="number" id="OtherAnnual" value="0" onchange="calculateGrandTotal()"></label><br>
-          <div class="space"></div>
-      </section>
         <section class="card">
         <h2>Household Info</h2>
       <div class="example"></div>
