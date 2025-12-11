@@ -1,4 +1,3 @@
-// feescale.js  (module)
 import { coverageChart, awcChart } from './charts.js';
 
 // --- Coverage helpers ---
@@ -217,6 +216,17 @@ freqSelect.addEventListener('change', calculateGrandTotal);
     container.appendChild(wrapper);
   }
 }
+
+// Setup household section toggle
+function setupHouseholdSectionToggle() {
+  const householdInput = document.getElementById('householdSize');
+  const householdSection = document.getElementById('householdMembersSection');
+  
+  if (!householdInput || !householdSection) {
+    console.warn('Household elements not found');
+    return;
+  }
+  
   // Set initial state on page load
   const initialSize = parseInt(householdInput.value, 10) || 1;
   householdSection.style.display = initialSize > 1 ? 'block' : 'none';
@@ -235,65 +245,8 @@ freqSelect.addEventListener('change', calculateGrandTotal);
     updateHouseholdMemberFields();
     updateHouseholdIncome();
   });
-function updateHouseholdIncome() {
-  const householdSize = parseInt(document.getElementById('householdSize')?.value) || 0;
-  const yearlyIncome  = parseFloat(document.getElementById('grandTotal')?.textContent) || 0;
-
-  const coverageLevel  = determineCoverageLevel(householdSize, yearlyIncome);
-  const awcQual        = determineAWCQualification(householdSize, yearlyIncome);
-
-  const covEl = document.getElementById('coverageLevel');
-  const awcEl = document.getElementById('awcQualification');
-  if (covEl) covEl.textContent = coverageLevel;
-  if (awcEl) awcEl.textContent = awcQual;
 }
-    const input = document.createElement('input');
-    input.type = 'text';
-    input.name = `name${i}`;
-    input.placeholder = `Name of person ${i}`;
-    input.style.cssText = 'flex:2; padding:8px; border-radius:10px; border:2px solid var(--pink); background:var(--pink);';
 
-    const plusBtn = document.createElement('button');
-    plusBtn.type = 'button';
-    plusBtn.textContent = 'Add Income';
-    plusBtn.style.cssText = 'flex:0 0 auto; padding:8px 16px; border-radius:10px; background:var(--pink); border:2px solid var(--pink); cursor:pointer; white-space: nowrap;';
-
-    topRow.append(select, input, plusBtn);
-
-    const incomeSection = document.createElement('div');
-    incomeSection.style.display = 'none';
-    incomeSection.style.marginTop = '10px';
-    incomeSection.style.padding = '10px';
-    incomeSection.style.border = '1px solid var(--pink)';
-    incomeSection.style.borderRadius = '8px';
-    incomeSection.style.backgroundColor = 'rgba(255, 182, 193, 0.1)';
-    incomeSection.innerHTML = `
-      <label style="display:block; margin:10px 0;">
-        Income Amount: $<input type="number" step="0.01" name="memberIncome${i}" style="margin-left:10px; padding:8px; border-radius:10px; border:2px solid var(--pink); background:var(--pink);" />
-      </label>
-      <label style="display:block; margin:10px 0;">
-        Frequency:
-        <select name="memberFrequency${i}" style="margin-left:10px; padding:8px; border-radius:10px; border:2px solid var(--pink); background:var(--pink);">
-          <option value="weekly">Weekly</option>
-          <option value="biweekly">Biweekly</option>
-          <option value="monthly">Monthly</option>
-          <option value="annually">Annually</option>
-        </select>
-      </label>
-    `;
-    const incomeInput = incomeSection.querySelector(`input[name="memberIncome${i}"]`);
-    const freqSelect = incomeSection.querySelector(`select[name="memberFrequency${i}"]`);
-    
-    if (incomeInput) incomeInput.addEventListener('input', calculateGrandTotal);
-    if (freqSelect) freqSelect.addEventListener('change', calculateGrandTotal);
-
-    plusBtn.addEventListener('click', () => {
-      incomeSection.style.display = incomeSection.style.display === 'none' ? 'block' : 'none';
-      calculateGrandTotal();
-    });
-
-    wrapper.append(topRow, incomeSection);
-    container.appendChild(wrapper);
 // --- Modals ---
 function setupModals() {
   const triggerModal1 = document.getElementById('triggerModal1');
@@ -521,17 +474,7 @@ function populateCoverageChart() {
     tbody.appendChild(row);
   }
 }
-// Initialize everything on page load
-    calculateGrandTotal();
-document.getElementById('householdSize').addEventListener('change', () => {
-  updateHouseholdMemberFields();
-});
 
-document.querySelectorAll('.toggleNotes').forEach(button => {
-    button.addEventListener('click', () => {
-        const notes = document.getElementById('notesContainer');
-        notes.style.display = (notes.style.display === 'none' || notes.style.display === '') ? 'block' : 'none';
-    });
 function populateAWCChart() {
   const tbody = document.getElementById('awcTableBody');
   if (!tbody) return;
