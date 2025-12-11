@@ -235,8 +235,6 @@ freqSelect.addEventListener('change', calculateGrandTotal);
     updateHouseholdMemberFields();
     updateHouseholdIncome();
   });
-}
-
 function updateHouseholdIncome() {
   const householdSize = parseInt(document.getElementById('householdSize')?.value) || 0;
   const yearlyIncome  = parseFloat(document.getElementById('grandTotal')?.textContent) || 0;
@@ -296,8 +294,6 @@ function updateHouseholdIncome() {
 
     wrapper.append(topRow, incomeSection);
     container.appendChild(wrapper);
-  }
-}
 // --- Modals ---
 function setupModals() {
   const triggerModal1 = document.getElementById('triggerModal1');

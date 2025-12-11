@@ -243,8 +243,7 @@ th {
 </head>
 <body>
     <a href="index.html" class="back-home">Back to Home</a>
-  <!-- Help Modal -->
-  <div id="helpModal" class="help-modal">
+   <div id="helpModal" class="help-modal">
     <div class="help-modal-content">
       <span class="close-help-modal" onclick="closeHelp()">&times;</span>
       <h2>How to Use Income Calculator</h2>
@@ -261,40 +260,26 @@ th {
       <p><strong>Tip:</strong> The calculator automatically converts all income types to annual income and compares against Federal Poverty Guidelines!</p>
     </div>
   </div>
+    <div class="page">
 <h1>Income Calculator<img src="images/heart.png" alt="Help" class="help-icon" onclick="openHelp()"></h1>
-<div class="page">
-      <label for="workingAt">Working @</label>
-      <input type="text" id="workingAt" placeholder="Where?" />
-      <button class="notes-btn toggleNotes">+ Add Notes</button>
-<label for="workingAt">Working @</label>
-      <input type="text" id="workingAt" placeholder="Where?" />
-      <button class="notes-btn toggleNotes">+ Add Notes</button>
-    </div>
-    <div class="cards">
-      <!-- Biweekly -->
-      <section class="card">
-    <div class="toolbar">
-  <div class="page">
     <div style="margin: 20px 0;">
-      <label for="incomeType"><strong>Income Type:</strong></label>
-      <select id="incomeType" style="padding: 6px 10px; border-radius: 10px; margin-left: 10px;">
+      <div class="toolbar">
+      <label for="incomeType">Income Type:</label>
+      <select id="incomeType">
         <option value="" selected disabled hidden>Select one...</option>
         <option value="W2">W2</option>
         <option value="Paycheck">Paycheck</option>
         <option value="NEED INCOME DOCS">NEED INCOME DOCS-VERBAL INCOME</option>
       </select>
-      <label for="workingAt" style="margin-left: 20px;">Working @</label>
-<input type="text" id="workingAt" placeholder="Where?" style="padding: 8px; border-radius: 10px; border: 1px solid #f8c9f9;" />
-<button style="padding: 8px; border-radius: 10px;  width: 130px;
-height: 40px;
-border: 2px solid #f8c9f9;
-border-radius: 30px; /* Rounded edges */
-background-color: #f8c9f9; /* Soft pink background */" class="toggleNotes">+ Add Notes</button>
-    </div>      
-    <div class="container">
-      <!-- Column 1: Biweekly and Weekly Income Sections -->
-      <div class="column">
-        <div class="section">
+
+      <label for="workingAt">Working @</label>
+      <input type="text" id="workingAt" placeholder="Where?" />
+      <button class="notes-btn toggleNotes">+ Add Notes</button>
+    </div>
+
+    <div class="cards">
+      <!-- Biweekly -->
+      <section class="card">
           <h2>Biweekly Income</h2>
           <div class="example"></div>
           <p>Example: Every other Friday</p>
@@ -307,8 +292,7 @@ background-color: #f8c9f9; /* Soft pink background */" class="toggleNotes">+ Add
           <div class="space"></div>
           <p>Annual: $<span id="biweeklyAnnual">0</span></p>
         </div>
-      </div>
-        <div class="section">
+<div class="section">
           <h2>Weekly Income</h2>
           <div class="example"></div>
           <p>Example: Every Friday</p>
